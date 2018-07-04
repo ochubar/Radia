@@ -1,0 +1,110 @@
+<html>
+	<head>
+		<title>Recent Developments</title>
+		<meta NAME="GENERATOR" CONTENT="Microsoft FrontPage 3.0">
+		<meta NAME="AUTHOR" CONTENT="Elleaume">
+	</head>
+	<body BGCOLOR="#ffffff" LINK="#0000ff" VLINK="#ff0000" ALINK="#ff0000">
+		<p ALIGN="center"><br>
+		</p>
+		<h1 ALIGN="center">Recent Developments in the <font COLOR="#ff0000">Radia </font><font COLOR="#000000">
+				Project</font>
+		</h1>
+		<h4>
+		</h4>
+		<p><font SIZE="+1">The following new features were implemented in the most recent 
+				version:</font>
+		</p>
+		<p><font COLOR="#ff0000"><big>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<big>Radia 4.116</big></big></font>
+			<ul>
+				<li>
+					<font SIZE="+1">Radia for Igor Pro for Windows released </font><font SIZE="+1">. </font>
+				<li>
+					<font SIZE="+1">A function for calculation of 2nd order kick matrices for 
+						trajectories of relativistic charged particles in periodic magnetic field was 
+						added (<tt><big><b>radFldFocKickPer</b></big></tt> - this function&nbsp;has the 
+						functionality of the "RadiaToTrack.nb" Mathematica notebook developed by 
+						P.Elleaume).</font>
+				<li>
+					<font SIZE="+1">Miscellaneous small improvements.</font></li>
+			</ul>
+		<p>&nbsp;</p>
+		<p><big>New features in previous versions:</big></p>
+		<p><big>&nbsp;&nbsp;&nbsp; Radia 4.097</big>
+			<ul>
+				<li>
+					<font SIZE="+1">More flexible definition of non-linear isotropic magnetic material 
+						(the </font><b><tt><big><big>radMatSatIso</big></big></tt></b><font SIZE="+1"> function 
+						accepts the definition of M vs H dependence by a list of points, see 
+						Example#3).</font>
+				<li>
+					<font SIZE="+1">More robust relaxation. The new relaxation method (No. 4) is more 
+						stable for strongly non-linear material dependencies. It is set now as a 
+						default method in the </font><b><tt><big><big>radRlxAuto</big></big></tt></b><font SIZE="+1">
+						function.</font>
+				<li>
+					<font SIZE="+1">The main magnetic field computation function </font><b><tt><big><big>radFld</big></big></tt></b><font SIZE="+1">
+						allows the field computation in many arbitrarily spaced points by only one 
+						function call.</font>
+				<li>
+					<font SIZE="+1">Miscellaneous small improvements: bug fixes in force and torque 
+						computation methods.</font></li>
+			</ul>
+		<p><big>&nbsp;&nbsp;&nbsp; Radia 4.09</big>
+			<ul>
+				<li>
+					<font SIZE="+1">New methods of segmentation: subdivision according to elliptic 
+						cylinder and by a set of parallel planes (new options in </font><b><tt><big><big>radObjDivMag</big></big></tt></b><font SIZE="+1">). 
+						The new methods of segmentation allow to strongly improve the efficiency of 
+						solving the iron-dominated geometries.</font>
+				<li>
+					<font SIZE="+1">New examples illustrating the use of the new subdivision methods 
+						for the efficient simulation of dipole and multipole magnets for particle 
+						accelerators.</font>
+				<li>
+					<font SIZE="+1">Miscellaneous small improvements: a possibility of "releasing" 
+						symmetries at duplication of the objects with the symmetries applied (new 
+						option in </font><b><tt><big><big>radObjDpl</big></big></tt></b><font SIZE="+1">); 
+						axes of the laboratory Cartesian frame in active 3D graphics (new options in </font>
+					<b><tt><big><big>radObjDrwQD3D</big></big></tt></b><font SIZE="+1">); bug fixes.</font></li>
+			</ul>
+		<p><big>&nbsp;&nbsp;&nbsp; Radia 4.08</big>
+			<ul>
+				<li>
+					<font SIZE="+1">Active 3D graphics facilitated by QuickDraw 3D library from Apple 
+						(new function&nbsp;&nbsp;</font><b><tt><big><big>radObjDrwQD3D</big></big></tt></b><font SIZE="+1">). 
+						To make use of this new functionality, one needs to have the QuickDraw 3D 1.5 
+						or later installed on one's system. The versions of QuickDraw 3D for Power 
+						Macintosh and Windows 95/NT can be downloaded from the Apple Web site for free 
+						(</font><big><a HREF="http://www.apple.com/quicktime/qd3d/">http://www.apple.com/quicktime/</a></big><font SIZE="+1">).</font>
+				</li>
+			</ul>
+		<p><big>&nbsp;&nbsp;&nbsp; Radia 4.07</big>
+			<ul>
+				<li>
+					<font SIZE="+1">More simple definition of complicated geometries: Automatic 
+						generation of convex polyhedrons based on the information on their horizontal 
+						slices (new functions</font><b><tt><big><big> radObjMltExtPgn</big></big></tt></b><font SIZE="+1">
+						and </font><b><tt><big><big>radObjMltExtRtg</big></big></tt></b><font SIZE="+1">).</font>
+				<li>
+					<font SIZE="+1">More flexible segmentation: Arbitrary cutting of objects by a 
+						plane; subdivision of objects in their local frames and in the laboratory frame 
+						(new function&nbsp;&nbsp;</font><b><tt><big><big>radObjCutMag</big></big></tt></b><font SIZE="+1">
+						and new options in </font><b><tt><big><big>radObjDivMag</big></big></tt></b><font SIZE="+1">).</font>
+				</li>
+			</ul>
+		<p>&nbsp;</p>
+		<p><br>
+			<font SIZE="+1">For the details of the new functions see the Radia <a HREF="ReferenceGuideMath/ReferenceFrameSet.html">
+					Reference Guide</a>.</font>
+		</p>
+		<p><br>
+		</p>
+		<hr ALIGN="right">
+		<p>
+		</p>
+		<p>Last modified:&nbsp;December 2004. <a HREF="mailto:oleg.chubar@synchrotron-soleil.fr">
+				Comments, suggestions or questions</a> &nbsp;are welcome. <!--__________________________________ SIGNATURE ____________________________________________-->
+		</p>
+	</body>
+</html>

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Py3_6|x64'">
+    <LocalDebuggerCommand>C:\SoftwareDevelopments\Python36_x64\python.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>..\..\env\radia_python</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>RADIA_Example03.py</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Py2_7|x64'">
+    <LocalDebuggerCommand>C:\SoftwareDevelopments\Python27_x64\python.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>..\..\env\radia_python</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>RADIA_Example03.py</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Py3_6|x64'">
+    <LocalDebuggerCommand>C:\SoftwareDevelopments\Python36_x64\python.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>..\..\env\radia_python</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>RADIA_Example03.py</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Py2_7|x64'">
+    <LocalDebuggerCommand>C:\SoftwareDevelopments\Python27_x64\python.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>..\..\env\radia_python</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>RADIA_Example03.py</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+</Project>

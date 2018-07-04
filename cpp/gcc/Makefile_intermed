@@ -1,0 +1,159 @@
+MATHVERSION=	10.2
+SYS=		Linux-x86-64
+
+RAD_CPP_DIR=	../
+RAD_SRC_DIR=	$(RAD_CPP_DIR)/src
+RAD_SRC_CORE_DIR=	$(RAD_SRC_DIR)/core
+RAD_SRC_TRI_DIR=	$(RAD_SRC_DIR)/ext/triangle
+SH_SRC_PARSE_DIR=	$(RAD_SRC_DIR)/ext/auxparse
+SH_SRC_GEN_MATH_DIR=	$(SRW_SRC_DIR)/ext/genmath
+RAD_SRC_ML_DIR=	$(RAD_SRC_DIR)/clients/mathlink
+
+#SHDIR=		$(SOFTDEVDIR)/Shared
+#SHSRCDIR=	$(SHDIR)/src
+#SHSRCGMDIR=	$(SHSRCDIR)/genmath
+#SHSRCPARSEDIR=	$(SHSRCDIR)/auxparse
+#SHLIBDIR=	$(SHDIR)/lib
+
+LIB_DIR=	$(RAD_CPP_DIR)/../ext_lib
+
+SH_INCLUDE=	-I$(SH_SRC_GEN_MATH_DIR) -I$(SH_SRC_PARSE_DIR)
+
+ML_ORIG_DIR=	/usr/local/Wolfram/Mathematica/${MATHVERSION}/SystemFiles/Links/MathLink/DeveloperKit/${SYS}/CompilerAdditions
+#MMA_LIB_DIR=	/usr/local/Wolfram/Mathematica/${MATHVERSION}/SystemFiles/Libraries/${SYS}
+MMA_LIB_DIR=	$(ML_ORIG_DIR)
+#MLINCLUDEDIR=	$(ML_ORIG_DIR)
+ML_INCLUDE=	-I$(ML_ORIG_DIR) -I$(RAD_SRC_ML_DIR)
+#MLLIBDIR=	$(ML_ORIG_DIR)
+#MLMPREP=	$(ML_ORIG_DIR)/mprep
+
+CC  = cc
+CXX = c++
+
+RAD_SRC_DEF=	-D__GCC__ -D__MATHEMATICA__ -DFFTW_ENABLE_FLOAT -DNO_TIMER -DANSI_DECLARATORS -DTRILIBRARY -DLINUX -D_GM_WITHOUT_BASE -DMLINTERFACE=4
+
+CFLAGS=	-O3 
+
+LIB=		-L$(MMA_LIB_DIR) -lML64i4 -ldl -luuid -L$(LIB_DIR) -lfftw -lm -lpthread -lrt
+#LIB=		-L$(MMA_LIB_DIR) -l:/usr/local/Wolfram/Mathematica/10.2/SystemFiles/Links/MathLink/DeveloperKit/Linux-x86-64/CompilerAdditions/libML64i4.a -ldl -luuid -L$(LIB_DIR) -lfftw -lm -lpthread -lrt
+
+OBJS=		radia_tm_linux.o radapl1.o radapl2.o radapl3.o radapl4.o radapl5.o radapl6.o radapl7.o radarccu.o radcast.o radexpgn.o radflm.o radg3d.o radg3dgr.o radgroup.o radinter.o radintrc.o radiobuf.o radmamet.o radmater.o radplnr1.o radplnr2.o radptrj.o radrec.o radrlmet.o radsbdac.o radsbdep.o radsbdrc.o radsbdvp.o radsend.o radvlpgn.o gmtrans.o gmfft.o triangle.o auxparse.o
+
+PRG=		Radia.exe
+
+pgm:		$(OBJS)
+		g++ $(ML_INCLUDE) $(OBJS) $(LIB) -o $(PRG)
+
+$(RAD_SRC_ML_DIR)/radia_tm_linux.c:	$(RAD_SRC_ML_DIR)/radia.tm
+		$(ML_ORIG_DIR)/mprep -o $(RAD_SRC_ML_DIR)/radia_tm_linux.c $(RAD_SRC_ML_DIR)/radia.tm
+
+radia_tm_linux.o:	$(RAD_SRC_ML_DIR)/radia_tm_linux.c 
+		cc $(CFLAGS) -c $(RAD_SRC_ML_DIR)/radia_tm_linux.c -O3 $(RAD_SRC_DEF) $(ML_INCLUDE)
+
+radapl1.o:	$(RAD_SRC_CORE_DIR)/radapl1.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radapl1.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radapl2.o:	$(RAD_SRC_CORE_DIR)/radapl2.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radapl2.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radapl3.o:	$(RAD_SRC_CORE_DIR)/radapl3.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radapl3.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radapl4.o:	$(RAD_SRC_CORE_DIR)/radapl4.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radapl4.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+ 
+radapl5.o:	$(RAD_SRC_CORE_DIR)/radapl5.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radapl5.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radapl6.o:	$(RAD_SRC_CORE_DIR)/radapl6.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radapl6.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radapl7.o:	$(RAD_SRC_CORE_DIR)/radapl7.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radapl7.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE) -I$(RAD_SRC_TRI_DIR)
+
+radarccu.o:	$(RAD_SRC_CORE_DIR)/radarccu.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radarccu.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radcast.o:	$(RAD_SRC_CORE_DIR)/radcast.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radcast.cpp -O3 $(RAD_SRC_DEF) $(SH_INCLUDE)
+
+radexpgn.o:	$(RAD_SRC_CORE_DIR)/radexpgn.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radexpgn.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radflm.o:	$(RAD_SRC_CORE_DIR)/radflm.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radflm.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radg3d.o:	$(RAD_SRC_CORE_DIR)/radg3d.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radg3d.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radg3dgr.o:	$(RAD_SRC_CORE_DIR)/radg3dgr.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radg3dgr.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radgroup.o:	$(RAD_SRC_CORE_DIR)/radgroup.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radgroup.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radinter.o:	$(RAD_SRC_CORE_DIR)/radinter.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radinter.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)	 
+
+radintrc.o:	$(RAD_SRC_CORE_DIR)/radintrc.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radintrc.cpp -O3 $(RAD_SRC_DEF) $(SH_INCLUDE)
+
+radiobuf.o:	$(RAD_SRC_CORE_DIR)/radiobuf.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radiobuf.cpp -O3 $(RAD_SRC_DEF)
+
+radmamet.o:	$(RAD_SRC_CORE_DIR)/radmamet.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radmamet.cpp -O3 $(RAD_SRC_DEF) $(SH_INCLUDE)
+
+radmater.o:	$(RAD_SRC_CORE_DIR)/radmater.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radmater.cpp -O3 $(RAD_SRC_DEF) $(SH_INCLUDE)
+
+radplnr1.o:	$(RAD_SRC_CORE_DIR)/radplnr1.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radplnr1.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radplnr2.o:	$(RAD_SRC_CORE_DIR)/radplnr2.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radplnr2.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radptrj.o:	$(RAD_SRC_CORE_DIR)/radptrj.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radptrj.cpp -O3 $(RAD_SRC_DEF) $(SH_INCLUDE)
+
+radrec.o:	$(RAD_SRC_CORE_DIR)/radrec.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radrec.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radrlmet.o:	$(RAD_SRC_CORE_DIR)/radrlmet.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radrlmet.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radsbdac.o:	$(RAD_SRC_CORE_DIR)/radsbdac.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radsbdac.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radsbdep.o:	$(RAD_SRC_CORE_DIR)/radsbdep.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radsbdep.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radsbdrc.o:	$(RAD_SRC_CORE_DIR)/radsbdrc.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radsbdrc.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radsbdvp.o:	$(RAD_SRC_CORE_DIR)/radsbdvp.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radsbdvp.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radsend.o:	$(RAD_SRC_CORE_DIR)/radsend.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radsend.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+radvlpgn.o:	$(RAD_SRC_CORE_DIR)/radvlpgn.cpp 
+		cc $(CFLAGS) -c $(RAD_SRC_CORE_DIR)/radvlpgn.cpp -O3 $(RAD_SRC_DEF) $(ML_INCLUDE) $(SH_INCLUDE)
+
+triangle.o:	$(RAD_SRC_TRI_DIR)/triangle.c 
+		cc $(CFLAGS) -c $(RAD_SRC_TRI_DIR)/triangle.c -O $(RAD_SRC_DEF) -I$(RAD_SRC_TRI_DIR)
+
+gmtrans.o:	$(SH_SRC_GEN_MATH_DIR)/gmtrans.cpp 
+		cc $(CFLAGS) -c $(SH_SRC_GEN_MATH_DIR)/gmtrans.cpp -O3 $(RAD_SRC_DEF)
+
+gmfft.o:	$(SH_SRC_GEN_MATH_DIR)/gmfft.cpp 
+		cc $(CFLAGS) -c $(SH_SRC_GEN_MATH_DIR)/gmfft.cpp -O3 $(RAD_SRC_DEF) 
+
+auxparse.o:	$(SH_SRC_PARSE_DIR)/auxparse.cpp 
+		cc $(CFLAGS) -c $(SH_SRC_PARSE_DIR)/auxparse.cpp -O3 $(RAD_SRC_DEF) 
+
+clean:
+		@rm $(OBJS) *~ 
+
+clobber:
+		@rm $(OBJS) $(PRG) radia_tm_linux.c *~ 

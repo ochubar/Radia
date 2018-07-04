@@ -1,0 +1,298 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[      8292,        289]
+NotebookOptionsPosition[      6604,        224]
+NotebookOutlinePosition[      7211,        247]
+CellTagsIndexPosition[      7168,        244]
+WindowFrame->Normal
+ContainsDynamic->False*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[StyleBox["Example # 2 : ESRF Superconducting Wiggler",
+ FontSize->24]], "Title",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["Version : 0.4", "Text",
+ Evaluatable->False,
+ CellChangeTimes->{{3.399655446*^9, 3.39965544609375*^9}},
+ AspectRatioFixed->True],
+
+Cell[CellGroupData[{
+
+Cell["Introduction", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ StyleBox["This example consists in the creation of a set of racetrack and \
+circular coils, plotting the coil geometry and the magnetic field produced. \
+This geometry corresponds to a 4T superconducting wiggler presently in \
+operation   at the ESRF. It is assumed that the reader has some experience \
+with ",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ StyleBox["Mathematica ",
+  Evaluatable->False,
+  AspectRatioFixed->True,
+  FontSlant->"Italic"],
+ StyleBox[" and that he has successfully run Example#1.",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "\n",
+ StyleBox["Evaluate sections in the order of presentation: \"Load and \
+Initialize Radia\" followed by \"Build the Geometry\", \"",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "Display the Geometry with QuickDraw 3D",
+ StyleBox["\", \"Plot the Geometry\", \"Plot the Magnetic Field\" and \"Plot \
+the Field Integrals\".",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "\n",
+ StyleBox["If successful, try to modify some parameters (see the Reference \
+Guide for the explanations on the ",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ StyleBox["Radia",
+  Evaluatable->False,
+  AspectRatioFixed->True,
+  FontSlant->"Italic"],
+ StyleBox[" functions) and re-execute the corresponding section. All sections \
+must be evaluated in the order of presentation. A section may be evaluated \
+several   times with the same or different parameters if the previous \
+sections have been evaluated before. The only limitation is memory. The \
+Radia.exe memory can be re-initialized by re-executing the section entitled \
+\"Load and   Initialize Radia\". The Kernel memory can be re-initialized by \
+calling Exit[] and then re-executing all sections of this example. If the \
+Front-End is   running out of memory, close some windows or close the \
+Front-End and start it again. Note that if by mistake any section is executed \
+before the previous ones are executed, it may be necessary to exit the Kernel \
+and re-start everything from the very beginning.",
+  Evaluatable->False,
+  AspectRatioFixed->True]
+}], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Load and Initialize Radia", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["The following instruction loads the Radia package and \
+returns the Radia  version number.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["<<Radia`;", "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Build the Geometry", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["These instructions define 4 racetrack coils and one \
+circular coil together  with their mirror symmetric counterparts. j1 and j2 \
+are current densities in  the coils.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+RadUtiMem[];
+
+(* Current Densities in A/mm^2 *)
+j1=128;j2=256;
+
+(* Coil Presentation Parameters *)
+n1=3;n2=6;c2={1,0,0};c1={0,1,1};thcn=0.001;
+
+(* Create 5 Coils *)
+Rt1=radObjRaceTrk[{0.,0.,38.},{9.5,24.5},{120.,0.},36,n1,j1];
+radObjDrwAtr[Rt1,c1,thcn];
+Rt3=radObjRaceTrk[{0.,0.,76.},{10.,25.},{90.,0.},24,n1,j1];
+radObjDrwAtr[Rt3,c1,thcn];
+Rt2=radObjRaceTrk[{0.,0.,38.},{24.5,55.5},{120.,0.},36,n1,j2];
+radObjDrwAtr[Rt2,c2,thcn];
+Rt4=radObjRaceTrk[{0.,0.,76.},{25.,55.},{90.,0.},24,n1,j2];
+radObjDrwAtr[Rt4,c2,thcn];
+Rt5=radObjRaceTrk[{0.,0.,60.},{150.,166.3},{0.,0.},39,n2,-j2];
+radObjDrwAtr[Rt5,c2,thcn];
+
+Grp=radObjCnt[{ Rt1,Rt2,Rt3,Rt4,Rt5}];
+
+(* Define Mirror Coils *)
+RadTrfZerPara[Grp,{0,0,0},{0,0,1}];\
+\>", "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Plot the Geometry", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["These instructions plot the geometry of coils \
+previously created.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+(* Special Options for the Plot[] *)
+RadPlot3DOptions[];
+
+(* Save the Geometry in \"dr\" *)
+dr=radObjDrw[Grp];
+
+(* Draw the Geometry *)
+Show[Graphics3D[dr
+,PlotLabel->\"SCW\"
+,BaseStyle \[Rule] {14, FontFamily \[Rule] \"Times\"}]]\
+\>", "Input",
+ CellChangeTimes->{
+  3.39937701634375*^9, 3.3993770811875*^9, 3.3993783643125*^9, {
+   3.399378481890625*^9, 3.399378570453125*^9}, 3.399378606453125*^9},
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Plot the Magnetic Field", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["The magnetic field vertical component profile is \
+plotted along the y axis.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+RadPlotOptions[];
+Plot[radFld[Grp,\"Bz\",{0,y,0}],{y,0,300}
+,AxesOrigin->{0,0}
+,FrameLabel->{\"Y [mm]\",\"Bz [T]\",\"X = Z = 0\",\"\"}]\
+\>", "Input",
+ CellChangeTimes->{3.399377189640625*^9},
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Plot the Field Integrals", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["This plots the vertical field integral along y for \
+the transverse  coordinates x varying from -400 to 400 mm.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+Plot[radFldInt[Grp,\"inf\",\"ibz\",{x,-300,0},{x,300,0}],{x,-400,400},
+FrameLabel->{\"X [mm]\",\"IBz [T mm]\",\"Z = 0\",\"\"}]\
+\>", "Input",
+ CellChangeTimes->{3.39937719175*^9},
+ AspectRatioFixed->True]
+}, Open  ]]
+},
+WindowToolbars->{},
+CellGrouping->Manual,
+WindowSize->{778, 879},
+WindowMargins->{{493, Automatic}, {Automatic, 2}},
+PrivateNotebookOptions->{"ColorPalette"->{RGBColor, 128}},
+ShowCellLabel->False,
+ShowCellTags->False,
+RenderingOptions->{"ObjectDithering"->True,
+"RasterDithering"->False},
+CharacterEncoding->"MacintoshAutomaticEncoding",
+FrontEndVersion->"6.0 for Microsoft Windows (32-bit) (June 19, 2007)",
+StyleDefinitions->"Classroom.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[568, 21, 140, 3, 43, "Title",
+ Evaluatable->False],
+Cell[711, 26, 134, 3, 25, "Text",
+ Evaluatable->False],
+Cell[CellGroupData[{
+Cell[870, 33, 77, 2, 54, "Section",
+ Evaluatable->False],
+Cell[950, 37, 2151, 49, 229, "Text",
+ Evaluatable->False]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3138, 91, 90, 2, 54, "Section",
+ Evaluatable->False],
+Cell[3231, 95, 218, 5, 25, "Text",
+ Evaluatable->False],
+Cell[3452, 102, 51, 1, 48, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3540, 108, 83, 2, 54, "Section",
+ Evaluatable->False],
+Cell[3626, 112, 296, 6, 43, "Text",
+ Evaluatable->False],
+Cell[3925, 120, 760, 26, 439, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4722, 151, 82, 2, 54, "Section",
+ Evaluatable->False],
+Cell[4807, 155, 195, 5, 25, "Text",
+ Evaluatable->False],
+Cell[5005, 162, 436, 15, 201, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5478, 182, 88, 2, 54, "Section",
+ Evaluatable->False],
+Cell[5569, 186, 204, 5, 25, "Text",
+ Evaluatable->False],
+Cell[5776, 193, 227, 7, 99, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6040, 205, 89, 2, 54, "Section",
+ Evaluatable->False],
+Cell[6132, 209, 239, 5, 25, "Text",
+ Evaluatable->False],
+Cell[6374, 216, 214, 5, 65, "Input"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

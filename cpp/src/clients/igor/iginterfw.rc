@@ -1,0 +1,40 @@
+/*	
+	This file is compiled by the resource compiler and creates XOP-specific
+	resources that IGOR looks for in an XOP module.
+*/
+
+#include "XOPResources.h"			// Defines XOP-specific symbols.
+
+1100 STR# /* SRW Errors */
+BEGIN //This errors are shared with Radia for Igor: update there when updating here !
+	"Requires Igor Pro 2.0 or later.\0",		// OLD_IGOR
+	"Wave does not exist.\0",							// NON_EXISTENT_WAVE
+	"This function requires 3D wave(s).\0",				// NEEDS_3D_WAVE
+    "Memory allocation failure.\0", // + 4 (from 1 to 100 - general igor interface messages
+    "Error at reading a number from a text wave.\0", // + 5
+    "This function requires Text wave(s).\0", // + 6
+    "This function requires 1D Text wave.\0", // + 7
+    "Computation aborted by user.\0", // + 8
+    "This function requires Numerical wave of type Single (32 bit) or Double Precision (64 bit).\0", // + 9
+    "Wave with zero number of elements encountered.\0", // + 10
+    "Numerical wave containing at least 3 elements is expected.\0", // + 11
+    "This function requires wave(s) of type Double Float 64 bit.\0", // + 12
+    "The submitted wave has too small number of elements.\0", // + 13
+    "2D numerical wave is expected.\0", // + 14
+    "1D or 2D numerical wave is expected. \0", // + 15
+    "2D numerical wave with at least 3 columns is expected. \0", // + 16
+    "Incompatible lengths of submitted waves. \0", // + 17
+	"This function requires Numeric wave(s).\0", // + 18
+	"Waves of equal dimensions are expected.\0", // + 19
+    "This function requires 2D Text wave.\0", // + 20
+	"\0"						// NOTE: NULL required to terminate the resource.
+END
+
+1100 XOPI						// XOPI - Describes general XOP properties to IGOR. 
+BEGIN
+	XOP_VERSION,				// Version number of host XOP system.
+	DEV_SYS_CODE,				// Code for development system used to make XOP
+	0,							// True if XOP requires hierarchical menus
+	0,							// True if XOP requires math coprocessor
+	0							// True if XOP requires MMU
+END

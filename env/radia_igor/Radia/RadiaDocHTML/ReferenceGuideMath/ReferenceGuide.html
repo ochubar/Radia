@@ -1,0 +1,2827 @@
+<html>
+	<head>
+		<title>Radia Reference</title>
+		<meta content="Microsoft FrontPage 3.0" name="GENERATOR">
+		<meta content="Chubar" name="AUTHOR">
+	</head>
+	<body vLink="#ff0000" aLink="#ff0000" link="#0000ff" bgColor="#ffffff">
+		<h1 align="center"><font color="#f70823">Radia </font>Reference Guide
+		</h1>
+		<p><br/>
+		</p>
+		<p><br/></p>
+			<dl>
+				<dt><A href="referenceguide.html#1. Generalities"><font size="+1">1. Generalities</font></A></dt>
+				<dt><A href="referenceguide.html#2. Initialization"><font size="+1">2. Initialization</font></A></dt>
+				<dt><A href="referenceguide.html#3. Field sources"><font size="+1">3. Field sources</font></A></dt>
+				<dt><A href="referenceguide.html#4. Magnetic materials"><font size="+1">4. Magnetic materials</font></A></dt> 
+				<dt><A href="referenceguide.html#5. Space transformations"><font size="+1">5. Space transformations</font></A></dt> 
+				<dt><A href="referenceguide.html#6. Field computation"><font size="+1">6. Field computation</font></A></dt> 
+				<dt><A href="referenceguide.html#7. Utilities"><font size="+1">7. Utilities</font></A> </dt>
+			</dl>
+		<p><br>
+			<font color="#0f0f0f">
+		</p>
+		<hr align="left" width="95%"/>
+		<p><br/></p>
+		<p><br>
+			<a name="1. Generalities"></a><b><font color="#0f0f0f" size="+2">1. Generalities</font></b>
+		</p>
+		<p>The current version of <i>Radia</i> is a separate application which is 
+			interfaced to <i><a href="http://www.wolfram.com/">Mathematica</a></i> via <i><a href="http://www.wolfram.com/support/">
+					MathLink</a></i>. To run <i>Radia</i>, one needs <i>Mathematica</i> to 
+			be installed on one's computer or local network.
+		</p>
+		<p><!-- --> The <i>Radia</i> <i>4.x</i> runs on the following platforms, with the 
+			following versions of <i>Mathematica</i>:</p>
+			<ul>
+				<li>
+					PowerMac (tested on MacOS 7.5) with <i>Mathematica</i> <i>3.0</i>
+				or later;
+				<li>
+					Windows 95/NT (tested on Windows 95 and NT 4.0) with <i>Mathematica 3.0</i> or 
+					later.
+				</li>
+			</ul>
+		<p><br>
+			Any calculation with <i>Radia</i> consists in preparing and executing cells in 
+			a <i>Mathematica</i> notebook, where <i>Radia</i> interface functions are used 
+			along with built-in or user-defined <i>Mathematica</i> functions.
+		</p>
+		<p>The collection of <i>Radia</i> interface functions consists of two parts:
+		</p>
+		<p>A) Primary functions, defined in<tt>&nbsp;Radia.exe </tt>file (compiled from C++ 
+			source). The names of these functions start with "<b><tt>rad</tt></b>"<b><tt> </tt></b>
+			("<b><tt>r</tt></b>" in lower case), like<b><tt>&nbsp;radObjRecCur[...]</tt></b>.
+		</p>
+		<p>B) Secondary functions, defined in<tt>&nbsp;init.m </tt>file written in <i>Mathematica 
+				Language</i>. The names of these functions start with "<b><tt>Rad</tt></b>" 
+			(capital "<tt><b>R</b></tt>"), like<b><tt>&nbsp;RadObjFullMag[...]</tt></b>. 
+			These functions call the Primary <i>Radia</i> functions, as well as 
+			built-in&nbsp;<i>Mathematica</i> functions. The aim of the Secondary functions 
+			is to allow more convenient usage of the basic <i>Radia</i> functionality for 
+			the expense of&nbsp;the possibilities given by <i>Mathematica</i>.
+		</p>
+		<p>Both the Primary and Secondary functions can (or should) be used directly in <i>Mathematica</i>
+			notebooks.
+		</p>
+		<p>Normally, the process of magnetostatic calculations with <i>Radia</i> includes 
+			the following steps</p>
+			<dl>
+				<dt>(x) Installing <i>Radia</i>;</dt> 
+				<dt>(I) Describing the problem in <i>Mathematica Language</i> in terms of <i>Radia</i> functions:</dt>
+					<dd>
+					    (I-a) creating initial objects - field sources prototypes;
+					</dd>
+					<dd>
+						(I-b) creating and applying appropriate magnetic materials to the objects created at (I-a);
+                    </dd>
+                    <dd>
+						(I-c) grouping objects by placing them in containers;
+					</dd>
+					<dd>
+						(I-d) creating and applying necessary transformations (boundary conditions);
+					</dd>
+				<dt>(II) Solving the problem:</dt>
+					<dd>
+						(II-a) applying any subdivision to the objects created;
+					</dd>
+					<dd>
+						(II-b) constructing an interaction matrix corresponding to the problem (I) and 
+						particular subdivision (II-a), and executing a relaxation procedure;
+					</dd>
+					<dd>
+						(II-c) computing any components (as field induction, field integrals along 
+						straight line, potentials or forces) of the magnetic field created by the 
+						"relaxed" objects;
+					</dd> 
+				<dt>(x) Uninstalling <i>Radia.</i> </dt>
+			</dl>
+		<p><br>
+			Steps (I-b) - (I-d) and (II-a) - (II-b) are optional (for example, if one has 
+			only current carrying elements, one does not need any relaxation procedure). 
+			The order of steps (I-b) - (I-d), (II-a) can be different.
+		</p>
+		<p>To obtain a solid solution in presence of iron, one may need certain iterations 
+			with the steps (II-a) - (II-c).
+		</p>
+		<p>We strongly recommend to start using <i>Radia</i> from the examples supplied 
+			with the package. We also assume that before starting <i>Radia</i>, users have 
+			already some experience with <i>Mathematica</i>. In any case, this experience 
+			is necessary for performing advanced magnetostatic calculations with <i>Radia</i>.
+		</p>
+		<p>The current reference mainly explains the Primary <i>Radia</i> functions.
+		</p>
+		<p>To get help on any <i>Radia</i> function from within a <i>Mathematica</i> notebook, 
+			general <i>Mathematica</i> mechanisms can be used. For example, the execution 
+			of a notebook cell with the input &nbsp; <b><tt>?rad*</tt></b>&nbsp; 
+			&nbsp;gives a list of all the Primary <i>Radia</i> functions &nbsp; (<b><tt>?Rad*</tt></b>&nbsp; 
+			&nbsp;for the list of all the Secondary functions). Then, to receive help on a 
+			particular function, one can copy its name from the above list, paste it into a 
+			new cell with the question mark in front, e.g.:&nbsp;&nbsp;<b><tt>?radObjRecMag</tt></b>
+			&nbsp;, and execute the cell. This gives the function template and a usage 
+			message for the function.
+		</p>
+		<p><br>
+		</p>
+		<p><br>
+			<a name="2. Initialization"></a><b><font color="#0f0f0f" size="+2">2. Initialization</font></b>
+		</p>
+		<p><font color="#0f0f0f">The Initialization of <i>Radia</i> is performed by executing 
+				the following command in an input cell of a <i>Mathematica</i> notebook:</font>
+		</p>
+		<p><b><tt>&lt;&lt;Radia`;</tt></b>
+		</p>
+		<p>For the above command to be executed well, it is necessary that the <i>Radia</i> 
+			package is located in the <tt>&nbsp;...:AddOns:Applications:Radia </tt>directory 
+			of the <i>Mathematica</i> installation. It is important that the files<tt>&nbsp;Radia.exe
+			</tt>and<tt>&nbsp;init.m </tt>are located in this directory. For detailed 
+			instructions on the actions to be performed for the proper installation of 
+			&nbsp;the <i>Radia</i> on a particular platform see the<tt>&nbsp;ReadMe </tt>file 
+			dedicated to that&nbsp;platform.
+		</p>
+		<p>This command loads all the functions presenting in the<tt>&nbsp;Radia.exe </tt>and<tt>&nbsp;init.m
+			</tt>files into memory and starts special process that actually performs all 
+			the <i>Radia</i> computations. If this process already exists, it is terminated 
+			and re-started. No function starting with "<b><tt>rad</tt></b>" or "<b><tt>Rad</tt></b>" 
+			can be executed before<b><tt> &lt;&lt;Radia`; </tt></b>is executed.
+		</p>
+		<p><br>
+		</p>
+		<p><br>
+			<a name="3. Field sources"></a><b><font color="#0f0f0f" size="+2">3. Field sources</font></b>
+		</p>
+		<table cellspacing="2" cellpadding="10" border="4">
+			<tr>
+				<td colspan="2"><a name="radObjRecCur"></a><b><tt>radObjRecCur[{x,y,z}, {wx,wy,wz}, 
+							{jx,jy,jz}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a current carrying rectangular parallelepipedic block.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{x,y,z}:</tt></b> list of three real numbers specifying Cartesian 
+					coordinates of the block's center of gravity (by default in mm).
+					<p><b><tt>{wx,wy,wz}: </tt></b>list of three real numbers specifying the block's 
+						dimensions (by default in mm).
+					</p>
+					<p><b><tt>{jx,jy,jz}:&nbsp;</tt></b> list of three real numbers specifying the 
+						vector of current density in the block (by default in A/mm^2).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><tt><font size="+1">Orientation: </font></tt>faces parallel to the XY, XZ and 
+					YZ planes of the laboratory frame.</td>
+			</tr>
+		</table>
+		<table cellspacing="2" cellpadding="10" border="4">
+			<tr>
+				<td colspan="2"><b><tt><a name="radObjArcCur">radObjArcCur</a>[{x,y,z}, {rmin,rmax}, 
+							{phimin,phimax}, h, nseg, j, "man|auto" :"man"]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a current carrying finite-length arc of rectangular cross-section.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{x,y,z}: </tt></b>list of three real numbers specifying Cartesian 
+					coordinates of the arc's center (by default in mm).
+					<p><b><tt>{rmin,rmax}: </tt></b>list of two real numbers specifying inner and outer 
+						radii of curvature of the conductor, respectively (by default in mm).
+					</p>
+					<p><b><tt>{phimin,phimax}: </tt></b>list of two real numbers specifying initial and 
+						final angles of the arc, respectively (by default in radian).
+					</p>
+					<p><b><tt>h: </tt></b>real number specifying height of the arc block (by default in mm).
+					</p>
+					<p><b><tt>nseg: </tt></b>circumference segmentation number.
+					</p>
+					<p><b><tt>j: </tt></b>real number specifying current density along curved path (by 
+						default in A/mm^2).
+					</p>
+					<p><b><tt>"man|auto": </tt></b>a string switch for setting manual (<b><tt>"man"</tt></b>) 
+						or automatic (<b><tt>"auto"</tt></b> ) mode when computing the field 
+						produced&nbsp;by the arc.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><tt><font size="+1">Orientation: </font></tt>rotation axis along Z, curved path 
+					parallel to the XY plane of the laboratory frame; angles &nbsp;<b><tt>phimin, phimax </tt>
+					</b>are off positive direction of the X axis.
+					<p>Current flows along the curved path.
+					</p>
+					<p>The allowed limits for&nbsp; <b><tt>phimin, phimax</tt></b> &nbsp;are: &nbsp;<b><tt>0 
+								&lt; phimin &lt; phimax &lt; 2*Pi</tt></b>.
+					</p>
+					<p>Circumference segmentation number<b><tt>&nbsp;nseg </tt></b>is used at computing 
+						the field from the arc&nbsp;in manual mode (<b><tt>"man|auto" </tt></b>switch 
+						set to<b><tt>&nbsp;"man"</tt></b>) and at visualization of the arc.
+					</p>
+					<p>In the automatic mode (<b><tt>"man|auto" </tt></b>switch set to<b><tt>&nbsp;"auto"</tt></b>) 
+						any computation of the field produced by the arc is made according to the 
+						general accuracy levels set up by the function<b><tt>&nbsp;radFldCmpCrt[...]</tt></b>.
+					</p>
+					<p>The function can be used without the<b><tt>&nbsp;"man|auto" </tt></b>switch 
+						variable. In this case, the field computation mode for the arc is assumed to be 
+						manual.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjRaceTrk"></a><b><tt>radObjRaceTrk[{x,y,z}, {rmin,rmax}, 
+							{lx,ly}, h, nseg, j, "man|auto" :"man"]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a current carrying racetrack coil consisting of four 90-degree bents 
+					connected by four straight parts.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{x,y,z}: </tt></b>list of three real numbers specifying Cartesian 
+					coordinates of the racetrack's center (by default in mm).
+					<p><b><tt>{rmin,rmax}: </tt></b>list of two real numbers specifying inner and outer 
+						radii of curvature of the racetrack's bents, respectively (by default in mm).
+					</p>
+					<p><b><tt>{lx,ly}: </tt></b>list of two real numbers specifying lengths of 
+						horizontal and longitudinal straight parts of the racetrack, respectively (by 
+						default in mm).
+					</p>
+					<p><b><tt>h: </tt></b>real number specifying height of the racetrack (by default in 
+						mm).
+					</p>
+					<p><b><tt>nseg: </tt></b>bent circumference segmentation number.
+					</p>
+					<p><b><tt>j: </tt></b>real number specifying current density (by default in 
+						A/mm^2).
+					</p>
+					<p><b><tt>"man|auto": </tt></b>a string switch for setting manual (<b><tt>"man"</tt></b>) 
+						or automatic (<b><tt>"auto"</tt></b> ) mode when computing the field 
+						produced&nbsp;by the bents.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><tt><font size="+1">Orientation: </font></tt>bents' rotation axes along Z, 
+					&nbsp;curved path parallel to XY plane of the laboratory frame, straight parts 
+					along X and Y axes.
+					<p>Both bents and straight parts of the racetrack have rectangular cross-sections.
+					</p>
+					<p>Lengths of the straight parts can be zero (<b><tt>lx=0,ly=0</tt></b>).
+					</p>
+					<p>Bent circumference segmentation number<b><tt>&nbsp;nseg </tt></b>is used when 
+						computing the field from the bents&nbsp;in manual mode (<b><tt>"man|auto" </tt></b>
+						switch set to<b><tt>&nbsp;"man"</tt></b>) and at visualization of the 
+						racetrack.
+					</p>
+					<p>In the automatic mode (<b><tt>"man|auto" </tt></b>switch set to<b><tt>&nbsp;"auto"</tt></b>) 
+						any computation of the field produced by the bents is made according to the 
+						general accuracy levels set up by the function<b><tt>&nbsp;radFldCmpCrt[...]</tt></b>.
+					</p>
+					<p>The function can be used without the<b><tt>&nbsp;"man|auto" </tt></b>switch 
+						variable. In this case, the field computation mode for the bents is assumed to 
+						be manual.
+					</p>
+					<p>The racetrack coil is not an "atomic" object: it is a <A href="referenceguide.html#radObjCnt">
+							container</A> with four <A href="referenceguide.html#radObjArcCur">current 
+							carrying arcs</A> and four <A href="referenceguide.html#radObjRecCur" name="003">
+							current-carrying rectangular parallelepipedic blocks</A> .</p>
+				</td>
+			</tr>
+		</table>
+		<table cellspacing="2" cellpadding="10" border="4">
+			<tr>
+				<td colspan="2"><a name="radObjFlmCur"></a><b><tt>radObjFlmCur[{{x1,y1,z1}, 
+							{x2,y2,z2},...}, i]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a &nbsp;current-carrying filament polygonal line conductor.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{{x1,y1,z1}, {x2,y2,z2},...}: </tt></b>list of lists of three real 
+					numbers specifying Cartesian coordinates of edge points of the polygonal line 
+					segments (by default in mm).
+					<p><b><tt>i: </tt></b>current (by default in A).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The polygonal line can consist of any number of segments larger than or equal 
+					to one, so the minimum number of the edge points should be two.
+					<p>The polygonal line is open by default; for it to be closed, the last point 
+						should be the same as the first one.
+					</p>
+					<p>The current is directed from the point {x1,y1,z1} to {x2,y2,z2} and so on.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellspacing="2" cellpadding="10" border="4">
+			<tr>
+				<td colspan="2"><a name="radObjScaleCur"></a><b><tt>radObjScaleCur[obj, k]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Scales current (density) in the obj by multiplying it by k (if obj is a current-carying object). If obj is a container, the current (density) scaling applies to all its members.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object (obj).</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><p><b><tt>obj: </tt></b>an integer number referencing the object in which the current (density) scaling should be done.</p>
+					<p><b><tt>k: </tt></b>coefficient to be applied to the current (density).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><p>This is a convenience function allowing to re-solve a problem with different external 
+				       magnetic field without re-instantiating the field sources and the interaction matrix.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjRecMag"></a><b><tt>radObjRecMag[{x,y,z}, {wx,wy,wz}, 
+							{mx,my,mz} :{0,0,0}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a rectangular parallelepipedic block with magnetization.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{x,y,z}: </tt></b>list of three real numbers specifying Cartesian 
+					coordinates of the block's center of gravity (by default in mm).
+					<p><b><tt>{wx,wy,wz}: </tt></b>list of three real numbers specifying the block's 
+						dimensions (by default in mm).
+					</p>
+					<p><b><tt>{mx,my,mz}: </tt></b>list of three real numbers specifying magnetization 
+						vector in the block (by default in Tesla).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><tt><font size="+1">Orientation: </font></tt>faces parallel to the XY, XZ and 
+					YZ planes of the laboratory frame.
+					<p>The magnetization of the block is initialized to <b><tt>{mx,my,mz}</tt></b>. If 
+						any magnetic material is later applied to the block, it fully overrides this 
+						value of the magnetization. At the relaxation, the value of the magnetization 
+						will be further modified.
+					</p>
+					<p>The function can be called without the magnetization vector <b><tt>{mx,my,mz}</tt></b>. 
+						In this case it is assumed to be <b><tt>{0,0,0}</tt></b> .</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjCylMag"></a><b><tt>radObjCylMag[{x,y,z}, r, h, nseg, a 
+							:"z",&nbsp;{mx,my,mz} :{0,0,0}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>
+					<P>Creates a uniformly magnetized extruded right polygonal block, which 
+						approximates cylinder (at large number of segments nseg).</P>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{x,y,z}: </tt></b>list of three real numbers specifying Cartesian 
+					coordinates of the center of gravity (by default in mm).
+					<p><b><tt>r: </tt></b>base radius&nbsp;(by default in mm).
+					</p>
+					<P><B><TT>h:&nbsp;</TT></B>cylinder&nbsp;height&nbsp;(by default in mm).
+					</P>
+					<P><B><TT>nseg:&nbsp;</TT></B>number of segments in the base polygon.
+					</P>
+					<P><B><TT>a:&nbsp;</TT></B>orientation of the cylinder axis (can be "x", "y" or 
+						"z").
+					</P>
+					<p><b><tt>{mx,my,mz}: </tt></b>list of three real numbers specifying magnetization 
+						vector (by default in Tesla).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><tt><font size="+1">Orientation: </font></tt>the cylinder axis can be parallel 
+					to the X, Y or Z axis of the laboratory frame (this is defined by the string 
+					variable <B><TT>a</TT></B>; the default orientation is along Z axis).
+					<p>The magnetization of the block is initialized to <b><tt>{mx,my,mz}</tt></b>. If 
+						any magnetic material is later applied to the block, it fully overrides this 
+						value of the magnetization. At the relaxation, the value of the magnetization 
+						will be further modified.
+					</p>
+					<p>The function can be called without the magnetization vector <b><tt>{mx,my,mz}</tt></b>. 
+						In this case it is assumed to be <b><tt>{0,0,0}</tt></b>.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjThckPgn"></a><b><tt>radObjThckPgn[x, lx, {{y1,z1}, 
+							{y2,z2},...}, {mx,my,mz} :{0,0,0}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates an extruded polygon (or straight prism)&nbsp;block with magnetization.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>x: </tt></b>real number specifying the horizontal&nbsp;Cartesian 
+					coordinate of the block's center (by default in mm).
+					<p><b><tt>lx: </tt></b>thickness of the extruded polygon (by default in mm).
+					</p>
+					<p><b><tt>{{y1,z1}, {y2,z2},...}: </tt></b>list of lists of two real numbers 
+						specifying the polygon in 2D (by default in mm).
+					</p>
+					<p><b><tt>{mx,my,mz}: </tt></b>list of three real numbers specifying magnetization 
+						vector in the block (by default in Tesla).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><tt><font size="+1">Orientation: </font></tt>the extruded polygon bases 
+					parallel to YZ plane of the laboratory frame, the extrusion axis parallel to X. 
+					Horizontal coordinates of the bases are <b><tt>x-lx/2</tt></b> and <b><tt>x+lx/2</tt></b>.
+					<p>The magnetization of the block is initialized to <b><tt>{mx,my,mz}</tt></b>. If 
+						any magnetic material is later applied to the block, it fully overrides this 
+						value of the magnetization. At the relaxation, the value of the magnetization 
+						will be further modified.
+					</p>
+					<p>The function can be used without the magnetization vector <b><tt>{mx,my,mz}</tt></b>. 
+						In this case it is assumed to be <b><tt>{0,0,0}</tt></b> .</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radObjPolyhdr">radObjPolyhdr</a>[{{x1,y1,z1}, 
+							{x2,y2,z2},...}, {{f1n1,f1n2,...}, {f2n1,f2n2,...},...}, {mx,my,mz}:{0,0,0}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a magnetized&nbsp;polyhedron (a volume limited by planes).</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{{x1,y1,z1}, {x2,y2,z2},...}: </tt></b>list of lists of three real 
+					numbers specifying Cartesian coordinates of the polyhedron vertex points (by 
+					default in mm).
+					<p><b><tt>{{f1n1,f1n2,...}, {f2n1,f2n2,...},...}: </tt></b>list of lists of integer 
+						numbers specifying indexes of the vertex points from the previous list forming 
+						the polyhedron faces.
+					</p>
+					<p><b><tt>{mx,my,mz}: </tt></b>list of three real numbers specifying magnetization 
+						vector inside&nbsp;the polyhedron (by default in Tesla).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>Each face of the polyhedron should be defined by listing the points in a 
+					clockwise or counterclockwise order of&nbsp; rounding the face.
+					<p>Only convex polyhedrons are supported by Radia. If any non-convex shape should 
+						be defined, a user has to define it as a group of several convex shapes.
+					</p>
+					<p>It is recommended to use<tt><b>&nbsp;radObjDrw[...] </b></tt>Radia function and<b><tt>&nbsp;Show[...]</tt></b>
+						and <b><tt>Graphics3D[...]</tt></b> Mathematica functions to visualize the 
+						polyhedron&nbsp;in 3D immediately after creation (to make sure that no error is 
+						done at the polyhedron definition).
+					</p>
+					<p>The magnetization of the block is initialized to <b><tt>{mx,my,mz}</tt></b>. If 
+						any magnetic material is later applied to the block, it fully overrides this 
+						value of the magnetization. At the relaxation, the value of the magnetization 
+						will be further modified.
+					</p>
+					<p>The function can be used without the magnetization vector <b><tt>{mx,my,mz}</tt></b>. 
+						In this case it is assumed to be <b><tt>{0,0,0}</tt></b>.
+					</p>
+					<p>The polyhedron created by the function<b><tt>&nbsp;radObjPolyhdr[...] </tt></b>can 
+						be subdivided into number of smaller polyhedrons and / or parallelepipeds by 
+						the function<tt><b>&nbsp;radObjDivMag[...]</b></tt> .</p>
+				</td>
+			</tr>
+		</table>
+		<table id="Table2" cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjArcPgnMag"></a><b><tt>radObjArcPgnMag[{x,y}, a, 
+							{{r1,z1},{r2,z2},...}, {phimin,phimax}, nseg, "sym|nosym" :"nosym", {mx,my,mz} 
+							:{0,0,0}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>
+					<P>Creates a uniformly magnetized finite-length arc of polygonal cross-section, 
+						which is approximated by n segment polyhedrons.</P>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{x,y}: </tt></b>list of two real numbers specifying Cartesian 
+					coordinates of the arc axis in the base plane (by default in mm).
+					<p><b><tt>a: </tt></b>character specifying orientation of the rotation axis in the 
+						laboratory frame (can be "x", "y" or "z").</p>
+					<P><B><TT>{{r1,z1},{r2,z2},...}: </TT></B>list of pairs of real numbers specifying 
+						radial and axial coordinates of the 2D cross-section polygon (by default in 
+						mm).</P>
+					<P><B><TT>{phimin,phimax}: </TT></B>list of two real numbers specifying initial and 
+						final angles of the arc (by default in radians).</P>
+					<P><B><TT>nseg: </TT></B>number of segments in the base polygon.</P>
+					<P><B><TT>"sym|nosym": </TT></B>a string switch which specifies whether the 
+						magnetization vectors in nseg sector polyhedrons are assumed to satisfy 
+						rotational symmetry (<B><TT>"sym"</B></TT>), or are assumed to be independent 
+						(i.e. will be allowed to vary independently at further relaxation).</P>
+					<p><b><tt>{mx,my,mz}: </tt></b>list of three real numbers specifying magnetization 
+						vector (by default in Tesla).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><tt><font size="+1">Orientation: </font></tt>the arc rotation axis can be 
+					parallel to the X, Y or Z axis of the laboratory frame (this is defined by the 
+					string variable <B><TT>a</TT></B>; the default orientation is along Z axis).
+					<p>The magnetization of the block is initialized to <b><tt>{mx,my,mz}</tt></b>. If 
+						any magnetic material is later applied to the block, it fully overrides this 
+						value of the magnetization. At the relaxation, the value of the magnetization 
+						will be further modified.
+					</p>
+					<p>The function can be called without the magnetization vector <b><tt>{mx,my,mz}</tt></b>. 
+						In this case it is assumed to be <b><tt>{0,0,0}</tt></b>.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radObjMltExtPgn">radObjMltExtPgn</a>[{{{{x11,y11},{x12,y12},...},z1}, 
+							{{{x21,y21},{x22,y22},...},z2},...}, {mx,my,mz}:{0,0,0}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Attempts to create a convex polyhedron or a set of convex polyhedrons based on 
+					horizontal slices, which are supposed to be convex planar polygons.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{{{{x11,y11},{x12,y12},...},z1}, {{{x21,y21},{x22,y22},...},z2},...}: </tt></b>
+					a nested list structure describing the horizontal slice polygons the resulting 
+					polyhedron(s) should be based on, where <b><tt>{{x11,y11},{x12,y12},...} </tt></b>
+					are 2D Cartesian coordinates of vertex points of a slice polygon, and <b><tt>z1, z2,...</tt></b>
+					are the slice polygons' attitudes (vertical coordinates). The default units are 
+					mm.
+					<p><b><tt>{mx,my,mz}: </tt></b>list of three real numbers specifying magnetization 
+						vector inside the polyhedron(s) (by default in Tesla).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>Each horizontal slice polygon should be defined by listing the points in a 
+					clockwise or counterclockwise order of the face rounding.
+					<p>The horizontal slice polygons should be convex. The use of non-convex slice 
+						polygons will result in <i>Radia</i> error messages and may lead to the 
+						application crash.
+					</p>
+					<p>The mutual planar orientation of the slice polygons can be arbitrary, with 
+						possibly no parallel segments.
+					</p>
+					<p>The function tries to generate a convex polyhedron by "putting" a minimal 
+						possible mantle surface on the horizontal slices specified. If the set of the 
+						slice polygons is such that a single convex polyhedron can not be generated, 
+						the function produces a group (container) of convex polyhedrons.
+					</p>
+					<p>The magnetization of the block(s) produced is initialized to <b><tt>{mx,my,mz}</tt></b>. 
+						If any magnetic material is later applied to the block(s), it fully overrides 
+						this value of the magnetization. At the relaxation, the value of the 
+						magnetization will be further modified.
+					</p>
+					<p>The function can be used without the magnetization vector <b><tt>{mx,my,mz}</tt></b>. 
+						In this case it is assumed to be <b><tt>{0,0,0}</tt></b>.
+					</p>
+					<p>The polyhedron(s) created by the function<b><tt>&nbsp;radObjMltExtPgn[...] </tt></b>
+						can be subdivided into number of smaller polyhedrons and / or parallelepipeds 
+						by the functions <tt><b>&nbsp;radObjDivMag[...] </b></tt>or <tt><b>radObjCutMag[...]</b></tt>
+						.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radObjMltExtRtg">radObjMltExtRtg</a>[{{{x1,y1,z1},{wx1,wy1}}, 
+							{{x2,y2,z2},{wx2,wy2}},...}, {mx,my,mz}:{0,0,0}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Attempts to create a convex polyhedron or a set of convex polyhedrons based on 
+					horizontal slices of rectangular shape.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{{{x1,y1,z1},{wx1,wy1}}, {{x2,y2,z2},{wx2,wy2}},...}: </tt></b>a nested 
+					list structure describing the horizontal slice rectangles the resulting 
+					polyhedron(s) should be based on, where<b><tt> {x1,y1,z1},{x2,y2,z2},...</tt></b>
+					are Cartesian coordinates of center points of the slice rectangles, and<b><tt> {wx1,wy1},{wx2,wy2},...
+						</tt></b>their dimensions (by default in mm).
+					<p><b><tt>{mx,my,mz}: </tt></b>list of three real numbers specifying magnetization 
+						vector inside the polyhedron(s) (by default in Tesla).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The function tries to generate a convex polyhedron by "putting" a minimal 
+					possible mantle surface on the horizontal slices specified. If the set of the 
+					slice rectangles is such that a single convex polyhedron can not be generated, 
+					the function produces a group (container) of convex polyhedrons.
+					<p>The magnetization of the block(s) is initialized to<b><tt> {mx,my,mz}</tt></b>. 
+						If any magnetic material is later applied to the block(s), it fully overrides 
+						this value of the magnetization. At the relaxation, the value of the 
+						magnetization will be further modified.
+					</p>
+					<p>The function can be used without the magnetization vector<b><tt> {mx,my,mz}</tt></b>. 
+						In this case it is assumed to be<b><tt> {0,0,0}</tt></b>.
+					</p>
+					<p>The polyhedron(s) created by the function<b><tt> radObjMltExtRtg[...] </tt></b>can 
+						be subdivided into number of smaller polyhedrons and / or parallelepipeds by 
+						the functions<tt><b> radObjDivMag[...]</b></tt> or <tt><b>radObjCutMag[...]</b></tt>
+						.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellspacing="2" cellpadding="10" border="4">
+			<tr>
+				<td colspan="2"><b><tt><a name="radObjMltExtTri">radObjMltExtTri</a>[x,lx,{{y1,z1},{y2,z2},...},{{k1,q1},{k2,q2},...},a:"x",{mx,my,mz}:{0,0,0},ki->Numb|Size,TriAngMin->...,TriAreaMax->...]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Attempts to create a triangulated extruded polygon block, i.e. a straight prism with its base being (possibly con-convex) 2D polygon subdivided by triangulation.</td> 
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object created.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><p><b><tt>x: </tt></b>a real number specifying the position of the block's center of gravity in the extrusion direction.</p>
+                    <p><b><tt>lx: </tt></b>a real number specifying the prism height (or "thickess").</p>
+                    <p><b><tt>{{y1,z1},{y2,z2},...}: </tt></b>a list of pairs of real numbers - 2D coordinates of the base polygon.</p>
+                    <p><b><tt>{{k1,q1},{k2,q2},...}: </tt></b>a list of pairs of real numbers defining subdivision (triangulation) 
+                        parameters for each segment of the base polygon border; the meaning of k1, k2,... depends on the value of the option "ki": 
+                        if "ki->Numb" (default), then k1, k2,... are numbers of sub-segments to be produced by the subdivision; if "ki->Size", 
+                        they are average sizes of the sub-segments to be produced; q1, q2,... are ratios of the last-to-first sub-segment lengths.</p>
+                    <p><b><tt>a: </tt></b>character specifying the extrusion direction (can be "x", "y" or "z").</p>
+					<p><b><tt>{mx,my,mz}: </tt></b>list of three real numbers specifying magnetization 
+						vector inside all triangular prisms produced (by default in Tesla).</p>
+					<p><b><tt>ki-&gt;Numb|Size: </tt></b>an optional parameter specifying whether 
+						the<b><tt> k1,k2,... </tt></b>from the subdivision parameters list should 
+						be treated as subdivision numbers (<b><tt>ki-&gt;Numb</tt></b>, default) or 
+						as average dimensions of the objects to be produced by the subdivision (<b><tt>ki-&gt;Size</tt></b>).</p>
+					<p><b><tt>TriAngMin-&gt;...: </tt></b>an optional parameter with a real number in place of "..." specifying minimal angle 
+					    of triangles to be produced (in degrees, default value is 20).</p>
+                    <p><b><tt>TriAreaMax-&gt;...: </tt></b>an optional parameter with a real number in place of "..." specifying
+                        maximal area of traingles to be produced (in mm^2, not defined by default).</p>
+                </td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><p>In this function, the "Triangle" - free 2D triangulation library by Jonathan Richard Shewchuk 
+				(<a href="http://www.cs.cmu.edu/~quake/triangle.html">http://www.cs.cmu.edu/~quake/triangle.html</a>) was used.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellspacing="2" cellpadding="10" border="4">
+			<tr>
+				<td colspan="2"><b><tt><a name="radObjM">radObjM</a>[obj]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Gives coordinates of geometrical center point(s) and magnetization(s) of the 
+					object<b><tt> obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>If<b><tt> obj </tt></b>is a 3D object with magnetization:<b><tt> {{{x,y,z},{mx,my,mz}}}</tt></b>, 
+					where<b><tt> {x,y,z} </tt></b>and<b><tt> {mx,my,mz} </tt></b>is center point of 
+					the 3D object and its magnetization respectively.
+					<p>If<b><tt> obj </tt></b>is a container:<b><tt> {{{x1,y1,z1},{mx1,my1,mz1}}, 
+								{{x2,y2,z2},{mx2,my2,mx2}},...},</tt></b> &nbsp; where<b><tt> {x1,y1,z1},{x2,y2,x2},...
+							</tt></b>are center points of the 3D objects with magnetization which are 
+						present in the container, <b><tt>{mx1,my1,mz1},{mx2,my2,mx2},... </tt></b>their 
+						magnetization vectors.</p>
+					<p>If<b><tt> obj </tt></b>is a 3D object without magnetization or a container with 
+						no 3D objects with magnetization:<b><tt> {}</tt></b> .</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the magnetic field source 
+					object.
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The function can be efficiently used for watching the magnetization inside the 
+					iron after the relaxation, in order to estimate quality of the relaxation or to 
+					analyze which parts of the geometry are strongly saturated, which are not, etc. 
+					(the latter being very useful for magnetostatics design works).
+					<p>To visualize the magnetization vectors as a set of arrows in space, use the 
+						function<b><tt> ListPlotVectorField3D[...] </tt></b>from the <em>Mathematica</em>
+						add-on package<b><tt> Graphics`PlotField3D</tt></b>`,&nbsp; like<b><tt> ListPlotVectorField3D[radObjM[obj],...]</tt></b>. 
+						Before that, don't forget to load the add-on package by executing<b><tt> &lt;&lt;Graphics`PlotField3D`</tt></b>. 
+						See the <em>Mathematica</em> Standard Add-on Packages documentation for the 
+						details of the&nbsp; <b><tt>ListPlotVectorField3D[...] </tt></b>function.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><tt><b><a name="radObjBckg">radObjBckg</a>[{bx,by,bz}]</b></tt></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a uniform background magnetic field.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{bx,by,bz}: </tt></b>list of three real numbers specifying the 
+					components of the uniform background magnetic field.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>No particular 3D shape is associated with this object.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjCnt"></a><b><tt>radObjCnt[{obj1,obj2,...}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a container for objects capable of producing magnetic field.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer reference number for the container.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{obj1,obj2,...}: </tt></b>list of integer numbers referencing individual 
+					objects to be placed into the container.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>Containers are individual objects: at field computation, they can be used the 
+					same way as any other individual objects capable of producing magnetic field.
+					<p>Containers can include any kind of object capable of producing magnetic 
+						field:&nbsp;current-carrying objects and/or objects with magnetization or 
+						magnetic material applied, and/or other containers.
+					</p>
+					<p>At creation of a container, the objects to be included into the container are 
+						not duplicated. The container stores only the reference numbers of these 
+						objects.
+					</p>
+					<p>Containers can be created empty: &nbsp;<b><tt>radObjCnt[{}]</tt></b> &nbsp;creates 
+						a container with no objects inside.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjAddToCnt"></a><b><tt>radObjAddToCnt[cnt, {obj1,obj2,...}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Adds objects to the container referenced by <b><tt>cnt</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>Value of &nbsp;<b><tt>cnt</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>cnt: </tt></b>an integer number referencing the container.
+					<p><b><tt>{obj1,obj2,...}: </tt></b>list of integer numbers referencing individual 
+						objects to be added to the container.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>Containers can include any kind of object capable of producing magnetic 
+					field:&nbsp;current-carrying objects and/or objects with magnetization or 
+					magnetic material applied, and/or other containers.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radObjCntStuf">radObjCntStuf</a>[obj]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Gives a list of general indexes of the objects in container if<tt><b> obj </b></tt>
+					is a container.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>If<b><tt>&nbsp;obj </tt></b>is&nbsp;a container: list of integer numbers 
+					referencing objects in the container.
+					<p>If <b><tt>&nbsp;obj </tt></b>is not&nbsp;a container: <b><tt>{obj}</tt></b> .</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the container.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radObjDivMag">radObjDivMag</a>[obj, 
+							{{k1,q1},{k2,q2},{k3,q3}}, {"pln",{n1x,n1y,n1z},{n2x,n2y,n2z},{n3x,n3y,n3z}} | 
+							{"cyl",{{ax,ay,az},{vx,vy,vz}},{px,py,pz},rat}, kxkykz-&gt;Numb|Size, 
+							Frame-&gt;Loc|Lab|LabTot] </tt></b>
+					<p>or<b><tt>&nbsp;radObjDivMag[obj, {{k1,q1},{k2,q2},{k3,q3}}] </tt></b>
+					</p>
+					<p>or<b><tt>&nbsp;radObjDivMag[obj, {k1,k2,k3}]</tt></b></p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Subdivides the object referenced by<b><tt>&nbsp;obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>Value of<b><tt>&nbsp;obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object, which can be an 
+					object with magnetization or magnetic material applied, or a container having 
+					such objects.
+					<p><b><tt>{{k1,q1},{k2,q2},{k3,q3}}: </tt></b>list of three lists of two numbers 
+						giving the main parameters of the subdivision, where<b><tt>&nbsp;k1,k2,k2 </tt></b>
+						are (depending on the value of the option<b><tt> kxkykz-&gt;Numb|Size</tt></b>) 
+						numbers of parts or average sizes of objects to be produced in different 
+						directions;<tt><b>&nbsp;q1,q2,q3 </b></tt>are the corresponding ratios of the 
+						last-to-first part sizes.</p>
+					<p><b><tt>{"pln", {n1x,n1y,n1z}, {n2x,n2y,n2z}, {n3x,n3y,n3z}}: </tt></b>a nested 
+						list structure providing additional specifications for the subdivision by three 
+						sets of parallel planes, where<b><tt> "pln" </tt></b>is the string 
+						identificator of the subdivision by parallel planes;<b><tt> {n1x,n1y,n1z},{n2x,n2y,n2z} </tt>
+						</b>and<b><tt> {n3x,n3y,n3z} </tt></b>are Cartesian coordinates of the vector 
+						normals for the three sets of parallel planes.</p>
+					<p><b><tt>{"cyl", {{ax,ay,az}, {vx,vy,vz}}, {px,py,pz}, rat}: </tt></b>a nested 
+						list structure providing additional specifications for the subdivision 
+						according to elliptic cylinder, where<b><tt> "cyl" </tt></b>is the string 
+						identificator of this type of subdivision;<b><tt> {{ax,ay,az},{vx,vy,vz}} </tt></b>
+						are, respectively,&nbsp; Cartesian coordinates of a point and a vector defining 
+						the cylinder axis;<b><tt> {px,py,pz} </tt></b>are Cartesian coordinates of a 
+						point specifying the orientation of one of the ellipse exes in the cylinder 
+						base (the ellipse axis is exactly the perpendicular from the point<b><tt> {px,py,pz} </tt>
+						</b>to the cylinder axis), and<b><tt> rat </tt></b>is the ratio of the two exes 
+						lengths of the ellipse in the cylinder base.</p>
+					<p><b><tt>kxkykz-&gt;Numb|Size: </tt></b>an optional parameter specifying whether 
+						the<b><tt> k1,k2,k3 </tt></b>from the main subdivision parameters list should 
+						be treated as subdivision numbers (<b><tt>kxkykz-&gt;Numb</tt></b>, default) or 
+						as average dimensions of the objects to be produced by the subdivision (<b><tt>kxkykz-&gt;Size</tt></b>).</p>
+					<p><b><tt>Frame-&gt;Loc|Lab|LabTot: </tt></b>an optional parameter specifying 
+						whether the subdivision should be performed in local frames of the objects as 
+						they were originally created (<b><tt>Frame-&gt;Loc</tt></b>, default) or in the 
+						laboratory frame (<b><tt>Frame-&gt;Lab </tt></b>or<b><tt> Frame-&gt;LabTot</tt></b>
+						).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>As a result of the subdivision, a container actually appears in place of the 
+					object <b><tt>obj</tt></b>; however, this container is referenced by the old 
+					value of the variable<b><tt>&nbsp;obj</tt></b>.
+					<p>The variables of the function starting from the third one are optional. If the 
+						third variable is not used, the subdivision is performed by three sets of 
+						parallel planes for which the unit vectors of the Cartesian frame are the 
+						normals.</p>
+					<p>If the third variable is used in the form<b><tt> {"pln",...}</tt></b>, the 
+						subdivision is performed by three sets of parallel planes which are normal to 
+						the vectors<b><tt> {n1x,n1y,n1z},{n2x,n2y,n2z} </tt></b>and<b><tt> {n3x,n3y,n3z}</tt></b>. 
+						The distances between the cutting parallel planes in each of the three sets are 
+						defined by the subdivision parameters<b><tt> {k1,q1},{k2,q2} </tt></b>and<b><tt> {k3,q3}</tt></b>.</p>
+					<p>If the third variable is used in the form<b><tt> {"cyl",...}</tt></b>, the 
+						subdivision is performed by a system of coaxial elliptic cylinders. The 
+						cylinder axis is defined by the point<b><tt> {ax,ay,az} </tt></b>and vector<b><tt> {vx,vy,vz}</tt></b>. 
+						One of two axes of the cylinder base ellipses is exactly the perpendicular from 
+						the point<b><tt> {px,py,pz} </tt></b>to the cylinder axis;<b><tt> rat </tt></b>is 
+						the ratio of the ellipse axes lengths. In this case of the subdivision, the 
+						parameters<b><tt> {k1,q1},{k2,q2} </tt></b>and<b><tt> {k3,q3} </tt></b>correspond 
+						to radial, azimuthal and axial directions respectively.</p>
+					<p>In the present version of <em>Radia</em>, a user has to choose himself the 
+						optimal methods of subdivision for different parts of the geometry under 
+						simulation. Qualitatively, an efficient segmentation is the segmentation such 
+						that the faces of the sub-volumes to be produced appear (after the relaxation!) 
+						parallel or perpendicular to the magnetization vector inside the sub-volumes. 
+						So, experience of a magnetostatics designer and a good qualitative 
+						understanding of the cases under study may strongly help to perform efficient 
+						subdivision and, as a sequence, to get more precise and/or fast numerical 
+						solution.</p>
+					<p>The rules for the optional parameters<b><tt> kxkykz-&gt;...</tt></b> and<b><tt> Frame-&gt;...</tt></b>
+						comply with <i>Mathematica</i> mechanism of options. For example, to specify 
+						the subdivision in local frames, one should type<b><tt> Frame-&gt;Loc </tt></b>with 
+						no any quotation marks.
+					</p>
+					<p>The action of<tt><b> Frame-&gt;Lab </b></tt>and<tt><b> Frame-&gt;LabTot </b></tt>
+						is different only for containers.<tt><b> Frame-&gt;LabTot </b></tt>means that 
+						all the container members are subdivided in the laboratory frame as one entity, 
+						by the same planes, whereas<b><tt> Frame-&gt;Lab </tt></b>corresponds to 
+						separate subdivision of the objects in the container, as they were not the 
+						container members.
+					</p>
+					<p>The subdivision with the options<tt><b> Frame-&gt;Lab </b></tt>or<tt><b> Frame-&gt;LabTot
+							</b></tt>preserves symmetries (or transformations with multiplicity more 
+						than 1) previously applied to the object, so that any mirrors (images) of the 
+						original object become mirrors of the objects produced by the subdivision of 
+						the original object in the laboratory frame.
+					</p>
+					<p>For simple uniform subdivision in directions X, Y and Z in local frames, the 
+						function can be called as<b><tt>&nbsp;radObjDivMag[obj, {k1,k2,k3},...] </tt></b>
+						or<b><tt>&nbsp;radObjDivMag[obj, {{k1,1},{k2,1},{k3,1}},...]</tt></b>.</p>
+					<p>If<b><tt>&nbsp;obj </tt></b>is a container at the input of<b><tt>&nbsp;radObjDivMag[obj,...]</tt></b>
+						,&nbsp;then the subdivision is applied only to the objects with magnetization 
+						or magnetic material applied (if they are present in the container), with no 
+						effect on any current-carrying objects.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radObjCutMag">radObjCutMag</a>[obj, {x,y,z}, {nx,ny,nz}, 
+							Frame-&gt;Loc|Lab] </tt></b>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Cuts the object<b><tt> obj </tt></b>by a plane passing through the point<b><tt> {x,y,z} </tt>
+					</b>normally to the vector<b><tt> {nx,ny,nz}</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A list of two indexes referencing the objects produced by the cutting (if the 
+					cutting plane crosses the object<b><tt> obj</tt></b>) or the value of<b><tt> obj </tt>
+					</b>(if the cutting plane does not cross the object<b><tt> obj</tt></b>).</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object to be cutted, 
+					which can be an object with magnetization or magnetic material applied, or a 
+					container having such objects.
+					<p><b><tt>{x,y,z}: </tt></b>list of three real numbers specifying Cartesian 
+						coordinates of a point on the cutting plane (by default in mm). <b><tt>{nx,ny,nz}: </tt>
+						</b>list of three real numbers specifying Cartesian coordinates the cutting 
+						plane normal. <b><tt>Frame-&gt;Loc|Lab: </tt></b>an optional parameter 
+						specifying whether the subdivision should be performed in local frames of the 
+						objects as they were originally created (<b><tt>Frame-&gt;Loc</tt></b>) or in 
+						the laboratory frame (<b><tt>Frame-&gt;Lab</tt></b> , default).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>As different from the function<b><tt> radObjDivMag</tt></b>,<b><tt> radObjCutMag </tt>
+					</b>does not replace the initial object by a container of objects produced by 
+					the cutting.
+					<p>Cutting a container produces two containers (if the cutting plane crosses the 
+						container stuff).</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjDpl"></a><b><tt>radObjDpl[obj, FreeSym-&gt;False|True]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Duplicates the object referenced by<b><tt>&nbsp;obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the new object - a copy of the one referenced by<b><tt>&nbsp;obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object to be duplicated.
+					<p><b><tt>FreeSym-&gt;False|True: </tt></b>an optional parameter specifying whether 
+						the symmetries (transformations with multiplicity more than one) previously 
+						applied to the object<b><tt> obj </tt></b>should be simply copied at the 
+						duplication (<b><tt>FreeSym-&gt;False</tt></b>, default), or a container of new 
+						independent objects should be created in place of any symmetry previously 
+						applied to the object<b><tt> obj</tt></b>. In both cases the final object 
+						created by the duplication has exactly the same geometry as the initial object<b><tt> obj</tt></b>
+						.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>This function actually duplicates the object referenced by<b><tt>&nbsp;obj </tt></b>
+					together with the materials and/or other properties if they were previously 
+					applied to the object<b><tt>&nbsp;obj</tt></b>.
+					<p>If applied to a container, the function duplicates the container itself and all 
+						the objects being present in the container.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><tt><b><a name="radObjDegFre">radObjDegFre</a>[obj]</b></tt></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Gives number of degrees of freedom for the relaxation of the object<tt><b> obj</b></tt>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number specifying number of degrees of freedom.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The number of degrees of freedom is:
+					<ul>
+						<li>
+							<tt><b>3 </b></tt>
+						- for a 3D object with magnetic material applied;
+						<li>
+						Sum of degrees of freedom over all the objects present in the container - for a 
+						container;
+						<li>
+							<tt><b>0 </b></tt>- in other cases.
+						</li>
+					</ul>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjDrwAtr"></a><b><tt>radObjDrwAtr[obj, {r,g,b}, thcn]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Applies drawing attributes - an RGB color and line thickness to the object 
+					referenced by<b><tt>&nbsp;obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>Value of <b><tt>obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object.
+					<p><b><tt>{r,g,b}: </tt></b>list of three real numbers specifying the RGB color to 
+						the object.
+					</p>
+					<p><b><tt>thcn: </tt></b>a real number specifying the line thickness when drawing 
+						the object.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>It should take place for the <b><tt>{r,g,b}</tt></b>: <b><tt>&nbsp;0&lt;r&lt;1</tt></b>, 
+					&nbsp;<b><tt>0&lt;g&lt;1</tt></b>, <b><tt>&nbsp;0&lt;b&lt;1</tt></b>.
+					<p>The initial default is<b><tt>&nbsp;thcn=0.001 </tt></b>for 3D <i>Mathematica</i> 
+						graphics.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjDrw"></a><b><tt>radObjDrw[obj]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Prepares a set of 3D graphical primitives representing&nbsp;the object &nbsp;<b><tt>obj</tt></b>
+					&nbsp;in space.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A <i>Mathematica</i> expression describing graphical primitives for later use 
+					as argument of &nbsp;<b><tt>Graphics3D</tt></b> <i>Mathematica</i> function.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The <b><tt>obj</tt></b> can refer to any <i>Radia</i> object capable of 
+					producing magnetic field, including containers.
+					<p>To get a final 3D plot representing the object &nbsp;<b><tt>obj</tt></b>, use<b><tt>&nbsp;Show[Graphics3D[radObjDrw[obj]]]</tt></b>. 
+						Both <b><tt>Show[...]</tt></b> and <b><tt>Graphics3D[...]</tt></b> built-in<i> Mathematica</i>
+						functions may have options as extra arguments (for more information see <i>Mathematica 
+							Books</i> or on-line help of&nbsp; <i>Mathematica</i>).
+					</p>
+					<p>The default options for the <i>Radia</i> graphics are set up by the Secondary 
+						functions <b><tt>RadPlot3DOptions</tt></b> and <b><tt>RadPlotOptions</tt></b>.
+					</p>
+					<p>By default, the graphical primitives visualizing the<i> Radia</i> objects are 
+						shown in accordance with default<i> Mathematica</i> rules of shading.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjDrwOpenGL"></a><b><tt>radObjDrwOpenGL[obj, 
+							EdgeLines-&gt;True|False, Axes-&gt;True|False]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Starts an application for ("live") viewing of 3D geometry of the object<b><tt> obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A new window of a 3D Viewer application with necessary interface for viewing of 
+					the object's geometry. During the viewing, the <i>Mathematica</i> notebook is 
+					in the execution mode. After the Viewer is exited, the value of<b><tt> obj </tt></b>
+					is returned to the notebook output cell.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object.
+					<p><b><tt>EdgeLines-&gt;True|False: </tt></b>an optional parameter specifying 
+						whether the edge lines of the object's geometry are outlined in the active 
+						drawings or not (default:<b><tt> EdgeLines-&gt;True</tt></b>).</p>
+					<p><b><tt>Axes-&gt;True|False: </tt></b>an optional parameter specifying whether 
+						the axes of the (laboratory) Cartesian frame are shown in the active drawings 
+						or not (default:<b><tt> Axes-&gt;True</tt></b> ).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The<b><tt> obj </tt></b>can refer to any <i>Radia</i> object capable of 
+					producing magnetic field, including containers. The object can have color 
+					attributes applied by the function<b><tt> radObjDrwAtr[...]</tt></b>.
+				</td>
+			</tr>
+		</table>
+		<table id="Table1" cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radObjDrwQD3D"></a><b><tt>radObjDrwQD3D[obj, 
+							EdgeLines-&gt;True|False, Axes-&gt;True|False]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Starts an application for active ("live") viewing of 3D geometry of the object<b><tt> obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A new window of a 3D Viewer application with necessary interface for active 
+					viewing of the object's geometry. During the viewing, the <i>Mathematica</i> notebook 
+					is in the execution mode. After the Viewer is exited, the value of<b><tt> obj </tt></b>
+					is returned to the notebook output cell.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object.
+					<p><b><tt>EdgeLines-&gt;True|False: </tt></b>an optional parameter specifying 
+						whether the edge lines of the object's geometry are outlined in the active 
+						drawings or not (default:<b><tt> EdgeLines-&gt;True</tt></b>).</p>
+					<p><b><tt>Axes-&gt;True|False: </tt></b>an optional parameter specifying whether 
+						the axes of the (laboratory) Cartesian frame are shown in the active drawings 
+						or not (default:<b><tt> Axes-&gt;True</tt></b> ).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><tt><font size="+1">IMPORTANT: </font></tt>For the function to be executed, the 
+					QuickDraw 3D graphics library from Apple should be properly installed on your 
+					system (i.e., a number of corresponding shared libraries, or DLLs, should be 
+					located in your system folder). The versions of QuickDraw 3D for Power 
+					Macintosh and Windows 95/NT are included into the Apple's QuickTime software 
+					and can be downloaded for free from the Apple web site (<a href="http://www.apple.com/quicktime/qd3d/">http://www.apple.com/quicktime/</a>). 
+					After downloading the QuickTime pack, follow the installation instructions 
+					supplied by Apple.
+					<p>Once the QuickDraw 3D is properly installed, the execution of the function<b><tt> radObjDrwQD3D[...]
+							</tt></b>will start a 3D Viewer application with the object<b><tt> obj </tt></b>
+						loaded for active viewing. The 3D Viewer has simple intuitive interface 
+						necessary to manipulate the 3D views of the object loaded (on-line changing the 
+						camera position, perspective, etc.). A user can save the geometry under 
+						observation to a file in 3D Metafile Format (3DMF) for further graphical 
+						processing / converting by the applications that support this format ("SaveAs" 
+						from the "File" menu of the 3D Viewer). After the viewing is finished, a user 
+						has to choose "Exit" (or "Quit") from "File" menu of the Viewer. This will 
+						terminate the Viewer and release the cell in the <i>Mathematica</i> notebook 
+						from which the function<b><tt> radObjDrwQD3D[...] </tt></b>was started.</p>
+					<p>The<b><tt> obj </tt></b>can refer to any <i>Radia</i> object capable of 
+						producing magnetic field, including containers. The object can have color 
+						attributes applied by the function<b><tt> radObjDrwAtr[...]</tt></b> .</p>
+				</td>
+			</tr>
+		</table>
+		<p><br>
+		</p>
+		<p><br>
+			<a name="4. Magnetic materials"></a><b><font color="#0f0f0f" size="+2">4. Magnetic 
+					materials</font></b>
+		</p>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radMatLin">radMatLin</a>[{ksipar,ksiper}, mr] </tt></b>
+					or<b><tt>&nbsp;radMatLin[{ksipar,ksiper}, {mrx,mry,mrz}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a linear anisotropic magnetic&nbsp;material.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the material.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{ksipar,ksiper}: </tt></b>list of two real numbers specifying magnetic 
+					susceptibility values in parallel&nbsp;and perpendicular &nbsp;directions to 
+					easy magnetization axis.
+					<p><b><tt>mr: </tt></b>a real number with absolute value giving magnitude of the 
+						remanent magnetization vector (by default in Tesla).
+					</p>
+					<p><b><tt>{mrx,mry,mrz}: </tt></b>list of three real numbers specifying remanent 
+						magnetization vector (by default in Tesla).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The function can be used in one of the two forms (see the templates above).
+					<p>If the function is called in the first form, the orientation of the remanent 
+						magnetization vector&nbsp;(giving the orientation of the easy magnetization 
+						axis) is specified by the initial magnetization vector in the object to which 
+						the material is later applied. If<b><tt>&nbsp;mr&gt;0 (mr&lt;0)</tt></b>, the 
+						remanent magnetization is set to be parallel (antiparallel) to the initial 
+						magnetization vector in the object. The magnitude of the remanent magnetization 
+						vector is <b><tt>|mr|</tt></b>.
+					</p>
+					<p>If the function is called in the second form, the remanent magnetization vector 
+						(and thus the orientation of the easy magnetization axis) is explicitly defined 
+						by the list argument<b><tt>&nbsp;{mrx,mry,mrz}</tt></b>, with no dependence on 
+						the initial magnetization vector in the object to which the material is later 
+						applied.
+					</p>
+					<p><i><big>The second form of the function is obsolete.</big></i></p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radMatSatIso">radMatSatIso</a>[{ksi1,ms1},{ksi2,ms2},{ksi3,ms3}]
+						</tt></b>or<b><tt>&nbsp;radMatSatIso[{{h1,m1},{h2,m2},...}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a nonlinear isotropic magnetic&nbsp;material.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the material.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>ks1,ks2,ks3: </tt></b>three real numbers specifying partial 
+					susceptibilities at zero field.
+					<p><b><tt>ms1,ms2,ms3: </tt></b>three real numbers specifying partial saturation 
+						magnetizations (by default in Tesla).</p>
+					<p><b><tt>{{h1,m1},{h2,m2},...}: </tt></b>list of pairs of real numbers defining 
+						the dependence of magnetization <b><tt>(m1,m2,...)</tt></b> versus magnetic 
+						field strength <b><tt>(h1,h2,...)</tt></b> point by point.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>In the first form, the dependence of the magnetization&nbsp;vector <b>M</b> on 
+					the field strength&nbsp;vector <b>H</b> is given by the formula:
+					<p><b>M</b><i><tt> </tt>= </i><tt>(</tt><b>H</b><i>/|</i><b>H</b><i>|</i><tt>)*</tt>[<tt>ms1*tanh(ks1*</tt><i>|</i><b>H</b><i>|<tt>/</i>ms1) 
+						+ ms2*tanh(ks2*</TT><i>|</i><b>H</b><i>|<tt>/</i>ms2) + ms3*tanh(ks3*</TT><i>|</i><b>H</b><i>|<tt>/</i>ms3)].</TT>
+					</p>
+					<p>In the second form, a continuous dependence of <i>|</i><b>M</b><i>|</i> versus <i>|</i><b>H</b><i>|</i>
+						is built from the list of pairs <b><tt>{{h1,m1},{h2,m2},...}</tt></b> using a 
+						spline interpolation. The vector <b>M</b> is parallel to <b>H</b>.</p>
+					<p><tt><font size="+1">IMPORTANT: </font></tt>For proper relaxation, the list <b><tt>{{h1,m1},{h2,m2},...}</tt></b>
+						should represent a <big><em>well-tabulated smoothly increasing </em></big>dependence<small>
+						</small>of <i>|</i><b>M</b><i>|</i> versus <i>|</i><b>H</b><i>|</i>. Please 
+						take into account that it is always assumed <i>|</i><b>M</b><i>|</i> = 0 at <i>|</i><b>H</b><i>|
+						</i>= 0, even if the values <b><tt>h1</tt></b> and <b><tt>m1</tt></b> differ 
+						from 0 in the list specified by user.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radMatSatAniso">radMatSatAniso</a>[{{ksi1par,ms1par}, 
+							{ksi2par,ms2par}, {ksi3par,ms3par}, ksi0par, hc}, {{ksi1per,ms1per}, 
+							{ksi2per,ms2per}, {ksi3per,ms3per}, ksi0per}] </tt></b>or<b><tt>&nbsp;radMatSatAniso[{{ksi1par,ms1par}, 
+							{ksi2par,ms2par}, {ksi3par,ms3par}, ksi0par, hc}, ksi0per]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a nonlinear anisotropic magnetic&nbsp;material.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the material.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>ksi0par, ksi1par, ksi2par, ksi3par: </tt></b>four real numbers 
+					specifying partial susceptibilities at zero field for the magnetization 
+					component parallel to the easy magnetization axis.
+					<p><b><tt>ms1par, ms2par, ms3par: </tt></b>three real numbers specifying partial 
+						saturation for the magnetization component parallel to the easy magnetization 
+						axis (by default in Tesla).
+					</p>
+					<p><tt><b>hc: </b></tt>a real number specifying coercivity for the component 
+						parallel to the easy magnetization axis.
+					</p>
+					<p><b><tt>ksi0per, ksi1per, ksi2per, ksi3per: </tt></b>four real numbers specifying 
+						partial susceptibilities at zero field for the magnetization component 
+						perpendicular to the easy magnetization axis.
+					</p>
+					<p><b><tt>ms1per, ms2per, ms3per: </tt></b>three real numbers specifying partial 
+						saturation for the magnetization component perpendicular to the easy 
+						magnetization axis (by default in Tesla).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>For this type of material, the magnetization component parallel to the easy 
+					magnetization axis&nbsp;is given by:
+					<p><tt>Mpar</tt><i>= &nbsp;</i><tt>ms1par*tanh[ksi1par*</tt>(<tt>Hpar-hc</tt>)<tt><i>/</i>ms1par] 
+							+ ms2par*tanh[ksi2par*</tt>(<tt>Hpar-hc</tt>)<tt><i>/</i>ms2par] + 
+							ms3par*tanh[ksi3par*</tt>(<tt>Hpar-hc</tt>)<tt><i>/</i>ms3par] + ksi0par*</tt>(<tt>Hpar-hc</tt>),
+					</p>
+					<p><tt>Hpar<i>=</i><b>H</b>*<i><b>e</b></i></tt>, &nbsp;where<i><b><tt>&nbsp;e </tt></b>
+						</i>is a unit vector of the easy magnetization axis, and <tt><b>H</b></tt> is 
+						the field strength vector.
+					</p>
+					<p>The magnetization component perpendicular to the easy magnetization axis is 
+						given by:
+					</p>
+					<p><tt><b>Mper</b></tt><i>= &nbsp;</i>[<tt>ms1per*tanh[ksi1per*|<b>Hper</b>|<i>/</i>ms1per] 
+							+ ms2per*tanh[ksi2per*|<b>Hper</b>|<i>/</i>ms2per] + ms3per*tanh[ksi3per*|<b>Hper</b>|<i>/</i>ms3per]]*<b>Hper</b>/|<b>Hper</b>| 
+							+ ksi0per*<b>Hper </b></tt>
+					</p>
+					<p>or<tt><b>&nbsp;Mper</b></tt><i>= &nbsp;</i><tt>ksi0per*<b>Hper</b></tt>, 
+						&nbsp;where <tt><b>&nbsp;Hper</b></tt>=<tt> <b>H </b>- Hpar*<i><b>e</b></i></tt>.
+					</p>
+					<p>The total magnetization vector is<tt><b>&nbsp;M</b></tt><i>= &nbsp;</i><tt>Mpar*<i><b>e</b></i>
+							+ <b>Mper</b></tt> .</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radMatApl"></a><b><tt>radMatApl[obj, mat]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Applies material referenced by<b><tt>&nbsp;mat</tt></b>, &nbsp;to object 
+					referenced by<b><tt>&nbsp;obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>Value of<b><tt>&nbsp;obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing an object created by<b><tt>&nbsp;radObjRecMag</tt></b>,<b><tt>&nbsp;radObjThckPgn
+						</tt></b>or<b><tt> radObjPolyhdr</tt></b>,&nbsp;or a container with at 
+					least one object created by any of these functions.
+					<p><b><tt>mat: </tt></b>an integer number referencing a material.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>If &nbsp;<b><tt>obj</tt></b> &nbsp;is a container, the material <b><tt>mat</tt></b>
+					is applied only to the objects in the container that were created by<b><tt> radObjRecMag</tt></b>,<b><tt>&nbsp;radObjThckPgn
+						</tt></b>or<b><tt> radObjPolyhdr</tt></b>.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radMatMvsH"></a><b><tt>radMatMvsH[obj, mid, {hx,hy,hz}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes magnetization from field strength vector for the object or material 
+					referenced by <b><tt>obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>The magnetization vector or one of its components, according to the value of 
+					variable <b><tt>mid</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing a material or an object to 
+					which material was applied.
+					<p><b><tt>mid: </tt></b>output magnetization component identification string. The 
+						following values of <b><tt>mid</tt></b> are allowed:
+						<ul>
+							<li>
+								<b><tt>"mx"</tt></b>
+							(for horizontal magnetization component),
+							<li>
+								<b><tt>"my"</tt></b>
+							(for longitudinal magnetization component),
+							<li>
+								<b><tt>"mz"</tt></b>
+							(for vertical magnetization component),
+							<li>
+								<b><tt>""</tt></b> (for all three components of the magnetization vector).
+							</li>
+						</ul>
+					<p><b><tt>{hx,hy,hz}: </tt></b>list of three real numbers specifying components of 
+						the &nbsp;magnetic field strength vector.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>If the magnetization component identification string<b><tt>&nbsp;mid </tt></b>is<b><tt>&nbsp;"mxmy"
+						</tt></b>or<b><tt>&nbsp;"mzmx" </tt></b>or<b><tt>&nbsp;"mymz" </tt></b>&nbsp;etc., 
+					the function returns list of two real numbers - components of the magnetization 
+					vector, in the order corresponding to the<b><tt>&nbsp;mid </tt></b>string;<b><tt>&nbsp;"mxmymz"
+						</tt></b>is equivalent to<b><tt>&nbsp;""</tt></b>.</td>
+			</tr>
+		</table>
+		<p><br>
+		</p>
+		<p><br>
+			<a name="5. Space transformations"></a><b><font color="#0f0f0f" size="+2">5. Space 
+					transformations</font></b>
+		</p>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radTrfTrsl"></a><b><tt>radTrfTrsl[{vx,vy,vz}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a translation.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the transformation.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{vx,vy,vz}: </tt></b>list of three real numbers specifying the 
+					translation vector.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The translation vector can be <b><tt>{0,0,0}</tt></b>.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radTrfRot"></a><b><tt>radTrfRot[{x,y,z}, {vx,vy,vz}, phi]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a rotation.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the transformation.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{x,y,z}: </tt></b>list of three real numbers specifying Cartesian 
+					coordinates of a point on the rotation axis.
+					<p><b><tt>{vx,vy,vz}: </tt></b>list of three real numbers specifying components of 
+						the rotation axis vector.
+					</p>
+					<p><b><tt>phi: </tt></b>a real number specifying the rotation angle.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The rotation axis vector can be of any length.
+					<p>The allowed limit for<b><tt>&nbsp;phi </tt></b>are:<b><tt>&nbsp;0 &lt; phi &lt; 2*Pi</tt></b>
+						.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radTrfPlSym"></a><b><tt>radTrfPlSym[{x,y,z}, {nx,ny,nz}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a plane symmetry.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the transformation.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{x,y,z}: </tt></b>list of three real numbers specifying Cartesian 
+					coordinates of a point on the symmetry plane.
+					<p><b><tt>{nx,ny,nz}: </tt></b>list of three real numbers specifying components of 
+						the vector normal to the plane .</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The plane normal vector can be of any length.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radTrfInv"></a><b><tt>radTrfInv[]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a field inversion. Magnetization and current densities are inverted 
+					while the geometry is unchanged.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the transformation.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radTrfCmbL"></a><b><tt>radTrfCmbL[OrigTrf, trf]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Multiplies an original transformation<b><tt> OrigTrf </tt></b>by another 
+					transformation<b><tt>&nbsp;trf </tt></b>from left.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>The value of <b><tt>&nbsp;OrigTrf</tt></b>, &nbsp;which references the 
+					transformation multiplication result.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>OrigTrf: </tt></b>an integer number referencing the original 
+					transformation.
+					<p><b><tt>trf: </tt></b>an integer number referencing the other transformation 
+						(left-multiplier).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The function arguments are not commutative.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radTrfCmbR"></a><b><tt>radTrfCmbR[OrigTrf, trf]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Multiplies an original transformation<b><tt> OrigTrf </tt></b>by another 
+					transformation<b><tt>&nbsp;trf </tt></b>from right.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>The value of<b><tt>&nbsp;OrigTrf</tt></b>, &nbsp;which references the 
+					transformation multiplication result.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>OrigTrf: </tt></b>an integer number referencing the original 
+					transformation.
+					<p><b><tt>trf: </tt></b>an integer number referencing the other transformation 
+						(right-multiplier).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The function arguments are not commutative.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radTrfOrnt"></a><b><tt>radTrfOrnt[obj, trf]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Orients the object referenced by<b><tt>&nbsp;obj</tt></b>, &nbsp;by applying 
+					the transformation<b><tt>&nbsp;trf </tt></b>to it once.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>Value of<b><tt>&nbsp;obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object.
+					<p><b><tt>trf:&nbsp;</tt></b> an integer number referencing the transformation to 
+						be applied.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>As a result of this function, the object <b><tt>obj</tt></b> obtains different 
+					orientation as compared to the initial one described with the &nbsp; <tt><font size="+1">
+							Orientation </font></tt>note for the function which created the object.
+					<p>The<b><tt>&nbsp;radTrfOrnt</tt></b> &nbsp;function can be applied to the same 
+						object any number of times, with the same or different transformations.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radTrfMlt"></a><b><tt>radTrfMlt[obj, trf, mlt]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates<b><tt>&nbsp;mlt-1</tt></b> &nbsp;objects with the first one being 
+					derived from the &nbsp;<b><tt>obj</tt></b>&nbsp; and each subsequent derived 
+					from the previous one, by applying the transformation<b><tt>&nbsp;trf</tt></b>. 
+					Following this, the object<b><tt> obj </tt></b>becomes equivalent to<b><tt>&nbsp;mlt </tt>
+					</b>different objects.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>Value of <b><tt>obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object.
+					<p><b><tt>trf:&nbsp;</tt></b>an integer number referencing the transformation to be 
+						applied.
+					</p>
+					<p><b><tt>mlt: </tt></b>an integer number specifying multiplicity of the 
+						transformation.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>Allthough after execution of this function the object<b><tt>&nbsp;obj </tt></b>is 
+					treated as<b><tt>&nbsp;mlt </tt></b>different objects at field computation, the 
+					new objects can not be considered (accessed) separately from the object<b><tt>&nbsp;obj</tt></b>.
+					<p>If <b><tt>&nbsp;mlt=1</tt></b>, &nbsp;the actions of <b><tt>&nbsp;radTrfMlt[obj, trf, 
+								mlt] </tt></b>and<b><tt>&nbsp;radTrfOrnt[obj, trf] </tt></b>are 
+						equivalent. However, for<b><tt>&nbsp;mlt&gt;1 </tt></b>the action of<b><tt>&nbsp;radTrfMlt[obj, 
+								trf, mlt] </tt></b>is not equivalent to any number of successive 
+						executions of<b><tt>&nbsp;radTrfOrnt[obj, trf]</tt></b>.
+					</p>
+					<p><tt><font size="+1">Treatment of symmetries:</font></tt> the symmetries created 
+						by the function <b><tt>&nbsp;radTrfMlt[obj, trf, mlt] </tt></b>&nbsp;with<b><tt> mlt&gt;1</tt></b>, 
+						&nbsp;should be considered as symmetries or boundary conditions &nbsp;<i><font size="+1">with 
+								respect to the magnetic field induction</font></i>. &nbsp;Following 
+						this, for example, if<b><tt>&nbsp;obj </tt></b>is a current-carrying object,<b><tt>&nbsp;trf
+							</tt></b>is a plane symmetry and<b><tt>&nbsp;mlt=2</tt></b>, &nbsp;then the 
+						resulting field induction distribution corresponds to the symmetry<b><tt>&nbsp;trf</tt></b>, 
+						&nbsp;however, current density vectors in<b><tt>&nbsp;obj </tt></b>and its 
+						mirror object are not, generally, related by the same symmetry.
+					</p>
+					<p>In the case of plane (mirror) symmetry, we recommend using more convenient 
+						Secondary functions <b><tt>RadTrfZerPara </tt></b>and &nbsp; <b><tt>RadTrfZerPerp </tt>
+						</b>("zero parallel" and "zero perpendicular" field induction components with 
+						respect to the symmetry plane).</p>
+				</td>
+			</tr>
+		</table>
+		<p><br>
+		</p>
+		<p><br>
+			<a name="6. Field computation"></a><b><font color="#0f0f0f" size="+2">6. Field 
+					computation</font></b>
+		</p>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radRlxPre"></a><b><tt>radRlxPre[obj, srcobj :0]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Builds an interaction matrix for the object referenced by<b><tt>&nbsp;obj</tt></b>, 
+					&nbsp;treating the object<b><tt>&nbsp;srcobj </tt></b>as an additional external 
+					field source.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the interaction matrix constructed.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object for which the 
+					interaction matrix should be constructed.
+					<p><b><tt>srcobj: </tt></b>an integer number referencing the object to be treated 
+						as additional external field source at construction of the interaction matrix 
+						for the object<b><tt>&nbsp;obj</tt></b> .</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The<b><tt>&nbsp;obj </tt></b>variable can reference a single object with 
+					magnetic material applied, or a container having at least one object with 
+					magnetic material applied.
+					<p>Normally,<b><tt>&nbsp;obj </tt></b>should reference a container including both 
+						passive objects as blocks with iron material applied and active field sources 
+						as current-carrying objects or blocks with magnetic material having non-zero 
+						remanent magnetization (the latter being relaxable objects and active field 
+						sources at the same time).
+					</p>
+					<p>The function can be used &nbsp;with or without the<b><tt>&nbsp;srcobj </tt></b>variable. 
+						The<b><tt>&nbsp;srcobj </tt></b>can contain any kind of object producing 
+						magnetic field; all of these objects will be treated as external field sources 
+						and will not change their parameters during the relaxation. This is done in 
+						order to provide the possibility of solving a complicated problem iteratively 
+						by parts, thus requiring less memory for the interaction matrices to be 
+						constructed.
+					</p>
+					<p><tt><font size="+1">Use of field symmetries: </font></tt>In most cases, if the 
+						problem has any intrinsic symmetries <i><font size="+1">with respect to the general 
+								field distribution</font></i>, it can be described both by creating and 
+						applying necessary symmetries to some initial objects, or by creating all the 
+						objects as independent ones, without any symmetries. We recommend using the 
+						former, since it enables saving memory and, in some cases, CPU-time of the 
+						solution. However, it is easy to obtain&nbsp;an incorrect solution by applying 
+						a field symmetry which does not take place in reality. The safe way to use the 
+						symmetries&nbsp;is to apply them at the upper level, i.e., to the container<b><tt>&nbsp;obj
+							</tt></b>for which the interaction matrix is constructed. If an additional 
+						external field source<b><tt>&nbsp;srcobj </tt></b>is used, it should have the 
+						same field symmetry properties as<b><tt>&nbsp;obj</tt></b> .</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radRlxMan"></a><b><tt>radRlxMan[intrc, meth, iternum, rlxpar]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Implements a manual relaxation procedure.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A list of three real numbers specifying (1) overage absolute change in &nbsp; 
+					magnetization after previous iteration over all the objects participating in 
+					the relaxation, (2) maximum absolute value of magnetization over all the 
+					objects participating in the relaxation, (3) maximum absolute value of magnetic 
+					field strength over the central points of all the objects participating in the 
+					relaxation. All three values are given for the last iteration.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>intrc: </tt></b>an integer number referencing the interaction matrix.
+					<p><b><tt>meth: </tt></b>an integer number specifying relaxation method; can be 0, 
+						1, 2, 3 or 4.
+					</p>
+					<p><b><tt>iternum:&nbsp;</tt></b>an integer number specifying number of iterations 
+						to do.
+					</p>
+					<p><b><tt>rlxpar: </tt></b>a real number specifying a relaxation parameter (not 
+						used in relaxation methods 3 and 4).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>After executing the relaxation procedure, each of the relaxable objects 
+					participating in the container for which the interaction matrix was built, 
+					receives a magnetization value corresponding to the general minimum of the 
+					interaction energy.
+					<p>Relaxation method<b><tt>&nbsp;meth=0 </tt></b>simply resets magnetization in all 
+						relaxable objects to zero;<b><tt>&nbsp;meth=1 </tt></b>and<b><tt> meth=2 </tt></b>
+						are methods using a relaxation parameter,<b><tt>&nbsp;0&lt;rlxpar&lt;1</tt></b>;<tt>
+							<b>meth=3 </b></tt>and<b><tt>&nbsp;meth=4 </tt></b>do not use any 
+						relaxation parameter (their action does not depend on the value of<b><tt>&nbsp;rlxpar</tt></b>).
+					</p>
+					<p>In most cases, the relaxation method<b><tt>&nbsp;meth=3 </tt></b>appears more 
+						suitable in comparison to&nbsp;other methods.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellspacing="2" cellpadding="10" border="4">
+			<tr>
+				<td colspan="2"><a name="radRlxAuto"></a><b><tt>radRlxAuto[intrc, prec, maxiter, meth :4, ZeroM->True|False]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Executes an automatic relaxation procedure.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A list of four numbers specifying (1) average absolute change in magnetization 
+					after previous iteration over all the objects participating in the relaxation, 
+					(2) maximum absolute value of magnetization over all the objects participating 
+					in the relaxation, (3) maximum absolute value of magnetic field strength over 
+					central points of all the objects participating in the relaxation, and (4) 
+					actual number of iterations done. The values (1)-(3) given, are those of last 
+					iteration.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>intrc: </tt></b>an integer number referencing the interaction matrix.
+					<p><b><tt>prec:&nbsp;</tt></b>a real number specifying an absolute precision value 
+						for magnetization (by default in Tesla), to be reached by the end of the 
+						relaxation.
+					</p>
+					<p><b><tt>maxiter: </tt></b>maximum number of iterations permitted to reach the 
+						specified precision.
+					</p>
+					<p><b><tt>meth: </tt></b>an integer number specifying relaxation method; the 
+						automatic relaxation is only available with<b><tt>&nbsp;meth=3 </tt></b>and<b><tt>&nbsp;meth=4</tt></b>.</p>
+					<p><b><tt>ZeroM->True|False: </tt></b>an optional parameter specifying whether the relaxation should be started by setting 
+					    the magnetization values in all paricipating objects to zero, or the existing magnetization values in the objects should be used.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The automatic relaxations stops whenever the change in magnetization (averaged 
+					over all the objects participating in the relaxation) between two successive 
+					iterations is smaller than<b><tt>&nbsp;prec</tt></b>, or the number of 
+					iterations is larger than<b><tt> maxiter</tt></b>.
+					<p>The signs of successful relaxation are: (1)&nbsp;average absolute change in 
+						magnetization between the last two iterations over all the objects 
+						participating in the relaxation (the first number in the function return 
+						list)&nbsp;is smaller then the value of the<b><tt>&nbsp;prec </tt></b>variable; 
+						(2) actual number of iterations done (the last number in the function return 
+						list) is smaller than the value of the<tt><b> maxiter</b><small>&nbsp;</small></tt>variable.
+					</p>
+					<p>This function can be used without the last variable, as<b><tt>&nbsp;radRlxAuto[intrc, 
+								prec, maxiter]</tt></b>. In this case the<tt> <b>meth=3 </b></tt>is 
+						used by default.
+					</p>
+					<p>The relaxation method<b><tt> meth=4 </tt></b>seems more stable in cases of 
+						essentially non-linear materials, however, it may work slower than<b><tt>&nbsp;meth=3</tt></b>.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellspacing="2" cellpadding="10" border="4">
+			<tr>
+				<td colspan="2"><a name="radRlxUpdSrc"></a><b><tt>radRlxUpdSrc[intrc]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Updates external field data for the relaxation (to take into account e.g. modification 
+				    of currents in coils, if any) without rebuilding the interaction matrix.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>Integer number referencing the interaction matrix (intrc).</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><p><b><tt>intrc: </tt></b>an integer number referencing the interaction matrix.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><p>This is a convenience function, which allows to update an existing interaction matix 
+				       and/or external field vector, without spending time on "re-building" it.</p>
+				    <p>This function can be applied e.g. after scaling current in external field sources by 
+				       the function <b><tt>radObjScaleCur</tt></b>.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellspacing="2" cellpadding="10" border="4" ID="Table4">
+			<tr>
+				<td colspan="2"><a name="radSolve"></a><b><tt>radSolve[obj, prec, maxiter, meth :4]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Builds interaction matrix for the object <b><tt>obj</tt></b> and executes 
+					relaxation procedure using the method number <b><tt>meth</tt></b>. Relaxation 
+					stops whenever the change in magnetization (averaged over all sub-elements) 
+					between two successive iterations is smaller than prec or the number of 
+					iterations is larger than maxiter.
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A list of four numbers specifying (1) average absolute change in magnetization 
+					after previous iteration over all the objects participating in the relaxation, 
+					(2) maximum absolute value of magnetization over all the objects participating 
+					in the relaxation, (3) maximum absolute value of magnetic field strength over 
+					central points of all the objects participating in the relaxation, and (4) 
+					actual number of iterations done. The values (1)-(3) given, are those of last 
+					iteration.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the geometry to be solved 
+					(typically a container, though can be any 3D object, to which a material was 
+					applied).
+					<p><b><tt>prec:&nbsp;</tt></b>a real number specifying an absolute precision value 
+						for magnetization (by default in Tesla), to be reached by the end of the 
+						relaxation.
+					</p>
+					<p><b><tt>maxiter: </tt></b>maximum number of iterations permitted to reach the 
+						specified precision.
+					</p>
+					<p><b><tt>meth: </tt></b>an integer number specifying relaxation method; the 
+						automatic relaxation is only available with<b><tt>&nbsp;meth=3 </tt></b>and<b><tt>&nbsp;meth=4</tt></b>.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The automatic relaxations stops whenever the change in magnetization (averaged 
+					over all the objects participating in the relaxation) between two successive 
+					iterations is smaller than<b><tt>&nbsp;prec</tt></b>, or the number of 
+					iterations is larger than<b><tt> maxiter</tt></b>.
+					<p>The signs of successful relaxation are: (1)&nbsp;average absolute change in 
+						magnetization between the last two iterations over all the objects 
+						participating in the relaxation (the first number in the function return 
+						list)&nbsp;is smaller then the value of the<b><tt>&nbsp;prec </tt></b>variable; 
+						(2) actual number of iterations done (the last number in the function return 
+						list) is smaller than the value of the<tt><b> maxiter</b><small>&nbsp;</small></tt>variable.
+					</p>
+					<p>This function can be used without the last variable, as<b><tt>&nbsp;radRlxAuto[intrc, 
+								prec, maxiter]</tt></b>. In this case the<tt> <b>meth=4</b></tt> is 
+						used by default.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radFldCmpPrc">radFldCmpPrc</a>[PrcB-&gt;prb, PrcA-&gt;pra, 
+							PrcBInt-&gt;prbint, PrcForce-&gt;prfrc, PrcTorque-&gt;prtrq, PrcEnergy-&gt;pre, 
+							PrcCoord-&gt;prcrd, PrcAngle-&gt;prang]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Sets absolute accuracy levels for computation of field induction (strength), 
+					vector potential, induction integrals along straight lines, force, 
+					&nbsp;torque, energy, relativistic particle trajectory coordinates and angles.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>prb: </tt></b>a real number specifying an absolute precision value for 
+					magnetic field induction and strength (by default in Tesla).
+					<p><b><tt>pra: </tt></b>a real number specifying an absolute precision value for 
+						magnetic field vector potential (by default in Tesla*mm).
+					</p>
+					<p><b><tt>prbint: </tt></b>a real number specifying an absolute precision value for 
+						magnetic field induction integral along a straight line (by default in 
+						Tesla*mm).
+					</p>
+					<p><b><tt>prfrc: </tt></b>a real number specifying an absolute precision value for 
+						force computation (by default in Newton).
+					</p>
+					<p><b><tt>prtrq: </tt></b>a real number specifying an absolute precision value for 
+						torque computation (by default in Newton*mm).
+					</p>
+					<p><b><tt>pre: </tt></b>a real number specifying an absolute precision value for 
+						energy computation (by default in Joule).
+					</p>
+					<p><b><tt>prcrd: </tt></b>a real number specifying an absolute precision value for 
+						computation of relativistic particle trajectory coordinates (by default in mm).
+					</p>
+					<p><b><tt>prang: </tt></b>a real number specifying an absolute precision value for 
+						computation of relativistic particle trajectory angles (by default in radian).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The function works in line with Mathematica mechanism of options, with<b><tt>&nbsp;PrcB-&gt;, 
+							PrcA-&gt;, PrcBInt-&gt;, PrcForce-&gt;, PrcTorque-&gt;, PrcEnergy-&gt;, 
+							PrcCoord-&gt;, PrcAngle-&gt; </tt></b>being predefined words (option 
+					names). The function can be called with any number of parameters placed in 
+					arbitrary order, for example:<b><tt> radFldCmpPrc[PrcBInt-&gt;0.001] </tt></b>for 
+					setting-in absolute accuracy level for field integral to 0.001 Tesla*mm;<b><tt> radFldCmpPrc[PrcEnergy-&gt;0.1, 
+							PrcForce-&gt;5.] </tt></b>for setting-in absolute accuracy level for 
+					energy to 0.1 Joule and absolute accuracy level for force to 5. Newton.
+					<p>This function only concerns direct field computation methods and has no effect 
+						on the accuracy of relaxation procedure. The latter is specified in the <A href="referenceguide.html#radRlxAuto">
+							relaxation functions</A>.
+					</p>
+					<p>The method for computation &nbsp;<A href="referenceguide.html#radFldPtcTrj">of a 
+							relativistic particle trajectory</A> &nbsp;is switched from manual to 
+						automatic mode by setting-in any positive value for the corresponding absolute 
+						precision level.
+					</p>
+					<p>In all cases for setting-in absolute accuracy levels for particular physical 
+						values we recommend to use the function<b><tt>&nbsp;radFldCmpPrc[...]</tt></b> rather 
+						than<b><tt>&nbsp;radFldCmpCrt[...]</tt></b> (the latter being obsolete).</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radFldCmpCrt">radFldCmpCrt</a>[prcB, prcA, prcBint, prcFrc, 
+							prcTrjCrd, prcTrjAng]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Sets absolute accuracy levels for computation of field induction (strength), 
+					vector potential, induction integrals along straight line, force, relativistic 
+					particle trajectory coordinates and angles.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>prcB: </tt></b>a real number specifying an absolute precision value for 
+					magnetic field induction and strength (by default in Tesla).
+					<p><b><tt>prcA: </tt></b>a real number specifying an absolute precision value for 
+						magnetic field vector potential (by default in Tesla*mm).
+					</p>
+					<p><b><tt>prcBint: </tt></b>a real number specifying an absolute precision value 
+						for magnetic field induction integral along a straight line (by default in 
+						Tesla*mm).
+					</p>
+					<p><b><tt>prcFrc: </tt></b>a real number specifying an absolute precision value for 
+						force computation (by default in Newton).
+					</p>
+					<p><b><tt>prcTrjCrd: </tt></b>a real number specifying an absolute precision value 
+						for computation of relativistic particle trajectory coordinates (by default in 
+						mm).
+					</p>
+					<p><b><tt>prcTrjAng: </tt></b>a real number specifying an absolute precision value 
+						for computation of relativistic particle trajectory angles (by default in 
+						radian).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td><i><big>This function is obsolete. Instead of it, we recommend to use the function </big>
+					</i><b><tt>radFldCmpPrc[...]</tt></b>.
+					<p>This function only concerns direct field computation methods and has no effect 
+						on the accuracy of relaxation procedure. The latter is specified in the <A href="referenceguide.html#radRlxAuto">
+							relaxation functions</A>.
+					</p>
+					<p>The method for computation &nbsp;<A href="referenceguide.html#radFldPtcTrj">of a 
+							relativistic particle trajectory</A> &nbsp;is switched from manual to 
+						automatic mode by setting-in any positive value for the corresponding absolute 
+						precision level.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radFldLenTol"></a><b><tt>radFldLenTol[abs, rel, zero :0]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Sets absolute and relative randomization magnitudes for all the length values, 
+					including coordinates and dimensions of the objects producing magnetic field, 
+					and coordinates of points where the field is computed.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>abs: </tt></b>a real number specifying an absolute randomization 
+					magnitude for all the length values (by default in mm).
+					<p><b><tt>rel: </tt></b>a real number specifying a relative randomization magnitude 
+						for all the length values.
+					</p>
+					<p><b><tt>zero: </tt></b>a real number specifying zero tolerance for all the length 
+						values (by default in mm).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The randomization of any length value<tt><b>&nbsp;x </b></tt>is done according 
+					to the formula (in C language notation):
+					<p><tt><b>x' = (x + abs*g1)*(1 + rel*g2) + ((x + abs*g1 == 0)? zero*g3 : 0);</b></tt>
+					</p>
+					<p>where<tt><b> g1, g2 </b></tt>and<tt><b> g3 </b></tt>are real random numbers 
+						evenly distributed within the interval [-0.5, 0.5].
+					</p>
+					<p>Optimal values of the variables can be:<b><tt>&nbsp;rel=10^(-10)</tt></b>,<b><tt>&nbsp;abs=L*rel</tt></b>,<b><tt>&nbsp;zero=abs</tt></b>, 
+						&nbsp;where<tt><b> L </b></tt>is the distance scale value (in mm) for the 
+						problem to be solved. Randomization magnitudes which are too small can result 
+						in run-time code errors; if they are too large, this can influence accuracy of 
+						the field computation.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radFld"></a><b><tt>radFld[obj, fid, {x,y,z}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes magnetic field created by the object referenced by<b><tt>&nbsp;obj </tt></b>
+					in the point with Cartesian coordinates <b><tt>{x,y,z}</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A list of real numbers or single&nbsp;real number representing the magnetic 
+					field component(s), according to the value of variable<b><tt>&nbsp;fid</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object producing the 
+					field to be computed.
+					<p><b><tt>fid: </tt></b>output field component identification string. The following 
+						values of <b><tt>fid</tt></b> are allowed:
+						<ul>
+							<li>
+								<b><tt>"bx"</tt></b> or <b><tt>"by"</tt></b> or <b><tt>"bz"</tt></b> or <b><tt>"b"</tt></b>
+							for horizontal or longitudinal or vertical component or the&nbsp;total vector 
+							of field induction (to be computed by default in Tesla),
+							<li>
+								<b><tt>"hx"</tt></b> or <b><tt>"hy"</tt></b> or <b><tt>"hz"</tt></b> or <b><tt>"h"</tt></b>
+							for horizontal or longitudinal or vertical component or the&nbsp;total vector 
+							of field strength (to be computed by default in Tesla),
+							<li>
+								<b><tt>"ax"</tt></b> or <b><tt>"ay"</tt></b> or <b><tt>"az"</tt></b> or <b><tt>"a"</tt></b>
+							for horizontal or longitudinal or vertical component or the&nbsp;total vector 
+							of the field vector-potential (to be computed by default in Tesla*mm),
+							<li>
+								<b><tt>"mx"</tt></b> or <b><tt>"my"</tt></b> or <b><tt>"mz"</tt></b> or <b><tt>"m"</tt></b>
+							for horizontal or longitudinal or vertical component or the&nbsp;total vector 
+							of magnetization (to be computed by default in Tesla),
+							<li>
+								<b><tt>""</tt></b> for the field induction, field strength, 
+								vector-potential&nbsp;and magnetization.
+							</li>
+						</ul>
+					<p><b><tt>{x,y,z}: </tt></b>list of three real numbers specifying Cartesian 
+						coordinates of the point where the field should be computed (by default in mm).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The output field component identification string &nbsp;<b><tt>fid </tt></b>can 
+					be <b><tt>"bxby"</tt></b> or <b><tt>"bxbyhxhy"</tt></b>, etc. In such cases the 
+					function returns a list of the field components in the order specified by the<b><tt> fid
+						</tt></b>string. The<b><tt>&nbsp;fid="" </tt></b>gives vectors of the field 
+					induction, strength, vector potential and magnetization in the form &nbsp;<tt><b>{{bx,by,bz}, 
+							{hx,hy,hz}, {ax,ay,az}, {mx,my,mz}}</b></tt>.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radFldLst"></a><b><tt>radFldLst[obj, fid, {x1,y1,z1}, {x2,y2,z2}, 
+							np, "arg|noarg", strt]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes magnetic field created by the object referenced by<b><tt>&nbsp;obj </tt></b>
+					in<b><tt>&nbsp;np </tt></b>points evenly positioned along a straight line 
+					segment with edge points having Cartesian coordinates <b><tt>{x1,y1,z1}</tt></b>
+					and <b><tt>{x2,y2,z2}</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td><b><tt>np</tt></b>-element list of real numbers representing the magnetic field 
+					component(s), according to the value of variable<b><tt>&nbsp;fid</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object producing the 
+					field to be computed.
+					<p><b><tt>fid: </tt></b>output field characteristics identification string. The 
+						following values of <b><tt>&nbsp;fid </tt></b>are allowed:
+						<ul>
+							<li>
+								<b><tt>"bx"</tt></b> or <b><tt>"by"</tt></b> or <b><tt>"bz"</tt></b> or <b><tt>"b"</tt></b>
+							for horizontal or longitudinal or vertical component or the&nbsp;total vector 
+							of field induction (to be computed by default in Tesla),
+							<li>
+								<b><tt>"hx"</tt></b> or <b><tt>"hy"</tt></b> or <b><tt>"hz"</tt></b> or <b><tt>"h"</tt></b>
+							for horizontal or longitudinal or vertical component or the&nbsp;total vector 
+							of field strength (to be computed by default in Tesla),
+							<li>
+								<b><tt>"ax"</tt></b> or <b><tt>"ay"</tt></b> or <b><tt>"az"</tt></b> or <b><tt>"a"</tt></b>
+							for horizontal or longitudinal or vertical component or the&nbsp;total vector 
+							of the field vector-potential (to be computed by default in Tesla*mm),
+							<li>
+								<b><tt>"mx"</tt></b> or <b><tt>"my"</tt></b> or <b><tt>"mz"</tt></b> or <b><tt>"m"</tt></b>
+							for horizontal or longitudinal or vertical component or the&nbsp;total vector 
+							of magnetization (to be computed by default in Tesla),
+							<li>
+								<b><tt>""</tt></b> for the field induction, field strength, vector-potential 
+								and magnetization.
+							</li>
+						</ul>
+					<p><b><tt>{x1,y1,z1}: </tt></b>list of three real numbers specifying Cartesian 
+						coordinates of the first edge point of the line segment along which the field 
+						should be computed (by default in mm).
+					</p>
+					<p><b><tt>{x2,y2,z2}: </tt></b>list of three real numbers specifying Cartesian 
+						coordinates of the second edge point of the line segment along which the field 
+						should be computed (by default in mm).
+					</p>
+					<p><b><tt>np: </tt></b>an integer number specifying amount of points where the 
+						field component(s) should be computed.
+					</p>
+					<p><b><tt>"arg|noarg": </tt></b>a string switch for setting the output format with 
+						or without the &nbsp;argument (<b><tt>"arg"</tt></b> or <b><tt>"noarg"</tt></b>), 
+						which is an&nbsp;offset of a point from <b><tt>{x1,y1,z1}</tt></b>,&nbsp;added 
+						to the value of the variable <b><tt>strt</tt></b>.
+					</p>
+					<p><b><tt>strt: </tt></b>a real number specifying a start-value for the output 
+						argument.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The output field component identification string &nbsp;<b><tt>fid </tt></b>can 
+					be <b><tt>"bxby"</tt></b> or <b><tt>"bxbyhxhy"</tt></b>, etc.
+					<p>If<b><tt>&nbsp;"arg|noarg" </tt></b>switch is set to <b><tt>"arg"</tt></b>, the 
+						output is a list of <b><tt>np</tt></b> two-element lists with the first element 
+						being the argument (the offset of a point&nbsp;from <b><tt>{x1,y1,z1}</tt></b>, 
+						added to the value of the variable<b><tt>&nbsp;strt</tt></b>) and the second 
+						one being a list or a single real number giving the field component(s) 
+						according to the value of the variable<b><tt>&nbsp;fid</tt></b>. &nbsp;If<b><tt>&nbsp;"arg|noarg"
+							</tt></b>switch is set to<b><tt>&nbsp;"noarg"</tt></b>, the output is a 
+						list of<b><tt>&nbsp;np </tt></b>lists or real numbers giving the field 
+						component(s) according to the value of the variable<b><tt>&nbsp;fid</tt></b>.
+					</p>
+					<p>We suggest using this function in cases when the field should be computed at a 
+						large number of points (for example for 2D or 3D field plots): in such cases 
+						the<b><tt>&nbsp;radFldLst[...] </tt></b>may work much faster then the<b><tt>&nbsp;radFld[...]
+							</tt></b>(being called many times).</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radFldInt"></a><b><tt>radFldInt[obj, "inf|fin", fid, {x1,y1,z1}, 
+							{x2,y2,z2}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes magnetic field induction integral along a straight line specified by 
+					two points with Cartesian coordinates <b><tt>{x1,y1,z1}</tt></b> and <b><tt>{x2,y2,z2}</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>The magnetic field induction integral vector or one of its components (computed 
+					by default in Tesla*mm), according to the value of variable<b><tt>&nbsp;fid</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object producing the 
+					field to be integrated.
+					<p><b><tt>"inf|fin": </tt></b>a string switch for setting the type of field 
+						induction integral: <b><tt>"inf"</tt></b> means integral along the straight 
+						line from minus to plus infinity, <b><tt>"fin"</tt></b> means integral along 
+						the straight line from the point <b><tt>{x1,y1,z1}</tt></b> to the point <b><tt>{x2,y2,z2}</tt></b>.
+					</p>
+					<p><b><tt>fid: </tt></b>output field integral component identification string. The 
+						following values of <b><tt>fid</tt></b> are allowed: <b><tt>"ibx"</tt></b> or <b><tt>"iby"</tt></b>
+						or <b><tt>"ibz"</tt></b>, or <b><tt>"" </tt></b>for horizontal or longitudinal 
+						or vertical field induction integral, or all of the three components.
+					</p>
+					<p><b><tt>{x1,y1,z1}: </tt></b>list of three real numbers specifying Cartesian 
+						coordinates of one point on the line along which the field integral should be 
+						computed (by default in mm).
+					</p>
+					<p><b><tt>{x2,y2,z2}: </tt></b>list of three real numbers specifying Cartesian 
+						coordinates of the other point on the line along which the field integral 
+						should be computed (by default in mm).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>If the field integral component identification string<b><tt>&nbsp;fid </tt></b>is<b><tt>&nbsp;"ibxiby"</tt></b>
+					or <b><tt>"bxby"</tt></b> or <b><tt>"xy"</tt></b> or <b><tt>"mzmx"</tt></b>, 
+					etc., the function returns a list of two real numbers - components of the field 
+					integral vector (in the order corresponding to the<b><tt>&nbsp;fid </tt></b>string);
+					<b><tt>"ibxibyibz"</tt></b> and <b><tt>"bxbybz" </tt></b>and <b><tt>"xyz"</tt></b>is 
+					equivalent to <b><tt>""</tt></b>.
+					<p>The finite field integral from the point <b><tt>{x1,y1,z1}</tt></b> to the point <b><tt>{x2,y2,z2}</tt></b>
+						(<b><tt>"fin"</tt></b>) is computed numerically, whereas the infinite one (<b><tt>"inf"</tt></b>) 
+						analytically (much faster in most cases).
+					</p>
+					<p>The absolute precision level for the numerical computation of the finite 
+						integral can be set by the function<b><tt>&nbsp;radFldCmpCrt[...]</tt></b> . 
+						The default precision is 0.001 Tesla*mm.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radFldPtcTrj"></a><b><tt>radFldPtcTrj[obj, E, {x0,dxdy0,z0,dzdy0}, 
+							{y0,y1}, np]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes trajectory of a relativistic charged particle in the magnetic field 
+					created by the object referenced by<b><tt>&nbsp;obj</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td><b><tt>np</tt></b>-element list of lists of four real numbers giving horizontal 
+					coordinate, horizontal angle, vertical coordinate and vertical angle of the 
+					particle trajectory at<b><tt>&nbsp;np </tt></b>points with longitudinal 
+					coordinates distributed from<b><tt>&nbsp;y0 </tt></b>to<b><tt>&nbsp;y1 </tt></b>
+					with a constant step (the default units are mm for the coordinates and radians 
+					for the angles).</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object producing the 
+					field.
+					<p><b><tt>E: </tt></b>a real number specifying the particle energy (by default in 
+						GeV).
+					</p>
+					<p><b><tt>{x0,dxdy0,z0,dzdy0}: </tt></b>list of four real numbers specifying the 
+						initial transverse coordinates (by default in mm) and angles (by default in 
+						radian).
+					</p>
+					<p><b><tt>{y0,y1}: </tt></b>list of two real numbers specifying the initial and 
+						final longitudinal coordinate values.
+					</p>
+					<p><b><tt>np: </tt></b>an integer number specifying amount of points where the 
+						particle trajectory characteristics should be computed, &nbsp;<b><tt>np &gt;= 2</tt></b>
+						.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The particle is assumed to have a charge equal to the charge of electron by 
+					absolute value.
+					<p>If an absolute precision is specified for the trajectory coordinate or/and angle 
+						(with the function &nbsp;<b><tt>radFldCmpCrt[...]</tt></b>), &nbsp;then the 
+						trajectory is computed with this precision in each of the<b><tt>&nbsp;np </tt></b>
+						points.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radFldEnr">radFldEnr</a>[objdst, objsrc] </tt></b>or<b><tt> 
+							radFldEnr[objdst, objsrc, {kx,ky,kz}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes potential energy of the object<tt><b>&nbsp;objdst </b></tt>in magnetic 
+					field produced by the object<tt><b>&nbsp;objsrc</b></tt>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>The energy value (by default in Joule).</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>objdst: </tt></b>an integer number referencing the object which 
+					potential energy should be computed.
+					<p><b><tt>objsrc: </tt></b>an integer number referencing the object producing 
+						magnetic field in which the potential energy of the object<b><tt>&nbsp;objdst </tt></b>
+						should be computed.
+					</p>
+					<p><b><tt>{kx,ky,kz}: </tt></b>list of three integer numbers specifying subdivision 
+						of the destination object<b><tt>&nbsp;objdst </tt></b>at the energy 
+						computation.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The function can be called with or without the destination subdivision list<b><tt>&nbsp;{kx,ky,kz}</tt></b>.&nbsp;If 
+					called with the destination &nbsp;object subdivision list, the function 
+					performs the energy computation based on subdivision of the object<b><tt>&nbsp;objdst </tt>
+					</b>according to<b><tt>&nbsp;{kx,ky,kz}</tt></b>. If called without the 
+					destination subdivision list, the function performs the&nbsp;energy computation 
+					in automatic mode, based on absolute accuracy level for the energy, with 
+					automatic subdivision of the destination object<b><tt>&nbsp;objdst</tt></b>.
+					<p>The absolute accuracy level for the energy&nbsp;computation in automatic mode 
+						can be set by the function<b><tt>&nbsp;radFldCmpPrc[...]</tt></b> . The default 
+						accuracy is 10 Joule.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radFldEnrFrc">radFldEnrFrc</a>[objdst, objsrc, fid] </tt>
+					</b>or<b><tt> radFldEnrFrc[objdst, objsrc, fid, {kx,ky,kz}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes force acting&nbsp;on the object<tt><b>&nbsp;objdst </b></tt>in 
+					magnetic field produced by the object<tt><b>&nbsp;objsrc</b></tt>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>The force vector or one of its components (computed by default in Newton), 
+					according to the value of variable<b><tt>&nbsp;fid</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>objdst: </tt></b>an integer number referencing the object on which the 
+					force (to be computed) is acting.
+					<p><b><tt>objsrc: </tt></b>an integer number referencing the object producing the 
+						magnetic field.
+					</p>
+					<p><b><tt>fid: </tt></b>output force component identification string. The following 
+						values of <b><tt>fid</tt></b> are allowed: <b><tt>"fx"</tt></b> or <b><tt>"fy"</tt></b>
+						or <b><tt>"fz"</tt></b>, or <b><tt>"" </tt></b>for particular component or all 
+						of the three components of the force vector.
+					</p>
+					<p><b><tt>{kx,ky,kz}: </tt></b>list of three integer numbers specifying subdivision 
+						of the destination object<b><tt>&nbsp;objdst </tt></b>at the force computation.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The function can be called with or without the destination subdivision list<b><tt>&nbsp;{kx,ky,kz}</tt></b>.&nbsp;If 
+					called with the destination &nbsp;object subdivision list, the function 
+					performs the force computation based on subdivision of the object<b><tt>&nbsp;objdst </tt>
+					</b>according to<b><tt>&nbsp;{kx,ky,kz}</tt></b>. If called without the 
+					destination subdivision list, the function performs the&nbsp;force computation 
+					in automatic mode, based on absolute accuracy level for the force, with 
+					automatic subdivision of the destination object<b><tt>&nbsp;objdst</tt></b>.
+					<p>The absolute accuracy level for the force&nbsp;computation in automatic mode can 
+						be set by the function<b><tt>&nbsp;radFldCmpPrc[...]</tt></b>. The default 
+						accuracy is 10 Newton.
+					</p>
+					<p>The function computes a force acting on a magnetized or current-carrying object, 
+						as a gradient of potential energy the object possesses in an external magnetic 
+						field. In many cases this method for the force computation appears advantageous 
+						as compared to the one based on the Maxwell stress tensor implemented in the 
+						function<b><tt>&nbsp;radFldFrc[...]</tt></b> .</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radFldEnrTrq">radFldEnrTrq</a>[objdst, objsrc, tid, 
+							{x,y,z}] </tt></b>or<b><tt> radFldEnrTrq[objdst, objsrc, tid, {x,y,z}, 
+							{kx,ky,kz}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes torque acting&nbsp;on the object<tt><b>&nbsp;objdst </b></tt>with 
+					respect to point<b><tt>&nbsp;{x,y,z} </tt></b>in magnetic field produced by the 
+					object<tt><b>&nbsp;objsrc</b></tt>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>The torque vector or one of its components (computed by default in Newton*mm), 
+					according to the value of variable<b><tt>&nbsp;tid</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>objdst: </tt></b>an integer number referencing the object on which the 
+					torque (to be computed) is acting.
+					<p><b><tt>objsrc: </tt></b>an integer number referencing the object producing the 
+						magnetic field.
+					</p>
+					<p><b><tt>tid: </tt></b>output force component identification string. The following 
+						values of<b><tt>&nbsp;tid </tt></b>are allowed: <b><tt>"tx"</tt></b> or <b><tt>"ty"</tt></b>
+						or <b><tt>"tz"</tt></b>, or <b><tt>"" </tt></b>for particular component or all 
+						of the three components of the torque vector.
+					</p>
+					<p><b><tt>{x,y,z}: </tt></b>list of three real numbers specifying Cartesian 
+						coordinates (by default in mm) of a point with respect to which the torque is 
+						computed.
+					</p>
+					<p><b><tt>{kx,ky,kz}: </tt></b>list of three integer numbers specifying subdivision 
+						of the destination object<b><tt>&nbsp;objdst </tt></b>at the torque 
+						computation.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The function can be called with or without the destination subdivision list<b><tt>&nbsp;{kx,ky,kz}</tt></b>.&nbsp;If 
+					called with the destination object subdivision list, the function performs the 
+					torque computation based on subdivision of the object<b><tt>&nbsp;objdst </tt></b>
+					according to<b><tt>&nbsp;{kx,ky,kz}</tt></b>. If called without the destination 
+					subdivision list, the function performs the&nbsp;torque computation in 
+					automatic mode, based on absolute accuracy level for the torque, with automatic 
+					subdivision of the destination object<b><tt>&nbsp;objdst</tt></b>.
+					<p>The absolute accuracy level for the torque&nbsp;computation in automatic mode 
+						can be set by the function<b><tt>&nbsp;radFldCmpPrc[...]</tt></b>. The default 
+						accuracy is 10 Newton*mm.
+					</p>
+					<p>The function computes a torque acting on a magnetized or current-carrying object 
+						in an external magnetic field through potential energy of&nbsp;the object in 
+						this field.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><b><tt><a name="radFldFrc">radFldFrc</a>[obj, shape]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes force of the field produced by the object<b><tt>&nbsp;obj </tt></b>into 
+					the objects located within the space region defined by the object<b><tt>&nbsp;shape</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>The force vector (computed by default in Newton).</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object creating the 
+					magnetic field.
+					<p><b><tt>shape: </tt></b>an integer number referencing the object defining the 
+						space region where the object(s) on which the force is acting, are located.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The <b><tt>shape</tt></b> can be the result of<b><tt> radObjRecMag[...] </tt></b>
+					(parallelepiped) or<b><tt>&nbsp;radFldFrcShpRtg[...] </tt></b>(rectangular 
+					surface).
+					<p>The absolute precision level for the force&nbsp;computation can be set by the 
+						function <b><tt>radFldCmpCrt[...]</tt></b>. The default precision is 1 Newton.
+					</p>
+					<p>If no objects with magnetization or magnetic material applied, or 
+						current-carrying objects are geometrically located within the <b><tt>shape</tt></b>, 
+						the force should be zero (with the absolute precision specified for the force 
+						computation).
+					</p>
+					<p>The function uses the force computation method based on the Maxwell stress 
+						tensor. Another <i>Radia</i> function &nbsp;<b><tt>radFldEnrFrc[...]</tt></b> computes 
+						forces through potential energy of the object in external magnetic field. The 
+						later method may work faster in some cases.</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radFldFrcShpRtg"></a><b><tt>radFldFrcShpRtg[{x,y,z}, {wx,wy}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Creates a rectangle to be used for field force computation.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>An integer number referencing the object.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>{x,y,z}: </tt></b>list of three real numbers specifying Cartesian 
+					coordinates of the rectangle's center (by default in mm).
+					<p><b><tt>{wx,wy}: </tt></b>list of two real numbers specifying the rectangle's 
+						dimensions.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The objects created by this function are only used at force computation.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radFldFocPot"></a><b><tt>radFldFocPot[obj, {x1,y1,z1}, {x2,y2,z2}, 
+							np]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes the potential for the trajectory of relativistic charged particle in 
+					magnetic field produced by the object<b><tt>&nbsp;obj</tt></b>. The integration 
+					is made from <b><tt>{x1,y1,z1}</tt></b> to <b><tt>{x2,y2,z2}</tt></b> with <b><tt>np</tt></b>
+					equidistant points.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A real number representing the value of the potential (by default in 
+					Tesla^2*mm^3).</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object producing the 
+					magnetic field.
+					<p><b><tt>{x1,y1,z1}: </tt></b>list of three real numbers specifying Cartesian 
+						coordinates of the integration start point.
+					</p>
+					<p><b><tt>{x2,y2,z2}: </tt></b>list of three real numbers specifying Cartesian 
+						coordinates of the integration end point.
+					</p>
+					<p><b><tt>np: </tt></b>number of points to be used at the potential computation.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The "focusing potential" is used to describe electron dynamics in the field of 
+					an Insertion Device. The exact definition and the theory of the "focusing 
+					potential" can be found in the paper:
+					<p>P. Elleaume, "A New Approach to the Electron Beam Dynamics in Undulators and 
+						Wigglers", Proc. of the EPAC92, Berlin, March 22-28, 1992.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<table id="Table3" cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radFldFocKickPer"></a><b><tt>radFldFocKickPer[obj, {x1,y1,z1}, 
+							{nsx,nsy,nsz}, per, nper, {n1x,n1y,n1z}, r1, np1, r2, np2, com :"", {nh :1, nps 
+							:8, d1 :0, d2 :0}]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Computes matrices of 2nd order kicks for the trajectory of relativistic charged 
+					particle propagating in periodic magnetic field produced by the object obj. The 
+					longitudinal integration along one period starts at point <b><tt>{x1,y1,z1}</tt></b>
+					and is done along direction pointed by vector <b><tt>{nsx,nsy,nsz}</tt></b>; 
+					one direction of the transverse grid is pointed by vector <b><tt>{n1x,n1y,n1z}</tt></b>, 
+					the other transverse direction is given by vector product of <b><tt>{n1x,n1y,n1z}</tt></b>
+					and <b><tt>{nsx,nsy,nsz}</tt></b>.
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A list containing: [[1]]- matrix of kick values in the first transverse 
+					direction, [[2]]- matrix of kick values in the second transverse direction, 
+					[[3]],[[4]]- lists of positions defining the transverse grid, [[5]]- formatted 
+					string containing the computed results (for saving into a text file).</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>obj: </tt></b>an integer number referencing the object producing the 
+					magnetic field.
+					<p><b><tt>{x1,y1,z1}: </tt></b>list of three Cartesian coordinates of the 
+						integration start point.</p>
+					<p><b><tt>{nsx,nsy,nsz}: </tt></b>list of three Cartesian coordinates of a vector 
+						defining the direction of the integration.</p>
+					<p><b><tt>per: </tt></b>magnetic field period length.</p>
+					<p><b><tt>nper: </tt></b>number of full periods.</p>
+					<p><b><tt>{n1x,n1y,n1z}: </tt></b>list of three Cartesian coordinates of a vector 
+						defining the first transverse direction.</p>
+					<p><b><tt>r1: </tt></b>range of the first transverse coordinate.</p>
+					<p><b><tt>np1: </tt></b>number of values of the first transverse coordinate.</p>
+					<p><b><tt>r2: </tt></b>range of the second transverse coordinate.</p>
+					<p><b><tt>np2: </tt></b>number of values of the second transverse coordinate.</p>
+					<p><b><tt>com: </tt></b>arbitrary string comment to be inserted into the formatted 
+						string returned by the function.</p>
+					<p><b><tt>nh: </tt></b>maximum number of magnetic field harmonics to treat (default 
+						1).</p>
+					<p><b><tt>nps: </tt></b>number of longitudinal points (default 8).</p>
+					<p><b><tt>d1: </tt></b>step of differentiation over the first transverse coordinate 
+						(by default equal to the step of the transverse grid where the focusing 
+						potential was computed).</p>
+					<p><b><tt>d2: </tt></b>step of differentiation over the second transverse 
+						coordinate (by default equal to the step of the transverse grid where the 
+						focusing potential was computed).</p>
+				</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The 2nd order kick matrices are obtained by numerical differentiation of the 
+					"focusing potential" vs transverse coordinates. The exact definition of the 
+					"focusing potential" can be found in the paper:
+					<p>P. Elleaume, "A New Approach to the Electron Beam Dynamics in Undulators and 
+						Wigglers", Proc. of the EPAC92, Berlin, March 22-28, 1992.
+					</p>
+				</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radFldUnits"></a><b><tt>radFldUnits[]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Shows the physical units currently in use.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A string of information on physical units currently used by <i>Radia</i>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>In the current version of <i>Radia</i>, this function can not modify the 
+					physical units; it only shows the default <i>Radia</i> units for the main 
+					physical quantities under operation.</td>
+			</tr>
+		</table>
+		<p><br>
+		</p>
+		<p><br>
+			<a name="7. Utilities"></a><b><font color="#0f0f0f" size="+2">7. Utilities</font></b>
+		</p>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radUtiDel"></a><b><tt>radUtiDel[elem]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Deletes the element referenced by<b><tt>&nbsp;elem</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>0</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>elem: </tt></b>an integer number referencing the element to be deleted.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>The<b><tt> elem </tt></b>can be any element previously created, including 
+					objects producing magnetic field, magnetic materials, transformations and 
+					interaction matrices.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radUtiDelAll"></a><b><tt>radUtiDelAll[]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Deletes all the previously created elements.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>0</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Notes</font></i></td>
+				<td>This function actually deletes all the previously created elements, including 
+					objects producing magnetic field, magnetic materials, transformations and 
+					interaction matrices.</td>
+			</tr>
+		</table>
+		<table cellSpacing="2" cellPadding="10" border="4">
+			<tr>
+				<td colSpan="2"><a name="radUtiDmp"></a><b><tt>radUtiDmp[elem]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Action</font></i></td>
+				<td>Gives information on the element referenced by<b><tt>&nbsp;elem</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font color="#0f0f0f">Return</font></i></td>
+				<td>A string of information on element<b><tt>&nbsp;elem</tt></b>.</td>
+			</tr>
+			<tr>
+				<td><i><font COLOR="#0f0f0f">Vars</font></i></td>
+				<td><b><tt>elem: </tt></b>an integer number referencing the element.</td>
+			</tr>
+		</table>
+		<table BORDER="4" CELLPADDING="10" CELLSPACING="2">
+			<tr>
+				<td COLSPAN="2"><b><tt><a NAME="radUtiVer">radUtiVer</a>[]</tt></b></td>
+			</tr>
+			<tr>
+				<td><i><font COLOR="#0f0f0f">Action</font></i></td>
+				<td>Gives the identification number of the <i>Radia</i> version in use.</td>
+			</tr>
+			<tr>
+				<td><i><font COLOR="#0f0f0f">Return</font></i></td>
+				<td>A real number specifying the <i>Radia</i> version.</td>
+			</tr>
+		</table>
+		<p><br>
+			<!--__________________________________ SIGNATURE ____________________________________________--></p>
+		<hr ALIGN="right">
+		<p>
+		</p>
+		<p>Last modified:&nbsp;December 18, 2004. <a HREF="mailto:chubar@esrf.fr">Comments 
+				or&nbsp;suggestions</a>&nbsp;&nbsp;are welcome. <!--__________________________________ SIGNATURE ____________________________________________-->
+		</p>
+	</body>
+</html>

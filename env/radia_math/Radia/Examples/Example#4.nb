@@ -1,0 +1,273 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[      8010,        264]
+NotebookOptionsPosition[      6508,        206]
+NotebookOutlinePosition[      7116,        229]
+CellTagsIndexPosition[      7073,        226]
+WindowFrame->Normal
+ContainsDynamic->False*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[StyleBox["Example # 4 : Uniformly Magnetized Polyhedron ",
+ FontSize->24]], "Title",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["Version : 0.1", "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[CellGroupData[{
+
+Cell["Introduction", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ StyleBox["This example illustrates the use of a polyhedron shape by means of \
+the \"",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "radObjMltExtPgn",
+ StyleBox["\" function. A uniformly magnetized polyhedron is created with a \
+magnetization of 1 Tesla. The field produced by this polyhedron is computed \
+and shown to be uniform inside the volume of the polyhedron and equal to 2/3 \
+Tesla as expected from an analytical integration.\nIt is assumed that the \
+reader has some experience with ",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ StyleBox["Mathematica ",
+  Evaluatable->False,
+  AspectRatioFixed->True,
+  FontSlant->"Italic"],
+ StyleBox["and that he has successfully run Example#1.",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "\n",
+ StyleBox["Evaluate sections in the order of presentation: \"Load and \
+Initialize Radia\" followed by \"Build the Geometry\", \"",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "Display the Geometry with QuickDraw 3D",
+ StyleBox["\", \"Plot the Geometry\", \"Plot the Magnetic Field\".",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "\n",
+ StyleBox["If successful, try to modify some parameters (see the Reference \
+Guide for the explanations on the ",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ StyleBox["Radia",
+  Evaluatable->False,
+  AspectRatioFixed->True,
+  FontSlant->"Italic"],
+ StyleBox[" functions) and re-execute the corresponding section. All sections \
+must be evaluated in the order of presentation. A section may be evaluated \
+several times with the same or different parameters if the previous sections \
+have been evaluated before. The only limitation is memory. The Radia.exe \
+memory   can be re-initialized by re-executing the section entitled \"Load \
+and Initialize Radia\". The Kernel memory can be re-initialized by calling \
+Exit[] and then re-executing all sections of this example. If the Front-End \
+is running out of memory, close some windows or close the Front-End and start \
+it again. Note that if by mistake any section is executed before the previous \
+ones are executed, it may be necessary to exit the Kernel and re-start \
+everything from the very beginning.",
+  Evaluatable->False,
+  AspectRatioFixed->True]
+}], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Load and Initialize Radia", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["The following instruction loads the Radia package and \
+returns the Radia version number.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["<<Radia`;", "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Build Geometry", "Section",
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999143127807503`*^9, 3.3999143135151253`*^9}},
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["These instructions define a uniformly magnetized \
+convex polyhedron which converges to a sphere at large values of segmentation \
+parameters.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+SphericalVolume[R_, nn\[CurlyPhi]_, nz_, {mx_,my_,mz_}]:=Module[{z, dz, \
+\[Theta], cos\[Theta], \[CurlyPhi], d\[CurlyPhi], SlicePgn, AllSlicePgns},
+\tdz=2.*R/nz;\tz=-R+dz; d\[CurlyPhi]=2.*\[Pi]/nn\[CurlyPhi];
+\tAllSlicePgns={{{{0.,0.}}, -R}};
+\tFor[i=1, i<=(nz-1), i++,
+\t\t\[Theta]=ArcSin[z/R]; cos\[Theta]=Cos[\[Theta]]; \
+\[CurlyPhi]=d\[CurlyPhi];
+\t\tSlicePgn={{R*cos\[Theta], 0.}};
+\t\tFor[k=1, k<=(nn\[CurlyPhi]-1), k++,
+\t\t\tSlicePgn=Append[SlicePgn, {R*Cos[\[CurlyPhi]]*cos\[Theta], R*Sin[\
+\[CurlyPhi]]*cos\[Theta]}]; 
+\t\t\t\[CurlyPhi]+=d\[CurlyPhi];
+\t\t];
+ \t\tAllSlicePgns=Append[AllSlicePgns, {SlicePgn, z}];
+\t\tz+=dz;
+\t];
+\tAllSlicePgns=Append[AllSlicePgns, {{{0.,0.}}, R}];
+\tradObjMltExtPgn[AllSlicePgns, N[{mx,my,mz}]]
+];
+
+radUtiDelAll[];
+aSpherMag = SphericalVolume[1., 15, 15, {1.,0.,0.}];
+radObjDrwAtr[aSpherMag, {0,0.5,0.8}];\
+\>", "Input",
+ CellChangeTimes->{{3.3999146910151253`*^9, 3.3999147181401253`*^9}},
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Plot Geometry", "Section",
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999143898120003`*^9, 3.3999143904213753`*^9}},
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["These instructions plot the geometry of coils \
+previously created.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+RadPlot3DOptions[];
+dr=radObjDrw[aSpherMag];
+
+(* Draw the Geometry *)
+Show[Graphics3D[dr
+,PlotLabel->\"Sphere\"
+,BaseStyle \[Rule] {14, FontFamily \[Rule] \"Times\"}]]\
+\>", "Input",
+ CellChangeTimes->{
+  3.3999144853276253`*^9, 3.3999145203901253`*^9, 3.3999149196557503`*^9, {
+   3.3999149579838753`*^9, 3.3999149831870003`*^9}},
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Plot Magnetic Field", "Section",
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999143932963753`*^9, 3.3999143939526253`*^9}},
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["The magnetic field created by the sphere is computed \
+on the center and a  profile along Y is plotted",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+RadPlotOptions[];
+Print[\"Field in the Center = \",radFld[aSpherMag,\"b\",{0,0,0}]]
+Plot[radFld[aSpherMag,\"Bx\",{0,y,0}],{y,-0.99,0.99}]\
+\>", "Input",
+ CellChangeTimes->{3.3999145247651253`*^9, 3.3999151222651253`*^9, 
+  3.3999151959682503`*^9},
+ AspectRatioFixed->True]
+}, Open  ]]
+},
+WindowToolbars->{},
+CellGrouping->Manual,
+WindowSize->{860, 913},
+WindowMargins->{{149, Automatic}, {Automatic, 15}},
+PrivateNotebookOptions->{"ColorPalette"->{RGBColor, 128}},
+ShowCellLabel->False,
+ShowCellTags->False,
+RenderingOptions->{"ObjectDithering"->True,
+"RasterDithering"->False},
+CharacterEncoding->"MacintoshAutomaticEncoding",
+FrontEndVersion->"6.0 for Microsoft Windows (32-bit) (June 19, 2007)",
+StyleDefinitions->"Classroom.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[568, 21, 144, 3, 43, "Title",
+ Evaluatable->False],
+Cell[715, 26, 75, 2, 25, "Text",
+ Evaluatable->False],
+Cell[CellGroupData[{
+Cell[815, 32, 77, 2, 54, "Section",
+ Evaluatable->False],
+Cell[895, 36, 2302, 53, 259, "Text",
+ Evaluatable->False]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3234, 94, 90, 2, 54, "Section",
+ Evaluatable->False],
+Cell[3327, 98, 217, 5, 25, "Text",
+ Evaluatable->False],
+Cell[3547, 105, 51, 1, 48, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3635, 111, 149, 3, 54, "Section",
+ Evaluatable->False],
+Cell[3787, 116, 270, 6, 25, "Text",
+ Evaluatable->False],
+Cell[4060, 124, 971, 26, 371, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5068, 155, 148, 3, 54, "Section",
+ Evaluatable->False],
+Cell[5219, 160, 195, 5, 25, "Text",
+ Evaluatable->False],
+Cell[5417, 167, 366, 12, 150, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5820, 184, 154, 3, 54, "Section",
+ Evaluatable->False],
+Cell[5977, 189, 230, 5, 25, "Text",
+ Evaluatable->False],
+Cell[6210, 196, 282, 7, 82, "Input"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

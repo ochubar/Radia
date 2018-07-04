@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0FD06408-7423-4BBA-8445-A3A9A9DC2CA8}</ProjectGuid>
+    <RootNamespace>Radia</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ProjectDir)</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(ProjectDir)</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreBuildEvent>
+      <Message>Performing MPREP</Message>
+      <Command>$(ProjectDir)..\..\ext_lib\mathlink\bin\mprep.exe $(ProjectDir)..\src\clients\mathlink\radia.tm -o $(ProjectDir)..\src\clients\mathlink\radia_tm_win.c</Command>
+    </PreBuildEvent>
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/Radia.tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\src\ext\triangle;..\src\clients\mathlink;..\..\ext_lib\mathlink\include;..\src\ext\glut_viewer;..\src\ext\genmath;..\src\ext\auxparse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;__VC__;__MATHEMATICA__;_WITH_GLUT;ALPHA_NONE;_CRT_SECURE_NO_DEPRECATE;FFTW_ENABLE_FLOAT;NO_TIMER;ANSI_DECLARATORS;TRILIBRARY;_GM_WITHOUT_BASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>.\Debug/Radia.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;version.lib;..\..\ext_lib\mathlink\lib\ml32i3m.lib;..\..\ext_lib\fftw_f.lib;..\..\ext_lib\GlutViewer.lib;..\..\ext_lib\glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>Radia.exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBC;LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\Debug/Radia.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath) "$(SolutionDir)..\..\env\radia_math\Radia"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Debug/Radia.tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\src\ext\triangle;..\src\clients\mathlink;..\..\ext_lib\mathlink\include;..\src\ext\glut_viewer;..\src\ext\genmath;..\src\ext\auxparse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;__VC__;__MATHEMATICA__;_WITH_GLUT;ALPHA_NONE;_CRT_SECURE_NO_DEPRECATE;FFTW_ENABLE_FLOAT;_GM_WITHOUT_BASE;NO_TIMER;TRILIBRARY;ANSI_DECLARATORS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>.\Debug/Radia.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\x64/$(ProjectName)/Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\x64/$(ProjectName)/Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\x64/$(ProjectName)/Debug/</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>version.lib;..\..\ext_lib\mathlink\lib\ml64i3m.lib;..\..\ext_lib\fftw64_f.lib;..\..\ext_lib\GlutViewer64d.lib;..\..\ext_lib\glut64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>Radia.exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>glut32;LIBC;LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\Debug/Radia.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Radia___Win32_Release/Radia.tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\src\ext\triangle;..\..\ext_lib\mathlink\include;..\src\ext\glut_viewer;..\src\ext\genmath;..\src\ext\auxparse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;NDEBUG_EXTRA;_WITH_GLUT;WIN32;_WINDOWS;__VC__;__MATHEMATICA__;ALPHA_NONE;_CRT_SECURE_NO_DEPRECATE;FFTW_ENABLE_FLOAT;NO_TIMER;ANSI_DECLARATORS;TRILIBRARY;_GM_WITHOUT_BASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <PrecompiledHeaderOutputFile>.\Release/Radia.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
+      <ObjectFileName>.\Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;version.lib;..\..\ext_lib\mathlink\lib\ml32i3m.lib;..\..\ext_lib\fftw_f.lib;..\..\ext_lib\GlutViewer.lib;..\..\ext_lib\glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>Radia.exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreSpecificDefaultLibraries>LIBC;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ProgramDatabaseFile>.\Release/Radia.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath) "$(SolutionDir)..\..\env\radia_math\Radia"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Radia___Win32_Release/Radia.tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\src\ext\triangle;..\..\ext_lib\mathlink\include;..\src\clients\mathlink;..\src\ext\glut_viewer;..\src\ext\genmath;..\src\ext\auxparse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;NDEBUG_EXTRA;_WITH_GLUT;WIN32;_WINDOWS;__VC__;__MATHEMATICA__;ALPHA_NONE;_CRT_SECURE_NO_DEPRECATE;FFTW_ENABLE_FLOAT;_GM_WITHOUT_BASE;NO_TIMER;ANSI_DECLARATORS;TRILIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderOutputFile />
+      <AssemblerListingLocation>.\x64/$(ProjectName)/Release/</AssemblerListingLocation>
+      <ObjectFileName>.\x64/$(ProjectName)/Release/</ObjectFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <ProgramDataBaseFileName>.\x64/$(ProjectName)/Release/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>version.lib;..\..\ext_lib\mathlink\lib\ml64i3m.lib;..\..\ext_lib\fftw64_f.lib;..\..\ext_lib\GlutViewer64.lib;..\..\ext_lib\glut64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>Radia.exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreSpecificDefaultLibraries> glut32;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ProgramDatabaseFile>.\Release/Radia.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy Radia.exe "$(SolutionDir)..\..\env\radia_math\Radia"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\ext\auxparse\auxparse.cpp" />
+    <ClCompile Include="..\src\ext\genmath\gmfft.cpp" />
+    <ClCompile Include="..\src\ext\genmath\gmtrans.cpp" />
+    <ClCompile Include="..\src\core\radapl1.cpp" />
+    <ClCompile Include="..\src\core\radapl2.cpp" />
+    <ClCompile Include="..\src\core\radapl3.cpp" />
+    <ClCompile Include="..\src\core\radapl4.cpp" />
+    <ClCompile Include="..\src\core\radapl5.cpp" />
+    <ClCompile Include="..\src\core\radapl6.cpp" />
+    <ClCompile Include="..\src\core\radapl7.cpp" />
+    <ClCompile Include="..\src\core\radarccu.cpp" />
+    <ClCompile Include="..\src\core\radcast.cpp" />
+    <ClCompile Include="..\src\core\radexpgn.cpp" />
+    <ClCompile Include="..\src\core\radflm.cpp" />
+    <ClCompile Include="..\src\core\radg3d.cpp" />
+    <ClCompile Include="..\src\core\radg3dgr.cpp" />
+    <ClCompile Include="..\src\core\radgroup.cpp" />
+    <ClCompile Include="..\src\core\radinter.cpp" />
+    <ClCompile Include="..\src\core\radintrc.cpp" />
+    <ClCompile Include="..\src\core\radiobuf.cpp" />
+    <ClCompile Include="..\src\core\radmamet.cpp" />
+    <ClCompile Include="..\src\core\radmater.cpp" />
+    <ClCompile Include="..\src\core\radplnr1.cpp" />
+    <ClCompile Include="..\src\core\radplnr2.cpp" />
+    <ClCompile Include="..\src\core\radptrj.cpp" />
+    <ClCompile Include="..\src\core\radrec.cpp" />
+    <ClCompile Include="..\src\core\radrlmet.cpp" />
+    <ClCompile Include="..\src\core\radsbdac.cpp" />
+    <ClCompile Include="..\src\core\radsbdep.cpp" />
+    <ClCompile Include="..\src\core\radsbdrc.cpp" />
+    <ClCompile Include="..\src\core\radsbdvp.cpp" />
+    <ClCompile Include="..\src\core\radsend.cpp" />
+    <ClCompile Include="..\src\core\radvlpgn.cpp" />
+    <ClCompile Include="..\src\ext\triangle\triangle.c" />
+    <ClCompile Include="..\src\clients\mathlink\radia_tm_win.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\ext\auxparse\auxparse.h" />
+    <ClInclude Include="..\src\ext\genmath\gmfft.h" />
+    <ClInclude Include="..\src\ext\genmath\gmtrans.h" />
+    <ClInclude Include="..\src\ext\genmath\gmvbstr.h" />
+    <ClInclude Include="..\src\ext\genmath\gmvect.h" />
+    <ClInclude Include="..\src\ext\genmath\gmvectf.h" />
+    <ClInclude Include="..\src\core\radapl1.h" />
+    <ClInclude Include="..\src\core\radappl.h" />
+    <ClInclude Include="..\src\core\radarccu.h" />
+    <ClInclude Include="..\src\core\radauxst.h" />
+    <ClInclude Include="..\src\core\radcast.h" />
+    <ClInclude Include="..\src\core\radcnvrg.h" />
+    <ClInclude Include="..\src\core\radexcep.h" />
+    <ClInclude Include="..\src\core\radexpgn.h" />
+    <ClInclude Include="..\src\core\radflm.h" />
+    <ClInclude Include="..\src\core\radg.h" />
+    <ClInclude Include="..\src\core\radg3d.h" />
+    <ClInclude Include="..\src\core\radg3da1.h" />
+    <ClInclude Include="..\src\core\radg3dgr.h" />
+    <ClInclude Include="..\src\core\radgroup.h" />
+    <ClInclude Include="..\src\core\radhandl.h" />
+    <ClInclude Include="..\src\core\radintrc.h" />
+    <ClInclude Include="..\src\core\radiobuf.h" />
+    <ClInclude Include="..\src\core\radmamet.h" />
+    <ClInclude Include="..\src\core\radmater.h" />
+    <ClInclude Include="..\src\core\radmtra1.h" />
+    <ClInclude Include="..\src\core\radopnam.h" />
+    <ClInclude Include="..\src\core\radplnr.h" />
+    <ClInclude Include="..\src\core\radptrj.h" />
+    <ClInclude Include="..\src\core\radrec.h" />
+    <ClInclude Include="..\src\core\radrlmet.h" />
+    <ClInclude Include="..\src\core\radsbdac.h" />
+    <ClInclude Include="..\src\core\radsbdep.h" />
+    <ClInclude Include="..\src\core\radsbdrc.h" />
+    <ClInclude Include="..\src\core\radsbdvp.h" />
+    <ClInclude Include="..\src\core\radsend.h" />
+    <ClInclude Include="..\src\core\radstlon.h" />
+    <ClInclude Include="..\src\core\radtrans.h" />
+    <ClInclude Include="..\src\core\radvlpgn.h" />
+    <ClInclude Include="..\src\core\radyield.h" />
+    <ClInclude Include="..\src\clients\mathlink\mathlink_wrap.h" />
+    <ClInclude Include="..\src\ext\triangle\triangle.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\src\clients\mathlink\radia.tm">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Performing MPREP</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">del $(ProjectDir)..\src\clients\mathlink\radia_tm_win.c
+$(ProjectDir)..\..\ext_lib\mathlink\bin\mprep.exe $(ProjectDir)..\src\clients\mathlink\radia.tm -o $(ProjectDir)..\src\clients\mathlink\radia_tm_win.c
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">radia_tm_win.c;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Performing MPREP</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)..\..\ext_lib\mathlink\bin\mprep.exe $(ProjectDir)..\src\clients\mathlink\radia.tm -o $(ProjectDir)..\src\ext\mathlink\radia_tm_win.c
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">radia_tm_win.c;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Performing MPREP</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)..\..\ext_lib\mathlink\bin\mprep.exe $(ProjectDir)..\src\clients\mathlink\radia.tm -o $(ProjectDir)..\src\clients\mathlink\radia_tm_win.c
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">radia_tm_win.c;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,173 @@
+<HTML>
+	<HEAD>
+		<TITLE>Radia Introduction</TITLE>
+		<META NAME="GENERATOR" CONTENT="Adobe PageMill 2.0 Mac">
+	</HEAD>
+	<BODY BGCOLOR="#ffffff" LINK="#0000ff" VLINK="#ff0000" ALINK="#ff0000">
+		<P>
+			<IMG SRC="ID_esrf.gif" WIDTH="90" HEIGHT="90" ALIGN="left" BORDER="0" NATURALSIZEFLAG="0">
+		<P ALIGN="center">
+			<BR>
+			<BR>
+			<H1 ALIGN="center">
+				<FONT COLOR="#f70823"></FONT>Introduction
+			</H1>
+		<P>
+			<BR>
+		<P>
+			<BR>
+		<P>
+			<BR>
+		<P>
+			<BR>
+		<P>
+			<BR>
+			<DL>
+				<DT><A HREF="#1. Purpose"><B><FONT SIZE="+1">1. Purpose</FONT></B></A> <DT><B><FONT SIZE="+1"><A HREF="#2. Computation Method">
+									2. Computation Method</A></FONT></B> <DT><A HREF="#3. Implementation Features">
+								<B><FONT SIZE="+1">3. Implementation Features</FONT></B></A></DT>
+			</DL>
+		<P>
+			<BR>
+			<FONT COLOR="#0f0f0f">
+				<HR ALIGN="left" WIDTH="95%">
+				<BR>
+			</FONT>
+		<P>
+			<BR>
+		<P>
+			<A NAME="1. Purpose"></A><B><FONT COLOR="#0f0f0f" SIZE="+2">1. Purpose</FONT></B>
+		<P>
+			<FONT COLOR="#000000" SIZE="+1">The Radia software package was designed for solving 
+				physical and technical problems one encounters during the development of 
+				Insertion Devices for Synchrotron Light Sources. However, it can also be used 
+				in different branches of physics, where efficient solution of 3D boundary 
+				problems of Magnetostatics is needed. </FONT>
+		<P>
+			<FONT COLOR="#000000" SIZE="+1">The Radia package is essentially a 3D 
+				magnetostatics computer code optimized for Undulators and Wigglers. In the 
+				Radia very special attention is paid to the accurate and fast computation of 
+				the magnetic field and the field integrals along a line. </FONT>
+		<P>
+			<FONT COLOR="#000000" SIZE="+1">Radia can solve a variety of problems with linear 
+				and nonlinear, isotropic and anisotropic magnetic materials (such as iron and 
+				permanent magnets, respectively) and, of course, with current-carrying elements 
+				of different shapes.</FONT>
+		<P>
+			<FONT COLOR="#000000" SIZE="+1">The code has been extensively benchmarked with 
+				respect to a commercial finite element code. All ESRF Insertion Devices built 
+				since 1992 have been designed using this code or its earlier versions. A large 
+				number of predictions made by Radia concerning the magnetic field and field 
+				integrals were verified on real insertion devices after manufacture. We are 
+				therefore convinced that by an efficient use of Radia one can design nearly any 
+				permanent magnet undulator or wiggler ab-initio, including the central field as 
+				well as the extremities. </FONT>
+		<P>
+			<BR>
+			<HR ALIGN="left" SIZE="1" WIDTH="95%">
+		<P>
+			<BR>
+			<B><FONT COLOR="#0f0f0f" SIZE="+2"><A NAME="2. Computation Method">2. Computation Method</A></FONT></B>
+		<P>
+			<FONT COLOR="#000000" SIZE="+1">The method used in Radia belongs to the category of 
+				Volume Integral Methods and differs strongly from the Finite Element Methods 
+				(FEM). Volume objects are created, material properties are applied to these 
+				objects. Each object can be subdivided into a number of smaller objects for 
+				which one tries to solve for the general problem in terms of the magnetization. 
+				The solution is performed by building a large matrix in memory which represents 
+				mutual interactions between the objects. We call this an Interaction Matrix. 
+				The final magnetization in each small object is obtained iteratively, by a 
+				sequence of multiplications of the Interaction Matrix by instant magnetizations 
+				vector, taking into account the material properties.&nbsp;We call this a 
+				Relaxation procedure. In this approach, one applies some kind of segmentation 
+				to the field-producing objects (typically iron) but, contrary to the FEM 
+				approach, one does not need to mesh the vacuum. This has a number of important 
+				consequences:</FONT>
+		<P>
+			<UL>
+				<LI>
+					<FONT COLOR="#000000" SIZE="+1">Geometries opened to infinity are more easily 
+						simulated.</FONT>
+					<P></P>
+				<LI>
+					<FONT COLOR="#000000" SIZE="+1">The number of elements required for a given 
+						precision on the prediction of the central field of an undulator is typically 
+						20 times smaller in our approach than with a FEM code. The CPU time required is 
+						also typically 20 times smaller. For example, the peak field of a hybrid 
+						undulator can be obtained with a precision better than 1% in less than 10 
+						seconds on a PowerMac 4400, while it would take a few minutes with a FEM code. </FONT>
+					<P></P>
+				<LI>
+					<FONT COLOR="#000000" SIZE="+1">Once the Relaxation is done, the magnetic field and 
+						field integrals can be computed anywhere in space whatever the distance to the 
+						field-producing objects.</FONT>
+					<P></P>
+				<LI>
+					<FONT COLOR="#000000" SIZE="+1">Field integrals can be computed using analytical 
+						formulas. This might be one of the most significant advantages of the Radia 
+						over a FEM code. The precision on a field integral computed with Radia only 
+						depends on the level of segmentation of the iron but not on the field sampling 
+						and boundary conditions at infinity as it is the case with FEM codes. It is 
+						easy to refine the segmentation until the computed field integrals are stable. 
+						In other words, accurate predictions of the magnetic field integrals are 
+						possible with Radia (eventhough it may require a large segmentation of the iron 
+						), which are practically impossible with FEM codes.</FONT>
+					<P></P>
+				<LI>
+					<FONT COLOR="#000000" SIZE="+1">The geometry creation is much simpler. In fact, a 
+						hybrid undulator can be created and solved using no more than 20 lines of 
+						Mathematica code. </FONT>
+					<P></P>
+				<LI>
+					<FONT COLOR="#000000" SIZE="+1">The essential drawback of Radia compared to a FEM 
+						code is the fast divergence of memory required for a given number of elements. 
+						In the present version of Radia, the memory required scales proportionally to 
+						the square of the number of elements. For example, one roughly needs 50 (13) MB 
+						of memory to solve a geometry made of 1000 (500) elements (which roughly 
+						corresponds to 20000 elements in a FEM code for a similar precision on the 
+						field). We plan to improve Radia in this respect in future versions. However, 
+						with the present version, for example,&nbsp;we have solved and optimized 
+						various geometries for the central field and field integral of a heavily 
+						saturated high field permanent magnet wiggler (2 T) using less than 3M of 
+						memory for the Radia code. </FONT>
+					<P></P>
+				<LI>
+					<FONT COLOR="#000000" SIZE="+1">Another drawback of Radia is an "artificial" 
+						discontinuity in computation of magnetic field inside the subdivided iron 
+						objects, occurring on the boundary between any adjacent sub-objects. This is 
+						also planned to be improved in future versions. The drawback&nbsp;is harmless 
+						with respect to the field computed outside the iron.</FONT></LI>
+			</UL>
+		<P>
+			<BR>
+			<HR ALIGN="left" SIZE="1" WIDTH="95%">
+		<P>
+			<BR>
+			<B><FONT COLOR="#0f0f0f" SIZE="+2"><A NAME="3. Implementation Features">3. Implementation 
+						Features</A></FONT></B>
+		<P>
+			<FONT COLOR="#000000" SIZE="+1">The core part of Radia is written in 
+				object-oriented&nbsp;C++. The&nbsp;versions interfaced to <A HREF="http://www.wolfram.com/">
+					Mathematica</A> and <A HREF="http://www.wavemetrics.com/">Igor Pro</A> are 
+				available. Pre- and post-processing of the field data is done in script 
+				languages (Mathematica and Igor Macro Language, depending on the version). 1D 
+				and 2D field plots are performed using the Graphics facilities built in 
+				Mathematica and Igor Pro. 3D geometries can be viewed using 
+				built-in&nbsp;OpenGL and QuickDraw 3D viewers, and can be exported for 
+				rendering in the Mathematica Front-End. </FONT>
+		<P>
+			<FONT COLOR="#000000" SIZE="+1">Radia is available on Windows, Mac OSX&nbsp;and 
+				Linux platforms.</FONT>
+		<P>
+		<P>
+			<BR>
+		<P>
+			<BR> <!--__________________________________ SIGNATURE ____________________________________________-->
+		<P ALIGN="right">
+			<HR ALIGN="right">
+		<P>
+		<P>
+			Last modified:&nbsp;December 2004. <A HREF="mailto:oleg.chubar@synchrotron-soleil.fr">
+				Comments</A> are welcome.<!--__________________________________ SIGNATURE ____________________________________________--></P>
+	</BODY>
+</HTML>

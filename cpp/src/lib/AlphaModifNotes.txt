@@ -1,0 +1,21 @@
+
+Required Modifications in Alpha
+===============================
+
+-------------------------------
+
+AlpError.h 
+
+Change from:
+
+private:
+vector<string> error;
+vector<string> warn;
+
+to:
+
+protected:
+vector<string> error;
+vector<string> warn;
+
+-------------------------------

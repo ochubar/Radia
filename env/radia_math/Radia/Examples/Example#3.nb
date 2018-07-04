@@ -1,0 +1,1270 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     45103,       1261]
+NotebookOptionsPosition[     40683,       1101]
+NotebookOutlinePosition[     42346,       1160]
+CellTagsIndexPosition[     42218,       1154]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ " ",
+ StyleBox["Example # 3 : Generic Hybrid Undulator",
+  FontSize->24]
+}], "Title",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["Version 0.7", "Text",
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999131561401253`*^9, 3.3999131562026253`*^9}},
+ AspectRatioFixed->True],
+
+Cell[CellGroupData[{
+
+Cell["Introduction", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ StyleBox["This example creates and solves a simple U46 Hybrid Undulator made \
+with   rectangular blocks. It is important to execute each section in the \
+order of presentation. If not, errors may be reported. Any section can be \
+edited and executed several times. To see the change in the peak field \
+induced by the   variation of the magnet size, edit the corresponding \
+parameter in the section  entitled \"Create the Geometry\", execute this \
+section and re-execute the   section \"Solve\". The section \"Optimizing \
+Parameters\" provides an example   of manual optimization of the pole \
+dimensions.",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "\n",
+ StyleBox["To obtain acceptable precision on the magnetic field, it is \
+essential to   increase the segmentation. This is done at the expense of \
+memory and CPU time. The segmentation in this example has been set to",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ " np={2,2,5} for the pole and nm={1,3,1} for the magnet. ",
+ StyleBox["This corresponds to an absolute error in the peak field of the \
+undulator   of the order of 1%. The user himself should experience \
+consequences of   increasing np and nm and see how CPU time and memory \
+increase, and how the value of the peak field approaches a limit which is the \
+value looked for. To do so, edit the nm or np values in the \"Create the \
+Geometry\" section, and re-execute both the \"Create the Geometry\" and \
+\"Solve\" sections. Using   segmentation which is too large segmentation may \
+result in a memory allocation failure. To recover from such situation, the \
+section \"Load and Initialize Radia\" should be re-executed. Memory \
+allocation failure can be avoided (to some extent) by giving more memory to \
+the Radia.exe process (Macintosh). \nIt is a fact that iron pieces need much \
+more segmentation than the magnets since the magnetization there is very \
+sensitive to the external field.",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "\n",
+ StyleBox["One can also compute the Field Integral produced by such an \
+undulator, forces on the magnets and poles, etc. One can build a wedge pole \
+undulator by   using polyhedrons or extruded polygons instead of rectangular \
+blocks... To learn more, read the Radia documentation, make tests and develop \
+experience.",
+  Evaluatable->False,
+  AspectRatioFixed->True]
+}], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Load and Initialize Radia", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+The following instruction loads the Radia package and returns the Radia \
+version number. This notebook requires the Radia version 4.097 or later. \
+\>", "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["<<Radia`;", "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Functions", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["The following function builds an array of rectangular \
+permanent magnets with their mirror symmetric counterparts, distributes the \
+colors, magnetic materials and sets the segmentation. The function is very \
+generic and can be used to build almost any hybrid undulator (without \
+optimizing the design of terminations).",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ "und[]:=Module[{},\nzer={0,0,0};\nGrp=",
+ StyleBox["radObjCnt",
+  FontColor->RGBColor[1, 0, 0]],
+ "[{}];\n\n(* Principal Poles and Magnets *)\ny=lp[[2]]/4;\nPole=",
+ StyleBox["RadObjFullMag",
+  FontColor->RGBColor[1, 0, 0]],
+ "[{lp[[1]]/4,y,-lp[[3]]/2-gap/2},{lp[[1]]/2,lp[[2]]/2,lp[[3]]},zer,np,Grp,mp,\
+cp];\ny+=lp[[2]]/4;\n\nFor[i=1,i<=NumPer,i++,(\n\
+initm={0,Mod[i+1,2]-Mod[i,2],0};\ny+=lm[[2]]/2;\nMagnet=",
+ StyleBox["RadObjFullMag",
+  FontColor->RGBColor[1, 0, 0]],
+ "[{lm[[1]]/4,y,-lm[[3]]/2-gap/2-gapoffset},{lm[[1]]/2,lm[[2]],lm[[3]]},initm,\
+nm,Grp,mm,cm];\ny+=(lm[[2]]+lp[[2]])/2;\n\nPole=",
+ StyleBox["RadObjFullMag",
+  FontColor->RGBColor[1, 0, 0]],
+ "[{lp[[1]]/4,y,-lp[[3]]/2-gap/2},{lp[[1]]/2,lp[[2]],lp[[3]]},zer,np,Grp,mp,\
+cp];\n\ny+=lp[[2]]/2;\n)];\n\ninitm={0,Mod[NumPer,2]-Mod[NumPer+1,2],0};\n\
+y+=lm[[2]]/4;\nMagnet=",
+ StyleBox["RadObjFullMag",
+  FontColor->RGBColor[1, 0, 0]],
+ "[{lm[[1]]/4,y,-lm[[3]]/2-gap/2-gapoffset},{lm[[1]]/2,lm[[2]]/2,lm[[3]]},\
+initm,nm,Grp,mm,cm];\n\n(* Mirrors *)\n",
+ StyleBox["RadTrfZerPerp",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Grp,{0,0,0},{1,0,0}];\n",
+ StyleBox["RadTrfZerPara",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Grp,zer,{0,0,1}];\n",
+ StyleBox["RadTrfZerPerp",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Grp,zer,{0,1,0}];\nGrp\n]"
+}], "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Define Magnetic Material ", "Section",
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999127515151253`*^9, 3.3999127519057503`*^9}},
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ StyleBox["The following instructions define a material by means of the \
+Magnetization  M (in Tesla) vs H (in Amp/m) dependence entered point by \
+point. The resulting M(H) curve is plotted for verification. Note that the \
+material is defined by calling the function \"",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "radMatSatIso",
+ StyleBox["\"  with the input parameter \"ma\" which contains the values of H \
+and M both expressed in Tesla. The conversion between Amp/m and Tesla  is \
+done by multiplying H by \"",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "4*Pi*10^(-7)",
+ StyleBox["\" when creating \"ma\". ",
+  Evaluatable->False,
+  AspectRatioFixed->True]
+}], "Text",
+ Evaluatable->False],
+
+Cell[TextData[{
+ "H = {0.8, 1.5, 2.2, 3.6, 5, 6.8, 9.8, 18, 28, 37.5, 42, 55, 71.5, 80, 85, \
+88, 92, 100, 120, 150, 200, 300, 400, 600, 800, 1000, 2000, 4000, 6000, \
+10000, 25000, 40000};\n\nM = {0.000998995, 0.00199812, 0.00299724, \
+0.00499548,0.00699372, 0.00999145, 0.0149877, 0.0299774, 0.0499648, \
+0.0799529, 0.0999472, 0.199931, 0.49991, 0.799899, 0.999893, 1.09989, \
+1.19988, 1.29987, 1.41985, 1.49981, 1.59975, 1.72962, 1.7995, 1.89925, \
+1.96899, 1.99874,  2.09749, 2.19497, 2.24246, 2.27743, 2.28958, 2.28973};\n\n\
+ma =  N[Table[{H[[i]]*4*Pi*10^(-7), M[[i]]}, {i, 1, Length[H]}]];\n\n",
+ StyleBox["RadPlotOptions",
+  FontColor->RGBColor[1, 0, 0]],
+ "[];\nListPlot[ma,\nJoined->True,\nAxesLabel->{\"H [Tesla]\",\"Mag \
+[Tesla]\"}]\n\nListPlot[ma,\nJoined->True,\nPlotRange->{{0,0.001},{0,2.2}},\n\
+AxesLabel->{\"H [Tesla]\",\"Mag [Tesla]\"}]\n\nmp=",
+ StyleBox["radMatSatIso",
+  FontColor->RGBColor[1, 0, 0]],
+ "[ma];"
+}], "Input",
+ CellChangeTimes->{{3.6700863622205486`*^9, 3.6700863679301586`*^9}, {
+  3.6700864088334303`*^9, 3.670086412078236*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Create Geometry", "Section",
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999127557963753`*^9, 3.3999127565620003`*^9}},
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ StyleBox["The following instructions build an undulator with NdFeB magnets \
+and poles  made with the material previously defined.  One could also use a \
+Radia predefined steel by replacing  \"",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "mp=",
+ StyleBox["radMatSatIso",
+  FontColor->RGBColor[1, 0, 0]],
+ "[ma]",
+ StyleBox["\" with \"mp=",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "RadMatAFK502[]",
+ StyleBox["\" or \"m=",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "RadMatXc06[]",
+ StyleBox["\" or \"m=",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ "RadMatSteel42",
+ StyleBox["[]\". See the section \"How to get Help\" later on to obtain the  \
+full specification of any of the  material  predefined in Radia .  ",
+  Evaluatable->False,
+  AspectRatioFixed->True]
+}], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ StyleBox["radUtiDelAll",
+  FontColor->RGBColor[1, 0, 0]],
+ "[];\n\n(* General Parameters *)\ngap=20;NumPer=2;per=46;gapoffset=1;\n\n(* \
+Pole Parameters *)\nlp={45,5,25};np={2,2,5};cp={1,0,1};\nll=per/2-lp[[2]];\n\n\
+(* Magnet Parameters *)\nlm={65,ll,45};nm={1,3,1};cm={0,1,1};\n\n(* Define \
+Pole Material *)\nmp=",
+ StyleBox["radMatSatIso",
+  FontColor->RGBColor[1, 0, 0]],
+ "[ma];\n \n(* Define NdFeB with 1.2 Tesla Remanent Magnetization *)\nmm=",
+ StyleBox["RadMatNdFeB",
+  FontColor->RGBColor[1, 0, 0]],
+ "[1.2];\n\n(* Build the Structure *)\nGrp=und[];"
+}], "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Plot Geometry", "Section",
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999127615620003`*^9, 3.3999127622651253`*^9}},
+ AspectRatioFixed->True],
+
+Cell["\<\
+The following instructions create a set of 3D graphical primitives \
+representing the structure in space, and plot it.\
+\>", "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ "draw=",
+ StyleBox["radObjDrw",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Grp];",
+ StyleBox["\n\nRadPlot3DOptions",
+  FontColor->RGBColor[1, 0, 0]],
+ "[];\nShow[Graphics3D[draw]\n,ViewPoint->{5,-1.5,2}\n,PlotRange->All]"
+}], "Input",
+ CellChangeTimes->{
+  3.3998980155276566`*^9, {3.3999126650776253`*^9, 3.3999126661557503`*^9}, {
+   3.6700787688556767`*^9, 3.670078772058878*^9}},
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Solve", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+The following instructions Solve for the magnetization of each sub-block \
+which constitutes the Undulator.\
+\>", "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ "t0=AbsoluteTime[];\nre=",
+ StyleBox["RadSolve",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Grp,0.0003,1000];\nt1=AbsoluteTime[];\n\nPrint[\"Solved in :    \
+\",Round[t1-t0],\"  seconds\"];\nPrint[\"Number of Iterations : \",re[[4]]];\n\
+Print[\"Average Stability of Magnetization at the last iteration :  \
+\",N[re[[1]],2],\"  T\"];\nPrint[\"Maximum Absolute Magnetization at the last \
+ iteration : \",N[re[[2]],4],\"  T\"];\nPrint[\"Maximum H vector at the last  \
+iteration : \",N[re[[3]],4],\"  T\"];\nPrint[\"\"];\nPrint[\"Central Field  \
+Bz(0,0,0) : \",N[",
+ StyleBox["radFld",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Grp,\"Bz\",zer],4],\"  T\"];"
+}], "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Plot the Magnetic Field", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ StyleBox["RadPlotOptions",
+  FontColor->RGBColor[1, 0, 0]],
+ "[];\nPlot[",
+ StyleBox["radFld",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Grp,\"Bz\",{0,y,0}],{y,-(NumPer+1)/2*per,(NumPer+1)/2*per}\n\
+,AxesOrigin->{0,0}\n,FrameLabel->{\"Y [mm]\",\"Bz [T]\",\"X = Z =  0\",\"\"}]"
+}], "Input",
+ CellChangeTimes->{3.3999127191557503`*^9},
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Checking the Magnetic Material", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["This cell presents a plot of the Magnetization vs \
+Field Strength for the  materials in use. Note that the NdFeB is anisotropic.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ StyleBox["RadPlotOptions",
+  FontColor->RGBColor[1, 0, 0]],
+ "[];\nPlot[",
+ StyleBox["radMatMvsH",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Pole, \"mz\", {0,0,hz}],{hz,-0.01,0.01}\n,FrameLabel->\"Pole Material \"\n\
+,AxesLabel->{\"H\",\"M\"}\n]\n\nPlot[\n{",
+ StyleBox["radMatMvsH",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Magnet, \"mz\", {0,0,h}]\n,",
+ StyleBox["radMatMvsH",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Magnet, \"my\", {0,h,0}]}\n,{h,-1,1}\n,FrameLabel->\"NdFeB\"\n\
+,AxesLabel->{\"H\",\"M\"}\n]"
+}], "Input",
+ CellChangeTimes->{
+  3.3999127861088753`*^9, 3.41130367171875*^9, {3.41130375146875*^9, 
+   3.411303760375*^9}, {3.411304570453125*^9, 3.411304577265625*^9}},
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Optimizing Parameters", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ StyleBox["In this section, some iterations are made on solving and computing \
+the  peak field of the undulator as a function of the horizontal width of the \
+ pole. The segmentation in the pole and magnet has been set to",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ " {1,1,1} resulting in a quick but inaccurate computation."
+}], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ "gap=20;NumPer=2;per=46;gapoffset=1;\t\nlp={45,5,25};np={1,1,1};cp={1,0,1};  \
+   \t\nll=per/2-lp[[2]];\nlm={65,ll,45};nm={1,1,1};cm={0,1,1};\t\t\n\n\
+F[]:=Module[{},\n",
+ StyleBox["radUtiDelAll",
+  FontColor->RGBColor[1, 0, 0]],
+ "[];\nmm=",
+ StyleBox["RadMatNdFeB",
+  FontColor->RGBColor[1, 0, 0]],
+ "[];\nmp=",
+ StyleBox["RadMatAFK502",
+  FontColor->RGBColor[1, 0, 0]],
+ "[];\nGrp=und[];\nre=",
+ StyleBox["RadSolve",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Grp,0.001,1000];\nN[",
+ StyleBox["radFld",
+  FontColor->RGBColor[1, 0, 0]],
+ "[Grp,\"Bz\",{0,0,0}],5]\n]\n\nt=Table[{y,(lp[[1]]=y;F[])},{y,4,40,5}];\n\
+ListPlot[t,Joined->True,AxesLabel->{\"Pole Width\",\"Peak Field\"}]"
+}], "Input",
+ CellChangeTimes->{
+  3.3999128077182503`*^9, {3.670086569076912*^9, 3.670086570090914*^9}},
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["How to Get Help", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["The following command lists all the functions defined \
+in the Radia.exe  file.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[CellGroupData[{
+
+Cell["?rad*", "Input",
+ AspectRatioFixed->True],
+
+Cell[BoxData[
+ DynamicModuleBox[{Typeset`open$$ = True}, 
+  PaneSelectorBox[{False->
+   RowBox[{
+    OpenerBox[Dynamic[Typeset`open$$],
+     ImageSize->Small], 
+    StyleBox["Global`", "InfoHeading"]}], True->GridBox[{
+     {
+      RowBox[{
+       OpenerBox[Dynamic[Typeset`open$$],
+        ImageSize->Small], 
+       StyleBox["Global`", "InfoHeading"]}]},
+     {GridBox[{
+        {
+         ButtonBox["radFld",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFld", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radMatLin",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radMatLin", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjDrwOpenGL",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radObjDrwOpenGL", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radRlxUpdSrc",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radRlxUpdSrc", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldCmpCrt",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldCmpCrt", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radMatMvsH",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radMatMvsH", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjFlmCur",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjFlmCur", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radSolve",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radSolve", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldCmpPrc",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldCmpPrc", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radMatSatAniso",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radMatSatAniso", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjGeoLim",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjGeoLim", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radTrfCmbL",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radTrfCmbL", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldEnr",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldEnr", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radMatSatIso",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radMatSatIso", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjGeoVol",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjGeoVol", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radTrfCmbR",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radTrfCmbR", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldEnrFrc",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldEnrFrc", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radMatSatLam",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radMatSatLam", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjM",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjM", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radTrfInv",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radTrfInv", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldEnrTrq",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldEnrTrq", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjAddToCnt",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radObjAddToCnt", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjMltExtPgn",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radObjMltExtPgn", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radTrfMlt",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radTrfMlt", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldFocKick",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldFocKick", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjArcCur",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjArcCur", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjMltExtPgnCur",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radObjMltExtPgnCur", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radTrfOrnt",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radTrfOrnt", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldFocKickPer",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radFldFocKickPer", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjArcPgnMag",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radObjArcPgnMag", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjMltExtPgnMag",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radObjMltExtPgnMag", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radTrfPlSym",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radTrfPlSym", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldFocPot",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldFocPot", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjBckg",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjBckg", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjMltExtRtg",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radObjMltExtRtg", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radTrfRot",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radTrfRot", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldFrc",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldFrc", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjCenFld",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjCenFld", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjMltExtTri",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radObjMltExtTri", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radTrfTrsl",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radTrfTrsl", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldFrcShpRtg",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radFldFrcShpRtg", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjCnt",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjCnt", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjPolyhdr",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjPolyhdr", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radUtiDel",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radUtiDel", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldInt",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldInt", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjCntStuf",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjCntStuf", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjRaceTrk",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjRaceTrk", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radUtiDelAll",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radUtiDelAll", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldLenRndSw",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radFldLenRndSw", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjCutMag",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjCutMag", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjRecCur",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjRecCur", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radUtiDmp",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radUtiDmp", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldLenTol",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldLenTol", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjCylMag",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjCylMag", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjRecMag",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjRecMag", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radUtiDmpPrs",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radUtiDmpPrs", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldLst",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldLst", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjDegFre",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjDegFre", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjScaleCur",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radObjScaleCur", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radUtiIntrptTim",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"radUtiIntrptTim", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldPtcTrj",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldPtcTrj", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjDivMag",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjDivMag", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjThckPgn",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjThckPgn", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radUtiVer",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radUtiVer", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["radFldShimSig",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldShimSig", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjDpl",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjDpl", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radRlxAuto",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radRlxAuto", "Global`"}},
+          ButtonNote->"Global`"], ""},
+        {
+         ButtonBox["radFldUnits",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radFldUnits", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjDrw",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjDrw", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radRlxMan",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radRlxMan", "Global`"}},
+          ButtonNote->"Global`"], ""},
+        {
+         ButtonBox["radMatApl",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radMatApl", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radObjDrwAtr",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radObjDrwAtr", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["radRlxPre",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"radRlxPre", "Global`"}},
+          ButtonNote->"Global`"], ""}
+       },
+       DefaultBaseStyle->"InfoGrid",
+       GridBoxItemSize->{"Columns" -> {{
+            Scaled[0.2375]}}}]}
+    },
+    GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}}]}, 
+   Dynamic[Typeset`open$$],
+   ImageSize->Automatic]]], "Print", "InfoCell",
+ CellChangeTimes->{3.670086599340965*^9}]
+}, Open  ]],
+
+Cell[TextData[StyleBox["The following command gives the template and the \
+description of the function  \"radObjArcCur\".",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[CellGroupData[{
+
+Cell["?radObjArcCur", "Input",
+ AspectRatioFixed->True],
+
+Cell[BoxData[
+ StyleBox["\<\"radObjArcCur[{x,y,z},{rmin,rmax},{phimin,phimax},h,nseg,j,\\\"\
+man|auto\\\":\\\"man\\\",a:\\\"z\\\"] creates a current-carrying \
+finite-length arc of rectangular cross-section, center point {x,y,z}, inner \
+and outer radii {rmin,rmax}, initial and final angles {phimin,phimax}, height \
+h, number of segments nseg, and azimuthal current density j. According to the \
+value of the \\\"man|auto\\\" switch, the field from the arc is computed \
+based on the number of segments nseg (\\\"man\\\"), or on the general \
+absolute precision level specified by the function radFldCmpCrt \
+(\\\"auto\\\"). The orientation of the rotation axis is defined by the \
+character a (which can be either \\\"x\\\", \\\"y\\\" or \\\"z\\\").\"\>", 
+  "MSG"]], "Print", "PrintUsage",
+ CellChangeTimes->{3.6700865996997657`*^9},
+ CellTags->"Info3670072199-3171275"]
+}, Open  ]],
+
+Cell[TextData[{
+ StyleBox["The following command lists all the functions defined in the \
+Init.m file. These functions are fully written in ",
+  Evaluatable->False,
+  AspectRatioFixed->True],
+ StyleBox["Mathematica",
+  Evaluatable->False,
+  AspectRatioFixed->True,
+  FontSlant->"Italic"],
+ StyleBox[" code ",
+  Evaluatable->False,
+  AspectRatioFixed->True]
+}], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[CellGroupData[{
+
+Cell["?Rad*", "Input",
+ AspectRatioFixed->True],
+
+Cell[BoxData[{
+ DynamicModuleBox[{Typeset`open$$ = True}, 
+  PaneSelectorBox[{False->
+   RowBox[{
+    OpenerBox[Dynamic[Typeset`open$$],
+     ImageSize->Small], 
+    StyleBox["System`", "InfoHeading"]}], True->GridBox[{
+     {
+      RowBox[{
+       OpenerBox[Dynamic[Typeset`open$$],
+        ImageSize->Small], 
+       StyleBox["System`", "InfoHeading"]}]},
+     {GridBox[{
+        {
+         ButtonBox["RadialityCentrality",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"RadialityCentrality", "System`"}},
+          ButtonNote->"System`"], 
+         ButtonBox["RadicalBoxOptions",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"RadicalBoxOptions", "System`"}},
+          ButtonNote->"System`"], 
+         ButtonBox["RadioButtonBar",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"RadioButtonBar", "System`"}},
+          ButtonNote->"System`"], 
+         ButtonBox["RadioButtonBoxOptions",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"RadioButtonBoxOptions", "System`"}},
+          ButtonNote->"System`"]},
+        {
+         ButtonBox["RadicalBox",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadicalBox", "System`"}},
+          ButtonNote->"System`"], 
+         ButtonBox["RadioButton",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadioButton", "System`"}},
+          ButtonNote->"System`"], 
+         ButtonBox["RadioButtonBox",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"RadioButtonBox", "System`"}},
+          ButtonNote->"System`"], 
+         ButtonBox["Radon",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"Radon", "System`"}},
+          ButtonNote->"System`"]}
+       },
+       DefaultBaseStyle->"InfoGrid",
+       GridBoxItemSize->{"Columns" -> {{
+            Scaled[0.2375]}}}]}
+    },
+    GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}}]}, 
+   Dynamic[Typeset`open$$],
+   ImageSize->Automatic]], "\n", 
+ DynamicModuleBox[{Typeset`open$$ = True}, 
+  PaneSelectorBox[{False->
+   RowBox[{
+    OpenerBox[Dynamic[Typeset`open$$],
+     ImageSize->Small], 
+    StyleBox["Global`", "InfoHeading"]}], True->GridBox[{
+     {
+      RowBox[{
+       OpenerBox[Dynamic[Typeset`open$$],
+        ImageSize->Small], 
+       StyleBox["Global`", "InfoHeading"]}]},
+     {GridBox[{
+        {
+         ButtonBox["Rad",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"Rad", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadMatAFK502",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadMatAFK502", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadMatSteel37",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadMatSteel37", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadPlot3DOptions",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"RadPlot3DOptions", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadTrfZerPerp",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadTrfZerPerp", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["Radia",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"Radia", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadMatFerrite",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadMatFerrite", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadMatSteel42",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadMatSteel42", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadPlotOptions",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"RadPlotOptions", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadUtiLoad",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadUtiLoad", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["RadLinkPattern",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"RadLinkPattern", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadMatNdFeB",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadMatNdFeB", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadMatXc06",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadMatXc06", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadSolve",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadSolve", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadUtiMem",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadUtiMem", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["Radlk",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"Radlk", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadMatSm2Co17",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadMatSm2Co17", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadObjExtRtg",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadObjExtRtg", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadTrfAxisPerm",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info3670072199-3171275", {"RadTrfAxisPerm", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadUtiSave",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadUtiSave", "Global`"}},
+          ButtonNote->"Global`"]},
+        {
+         ButtonBox["RadMatAFK1",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadMatAFK1", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadMatSmCo5",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadMatSmCo5", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadObjFullMag",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadObjFullMag", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadTrfZerPara",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadTrfZerPara", "Global`"}},
+          ButtonNote->"Global`"], 
+         ButtonBox["RadUtiVer",
+          BaseStyle->"InformationLink",
+          ButtonData:>{"Info3670072199-3171275", {"RadUtiVer", "Global`"}},
+          ButtonNote->"Global`"]}
+       },
+       DefaultBaseStyle->"InfoGrid",
+       GridBoxItemSize->{"Columns" -> {{
+            Scaled[0.19]}}}]}
+    },
+    GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}}]}, 
+   Dynamic[Typeset`open$$],
+   ImageSize->Automatic]]}], "Print", "InfoCell",
+ CellChangeTimes->{3.670086599933766*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "The following command gives the full mathematica definition of the function \
+\"RadMatAFK502\" as defined in ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ ". "
+}], "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"??", "RadMatAFK502"}]], "Input"],
+
+Cell[BoxData[
+ StyleBox["\<\"RadMatAFK502[] creates a Vanadium Permendur type material from \
+MetalImphy (Fe : 49%, Co: 49%, V: 2%) similar to Vacoflux50 from \
+VacuumSchmelze.\"\>", "MSG"]], "Print", "PrintUsage",
+ CellChangeTimes->{3.670086600276966*^9},
+ CellTags->"Info3670072200-3171275"],
+
+Cell[BoxData[
+ InterpretationBox[GridBox[{
+    {GridBox[{
+       {
+        RowBox[{
+         RowBox[{"RadMatAFK502", "[", "]"}], ":=", 
+         RowBox[{"radMatSatIso", "[", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"1.788`", ",", "0.437`", ",", "0.115`"}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"10485.`", ",", "241.5`", ",", "7.43`"}], "}"}]}], "]"}]}]}
+      },
+      BaselinePosition->{Baseline, {1, 1}},
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxItemSize->{"Columns" -> {{
+           Scaled[0.999]}}, "ColumnsIndexed" -> {}, "Rows" -> {{1.}}, 
+        "RowsIndexed" -> {}}]}
+   },
+   BaselinePosition->{Baseline, {1, 1}},
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}}],
+  Definition[$CellContext`RadMatAFK502],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.6700866002925663`*^9},
+ CellTags->"Info3670072200-3171275"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+PrintingStyleEnvironment->"Working",
+WindowToolbars->"EditBar",
+CellGrouping->Manual,
+WindowSize->{857, 907},
+WindowMargins->{{144, Automatic}, {9, Automatic}},
+PrintingCopies->1,
+PrintingPageRange->{Automatic, Automatic},
+PageHeaders->{{
+   Cell[
+    TextData[{
+      CounterBox["Page"]}], "PageNumber"], Inherited, 
+   Cell[
+    TextData[{
+      ValueBox["FileName"]}], "Header"]}, {
+   Cell[
+    TextData[{
+      ValueBox["FileName"]}], "Header"], Inherited, 
+   Cell[
+    TextData[{
+      CounterBox["Page"]}], "PageNumber"]}},
+PrintingOptions->{"FacingPages"->True,
+"FirstPageHeader"->False,
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->{{54, 54}, {72, 72}}},
+PrivateNotebookOptions->{"ColorPalette"->{RGBColor, 128}},
+ShowSelection->True,
+ShowCellLabel->False,
+ShowCellTags->False,
+RenderingOptions->{"ObjectDithering"->True,
+"RasterDithering"->False},
+CharacterEncoding->"MacintoshAutomaticEncoding",
+Magnification->1,
+FrontEndVersion->"9.0 for Microsoft Windows (64-bit) (January 25, 2013)",
+StyleDefinitions->"Classroom.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "Info3670072199-3171275"->{
+  Cell[29794, 808, 874, 13, 109, "Print",
+   CellTags->"Info3670072199-3171275"]},
+ "Info3670072200-3171275"->{
+  Cell[39293, 1061, 293, 5, 58, "Print",
+   CellTags->"Info3670072200-3171275"],
+  Cell[39589, 1068, 1054, 28, 23, "Print",
+   CellTags->"Info3670072200-3171275"]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"Info3670072199-3171275", 41918, 1143},
+ {"Info3670072200-3171275", 42030, 1146}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[545, 20, 148, 6, 55, "Title",
+ Evaluatable->False],
+Cell[696, 28, 143, 3, 25, "Text",
+ Evaluatable->False],
+Cell[CellGroupData[{
+Cell[864, 35, 77, 2, 54, "Section",
+ Evaluatable->False],
+Cell[944, 39, 2440, 44, 295, "Text",
+ Evaluatable->False]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3421, 88, 90, 2, 54, "Section",
+ Evaluatable->False],
+Cell[3514, 92, 217, 5, 25, "Text",
+ Evaluatable->False],
+Cell[3734, 99, 51, 1, 48, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3822, 105, 74, 2, 54, "Section",
+ Evaluatable->False],
+Cell[3899, 109, 450, 8, 43, "Text",
+ Evaluatable->False],
+Cell[4352, 119, 1340, 33, 541, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5729, 157, 160, 3, 54, "Section",
+ Evaluatable->False],
+Cell[5892, 162, 727, 18, 61, "Text",
+ Evaluatable->False],
+Cell[6622, 182, 1067, 19, 320, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7726, 206, 150, 3, 54, "Section",
+ Evaluatable->False],
+Cell[7879, 211, 869, 28, 61, "Text",
+ Evaluatable->False],
+Cell[8751, 241, 616, 14, 371, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9404, 260, 148, 3, 54, "Section",
+ Evaluatable->False],
+Cell[9555, 265, 188, 5, 25, "Text",
+ Evaluatable->False],
+Cell[9746, 272, 418, 12, 133, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[10201, 289, 70, 2, 54, "Section",
+ Evaluatable->False],
+Cell[10274, 293, 177, 5, 25, "Text",
+ Evaluatable->False],
+Cell[10454, 300, 699, 15, 218, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11190, 320, 88, 2, 54, "Section",
+ Evaluatable->False],
+Cell[11281, 324, 370, 10, 99, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11688, 339, 95, 2, 54, "Section",
+ Evaluatable->False],
+Cell[11786, 343, 257, 5, 25, "Text",
+ Evaluatable->False],
+Cell[12046, 350, 712, 19, 252, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[12795, 374, 86, 2, 54, "Section",
+ Evaluatable->False],
+Cell[12884, 378, 408, 9, 43, "Text",
+ Evaluatable->False],
+Cell[13295, 389, 824, 23, 303, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14156, 417, 80, 2, 54, "Section",
+ Evaluatable->False],
+Cell[14239, 421, 207, 5, 25, "Text",
+ Evaluatable->False],
+Cell[CellGroupData[{
+Cell[14471, 430, 47, 1, 48, "Input"],
+Cell[14521, 433, 14950, 360, 471, "Print"]
+}, Open  ]],
+Cell[29486, 796, 225, 5, 25, "Text",
+ Evaluatable->False],
+Cell[CellGroupData[{
+Cell[29736, 805, 55, 1, 48, "Input"],
+Cell[29794, 808, 874, 13, 109, "Print",
+ CellTags->"Info3670072199-3171275"]
+}, Open  ]],
+Cell[30683, 824, 414, 14, 25, "Text",
+ Evaluatable->False],
+Cell[CellGroupData[{
+Cell[31122, 842, 47, 1, 48, "Input"],
+Cell[31172, 845, 7804, 198, 244, "Print"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[39013, 1048, 196, 6, 25, "Text"],
+Cell[CellGroupData[{
+Cell[39234, 1058, 56, 1, 48, "Input"],
+Cell[39293, 1061, 293, 5, 58, "Print",
+ CellTags->"Info3670072200-3171275"],
+Cell[39589, 1068, 1054, 28, 23, "Print",
+ CellTags->"Info3670072200-3171275"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

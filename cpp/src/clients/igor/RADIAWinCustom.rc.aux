@@ -1,0 +1,63 @@
+/*	WaveAccessWinCustom.rc -- resources for WaveAccess on Windows
+
+	This file is compiled by the resource compiler and creates XOP-specific
+	resources that IGOR looks for in an XOP module.
+*/
+
+#include "XOPResources.h"			// Defines XOP-specific symbols.
+
+/* Custom error messages */
+1100 STR#
+BEGIN
+	"WaveAccess requires Igor Pro 2.0 or later.\0",		// OLD_IGOR
+	"Wave does not exist.\0",							// NON_EXISTENT_WAVE
+	"This function requires a 3D wave.\0",				// NEEDS_3D_WAVE
+
+	"\0"							// NOTE: NULL required to terminate the resource.
+END
+
+1100 XOPI							// XOPI - Describes general XOP properties to IGOR. 
+BEGIN
+	XOP_VERSION,					// Version number of host XOP system.
+	DEV_SYS_CODE,					// Code for development system used to make XOP.
+	0,								// Obsolete - set to zero.
+	0,								// Obsolete - set to zero.
+	XOP_TOOLKIT_VERSION				// XOP Toolkit version.
+END
+
+1100 XOPF							// Describes functions that the XOP adds to IGOR.
+BEGIN
+	"WAGetWaveInfo\0",				// Function name.
+	F_WAVE | F_EXTERNAL,			// Function category,
+	HSTRING_TYPE,					// Return value type.
+		WAVE_TYPE,					// First parameter type.
+		0,							// End of parameters.
+
+	"WAFill3DWaveDirectMethod\0",	// Function name.
+	F_WAVE | F_EXTERNAL,			// Function category,
+	NT_FP64,						// Return value type.
+		WAVE_TYPE,					// First parameter type.
+		0,							// End of parameters.
+
+	"WAFill3DWavePointMethod\0",	// Function name.
+	F_WAVE | F_EXTERNAL,			// Function category,
+	NT_FP64,						// Return value type.
+		WAVE_TYPE,					// First parameter type.
+		0,							// End of parameters.
+
+	"WAFill3DWaveStorageMethod\0",	// Function name.
+	F_WAVE | F_EXTERNAL,			// Function category,
+	NT_FP64,						// Return value type.
+		WAVE_TYPE,					// First parameter type.
+		0,							// End of parameters.
+
+	"WAModifyTextWave\0",			// Function name.
+	F_WAVE | F_EXTERNAL,			// Function category,
+	NT_FP64,						// Return value type.
+		WAVE_TYPE,					// First parameter type.
+		HSTRING_TYPE,				// Second parameter type.
+		HSTRING_TYPE,				// Third parameter type.
+		0,							// End of parameters.
+
+	"\0"							// NOTE: NULL required to terminate the resource.
+END

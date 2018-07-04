@@ -1,0 +1,1492 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     60203,       1483]
+NotebookOptionsPosition[     22685,        636]
+NotebookOutlinePosition[     58432,       1418]
+CellTagsIndexPosition[     58389,       1415]
+WindowFrame->Normal
+ContainsDynamic->False*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[StyleBox["Example # 5 : Simple Dipole Magnet ",
+ FontSize->24]], "Title",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["Version : 0.5", "Text",
+ PageWidth->PaperWidth,
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999183033745003`*^9, 3.3999183034682503`*^9}},
+ AspectRatioFixed->True],
+
+Cell[CellGroupData[{
+
+Cell["Introduction", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+This example concerns the geometries dominated by iron. At any point in space \
+one can consider that the magnetic field is the sum of two  contributions. \
+One comes from the real sources of magnetic field such as coils or permanent \
+magnets. The other comes from the iron  through its magnetization. Even \
+though the magnetization of the iron is induced by  the coils or permanent \
+magnets, its field contribution to the point of interest can be much larger \
+than the direct contribution form coils and magnets. We call these geometries \
+ : \[OpenCurlyDoubleQuote]Iron Dominated \",  electro-magnet dipole and \
+quadrupole used in particle accelerators fall into this category. Most of \
+undulators and wigglers used as synchrotron radiation sources do not fall \
+into this category. The field computation with Radia in the case of Iron \
+Dominated geometries presents a few specific difficulties and is usually less \
+accurate than in the case of coil or permanent magnet dominated structure. \
+Nevertheless, special methods have been developed to  reach a reasonable \
+precision within a reasonable cpu time and memory. The example below is that \
+of a simple dipole steerer made of a closed circuit of iron with a small gap \
+and a coil wounded around the circuit that drives some flux in the iron (see \
+the graphics below). This example is more delicate than all  previous \
+examples and we advise the beginner to first get experienced with them before \
+diving into this one. 
+Among the most important things to remember if one wants to  reach a good \
+precision in a reasonable time are :
+- Always segment the corners of the iron circuits as parallel or \
+perpendicular to the flux line as possible. For right angle corners, this can \
+be done with the circular or ellipsoidal mode of segmentation (see below). \
+This is extremely important. In this example, we make use of the circular \
+segmentation twice (the other two corners are segmented similarly by \
+symmetry) it is made in the section entitled  \"Defining the Model\" when \
+calling  \"radObjDivMag[g3,{nbr,nbp,n3[[1]]},typ]\" and  \
+\"radObjDivMag[g5,{nbr,nbp,n5[[1]]},typ]\". 
+- Use a narrower segmentation on the iron faces close to the region of \
+interest .
+- Start with low segmentation numbers and increase them gradually to check \
+that the field is stable. Beware that the memory and cpu time tends to grow \
+like the square number of elements. 
+- Use symmetries as much as possible. It saves both memory and CPU time. The \
+steerer dipole shown below has a symmetry of order 2 x 2.  16 times more \
+memory and 4 times more cpu time would have been needed without using the \
+symmetries. 
+As for the previous examples, try to modify some parameters (see the \
+Reference Guide for the explanations on all Radia functions) and re-execute \
+the corresponding section. All sections must be evaluated in the order of \
+presentation. A section may be evaluated several times with the same or \
+different parameters if the previous sections have been evaluated before. The \
+only limitation is memory. The Radia.exe memory can be re-initialized by \
+re-executing the section entitled \[OpenCurlyDoubleQuote]Load and Initialize \
+Radia\[CloseCurlyDoubleQuote]. The Kernel memory can be re-initialized by \
+executing Exit[] and then re-executing all sections of this example. If the \
+Front-End is running out of memory, close some windows or close the Front-End \
+and start it again. Note that if by mistake any section is executed before \
+the previous ones are executed, it may be necessary to exit the Kernel and \
+re-start everything from the very beginning. The maximum precision requires \
+large memory and long cpu time and ultimately, you may want to add extra \
+memory to your computer. However remember that the memory required tends to \
+be proportional to the square number of sub-elements and increasing the \
+segmentation by 2 in all three directions results in 8 times more \
+sub-elements and 64 times more memory. Consequently, one should increase the \
+segmentation number in some \[OpenCurlyDoubleQuote]intelligent\
+\[CloseCurlyDoubleQuote] manner ,  this requires a bit of experience. One way \
+to  develop this skill is to  watch the precision following an  increase of  \
+the segmentation in one object and one plane at a time . By this method, one \
+quickly  identifies the objects and the directions which require more \
+segmentation to improve the accuracy.\
+\>", "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Load and Initialize Radia", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["The following instruction loads the Radia package and \
+returns the Radia  version number. It also load the \"PlotField3D\" package \
+to be used later. ",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+<<Radia`;
+<<VectorFieldPlots`;\
+\>", "Input",
+ CellChangeTimes->{
+  3.3999175292807503`*^9, {3.3999175635307503`*^9, 3.3999175672495003`*^9}},
+ AspectRatioFixed->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Defining Model", "Section",
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999160763120003`*^9, 3.3999160769838753`*^9}},
+ AspectRatioFixed->True],
+
+Cell["A routine to create the geometry.", "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+eps=0;\t\t\t\t\t(* used for debugging *)
+Off[General::\"spell1\"];
+geom[circ_]:=(
+ironcolor={0,0.5,1};
+coilcolor={1,0,0};
+
+(* The pole faces *)
+
+lx1=thick/2;ly1=width;lz1=20;l1={lx1,ly1,lz1};
+k1={{thick/4-chamfer/2,0,gap/2},{thick/2-chamfer,ly1-2*chamfer}};
+k2={{thick/4,0,gap/2+chamfer},{thick/2,ly1}};
+k3={{thick/4,0,gap/2+lz1},{thick/2,ly1}};
+g1=radObjMltExtRtg[{k1,k2,k3}];
+radObjDivMag[g1,n1];
+
+(* Vertical segment on top of pole faces *)
+
+lx2=thick/2;ly2=ly1;lz2=30;l2={lx2,ly2,lz2};
+p2={thick/4,0,lz1+gap/2+lz2/2+1*eps};
+g2=radObjRecMag[p2,l2];radObjDivMag[g2,n2];
+
+(* Corner *)
+
+lx3=thick/2;ly3=ly2;lz3=ly2*1.25;l3={lx3,ly3,lz3};
+p3={thick/4,0,lz1+gap/2+lz2+lz3/2+2*eps};
+g3=radObjRecMag[p3,l3];
+typ={\"cyl\",{p3+{0,+ly3/2,-lz3/2},{1,0,0}},p3+{0,-ly3/2,-lz3/2},lz3/ly3};
+
+If[circ==1,
+radObjDivMag[g3,{nbr,nbp,n3[[1]]},typ],
+radObjDivMag[g3,n3]];
+
+(* Horizontal segment between the corners *)
+
+lx4=thick/2;ly4=80;lz4=lz3;l4={lx4,ly4,lz4};p4={thick/4,ly3/2+eps+ly4/2,p3[[3]\
+]};
+g4=radObjRecMag[p4,l4];radObjDivMag[g4,n4];
+
+(* The other corner  *)
+
+lx5=thick/2;ly5=lz4*1.25;lz5=lz4;l5={lx5,ly5,lz5};
+p5={thick/4,p4[[2]]+eps+(ly4+ly5)/2,p4[[3]]};
+g5=radObjRecMag[p5,l5];
+
+
+typ={\"cyl\",{p5+{0,-ly5/2,-lz5/2},{1,0,0}},p5+{0,ly5/2,-lz5/2},lz5/ly5};
+
+If[circ==1,
+radObjDivMag[g5,{nbr,nbp,n5[[1]]},typ],
+radObjDivMag[g5,n5]];
+
+(* The vertical segment inside the coil *)
+
+lx6=thick/2;ly6=ly5;lz6=gap/2+lz1+lz2;l6={lx6,ly6,lz6};
+p6={thick/4,p5[[2]],p5[[3]]-(lz6+lz5)/2-eps};
+g6=radObjRecMag[p6,l6];radObjDivMag[g6,n6];
+
+(* Generation of the coil *)
+
+Rmin=5;Rmax=40;Nseg=4;H=2*lz6-5;
+CurDens=current/H/(Rmax-Rmin);
+pc={0,p6[[2]],0};
+coil=radObjRaceTrk[pc,{Rmin,Rmax},{thick,ly6},H,3,CurDens];
+radObjDrwAtr[coil,coilcolor];
+
+(* make container and set the colors *)
+
+g=radObjCnt[{g1,g2,g3,g4,g5,g6}];
+radObjDrwAtr[g,ironcolor];
+radMatApl[g,ironmat];
+t=radObjCnt[{g,coil}];
+
+(* define the symmetries *)
+
+RadTrfZerPerp[g,{0,0,0},{1,0,0}];
+RadTrfZerPara[g,{0,0,0},{0,0,1}];
+);\
+\>", "Input",
+ AspectRatioFixed->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Creating the Model and Solving", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ "Creating and solving of the field geometry. The Bz field printed is the \
+vertical field in the middle of the gap. In this computation, the subdivision \
+in the iron is low in order to achieve a short CPU time at the cost of a \
+reduced precision. The excitation current is low and the iron has a very \
+large permeability. Therefore there is no saturation in the iron and the \
+Ampere law gives a good estimate of the field on axis to which the computed \
+field can be compared. The sources of discrepancy between the computed and \
+estimated fields from Ampere's law are the residual small deviation from \
+uniformity in the gap and the unsufficient  segmentation. A closer agreement \
+between them is reached if one uses the following higher segmentation \
+parameters : nx=3; nbp=3; nbr=3; n1={nx,3,2}; n2={nx,3,3};n4={nx,3,3}  \
+n6={nx,3,3}, the cpu time is longer but still reasonable. One can observe \
+some saturation in the iron by either increasing the current in the coil (for \
+example current =-10000) or using a lower saturated magnetization when \
+calling   \"radMatSatIso\" or by using an other material. The computed \
+Mag_Max and  H_Max are the maximum value of the magnetization vector and H \
+vector in the iron circuit both expressed in Tesla. If saturation starts \
+somewhere in the circuit,  Mag_Max approaches the saturated magnetization of \
+the material (2T in this example as defined in \"radMatSatIso\")  and H_Max \
+deviates from 0. One may want to vary the   gap, thick, width and chamfer \
+parameters but one may need to increase or reduce some segmentation parameter \
+accordingly to keep a reasonable precision  for a reasonable cpu time. Just \
+try and play  by changing some parameters and re-executing ! The only risk is \
+if one sets a  too large segmentation parameter  resulting in insufficient \
+memory or too long cpu time. If this happens, in the worst case you will have \
+to kill the ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " Kernel by one way on an other, if Radia.exe is still alive kill it also \
+(by switching to it and then exiting) then re-execute all sections of this \
+notebook  starting by \"Load and Initialize Radia\" etc... One may estimate \
+the memory requirement by looking at the size of the interaction matrix. You \
+may then switch to the next sections to see how to display the 3D graphics of \
+your geometry  or make field or field integral plots at whatever point you \
+are interested in. "
+}], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+(* Geometry Parameters *)
+
+gap=10;  \t\t\t\t\t(* in mm  *)
+thick=50;\t\t\t\t\t(* in mm  *)
+width=40;\t\t\t\t\t(* in mm  *)
+chamfer=8;\t\t\t\t\t(* in mm  *)
+current=-2000;\t\t\t\t(* in Ampere  *)
+
+(* Segmentation Parameters *)
+
+nx=2;\t\t\t\t\t\t
+nbp=2;nbr=2; \t\t\t\t(* for the corners *)
+n1={nx,3,2};\t\t\t\t(* pole faces *)
+n2={nx,2,2};\t\t\t\t(* small vertical arm *)
+n3={nx,2,2};\t\t\t\t
+n4={nx,2,2};\t\t\t\t(* horizontal arm *)
+n5={nx,2,2};\t\t\t\t
+n6={nx,2,2};\t\t\t\t(* inside the coil *)
+
+(* Build the geometry *)
+
+t0=AbsoluteTime[];
+radUtiDelAll[];
+ironmat=radMatSatIso[{20000,2},{0.1,2},{0.1,2}];
+geom[1];
+size=radObjDegFre[t];
+
+(* Solve the geometry *)
+
+t1=AbsoluteTime[];
+res=RadSolve[t,0.0001,1500];
+t2=AbsoluteTime[];
+
+(* Print The results *)
+
+b0=radFld[t,\"Bz\",{0,0,0}];
+bampere=(-4*Pi*current/gap)/10000;
+r=b0/bampere;
+
+Print[\"Mag_Max  H_Max  N_Iter = \",N[res[[2]],3],\" T \",N[res[[3]],3],\" T \
+\",res[[4]]];
+Print[\"Built & Solved in \",Round[t1-t0],\" & \",Round[t2-t1], \" seconds\"]
+Print[\"Interaction Matrix : \",size,\" X \",size,\" or \", \
+N[size*size*4/1000000,2],\" Mbytes\"]
+Print[\"Bz = \", N[b0,4],\" T,   Bz Computed / Bz Ampere Law  = \",N[r,4]]\
+\>", "Input",
+ AspectRatioFixed->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Magnetization in Iron ", "Section",
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999161090463753`*^9, 3.3999161098901253`*^9}},
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["Plot the magnetization in the center of each \
+subdivided element of the iron. ",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"RadPlot3DOptions", "[", "]"}], ";"}], "\n", 
+ RowBox[{"ListVectorFieldPlot3D", "[", 
+  RowBox[{
+   RowBox[{"radObjM", "[", "t", "]"}], "\n", ",", 
+   RowBox[{"VectorHeads", "->", "True"}], "\n", ",", 
+   RowBox[{"ColorFunction", "->", " ", "Hue"}], "\n", ",", 
+   RowBox[{"PlotLabel", "->", 
+    RowBox[{"\"\<Magnetization in Element # \>\"", "<>", 
+     RowBox[{"ToString", "[", "t", "]"}]}]}], "\n", ",", 
+   RowBox[{"ViewPoint", "->", 
+    RowBox[{"{", 
+     RowBox[{"3", ",", "2", " ", ",", " ", "0"}], "}"}]}], "\n", ",", 
+   RowBox[{"PlotRange", "->", 
+    RowBox[{"{", 
+     RowBox[{"All", ",", "All", ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "110"}], "}"}]}], "}"}]}], " ", "\n", ",", 
+   RowBox[{"ScaleFactor", "->", "8"}]}], "]"}]}], "Input",
+ CellChangeTimes->{3.3999178362963753`*^9, 3.3999185101870003`*^9}]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " Graphics"
+}], "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["These instructions plot the geometry of the steerer \
+dipole.",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"draw", "=", 
+   RowBox[{
+    StyleBox["radObjDrw",
+     FontColor->RGBColor[1, 0, 0]], "[", "t", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   StyleBox["RadPlot3DOptions",
+    FontColor->RGBColor[1, 0, 0]], "[", "]"}], ";"}], "\n", 
+ RowBox[{"Show", "[", 
+  RowBox[{
+   RowBox[{"Graphics3D", "[", "draw", "]"}], "\n", ",", 
+   RowBox[{"ViewPoint", "->", 
+    RowBox[{"{", 
+     RowBox[{"5", ",", 
+      RowBox[{"-", "1.5"}], ",", "1"}], "}"}]}], "\n", ",", 
+   RowBox[{"PlotRange", "->", "All"}]}], "]"}]}], "Input",
+ CellChangeTimes->{
+  3.3999161599995003`*^9, {3.3999179654057503`*^9, 3.3999179670307503`*^9}}]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Magnetic Field Plots ", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[{
+ "Here are a few plots of field and field integrals in the gap. Note that the \
+plot is made by calling  \"radFldLst \" followed by a \"ListPlot\". The same \
+result can be obtained by calling \"radFld\" followed by \"Plot\" but it \
+would be significantly slower because of the large number of  calls made to  \
+Mathlink . The mathlink protocol used by ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " is responsible  for the data exchange between the Kernel and Radia.exe \
+processes. It is rather slow (dependening on platforms).  It is also much \
+easier to control the number of points  used in the graphichs when calling \
+\"radFldLst\" rather than \"radFld\". Each graph corresponds to the field \
+created by the whole steerer. It is possible to compute separately the \
+contribution from the coil or from the iron. To do so, one simply needs to \
+replace ob=t by ob=coil or ob=g. It is also possible to compute the \
+contribution from each part of the iron circuit g1,g2...g6. To do so,  one \
+would use ob=g1 or ob=g2 etc.. However, one should remember that the \
+symmetries has been assigned to the container g and not to each element \
+g1,g2..g6 therefore the field from each element must be multiplied by 2 x 2 = \
+4. One should remember that even though the field  from the whole steerer is \
+the sum of the field from the coil + 4 times the field from g1+g2+...g6,  the \
+magnetization of any element gi depends on the magnetization of all the other \
+elements. It is nevertheless quite interesting to see which part of the \
+magnetized iron circuit contributes the most to the field in the gap and what \
+is its field gradient. "
+}], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ob", "=", "t"}], ";", 
+  RowBox[{"y", "=", "1"}], ";", 
+  RowBox[{"z", "=", "1"}], ";", 
+  RowBox[{"xmax", "=", "30"}], ";", 
+  RowBox[{"Nn", "=", "40"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"RadPlotOptions", "[", " ", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"bz", "=", 
+   RowBox[{"radFldLst", "[", 
+    RowBox[{"ob", ",", "\"\<Bz\>\"", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", "xmax"}], ",", "y", ",", "z"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"xmax", ",", "y", ",", "z"}], "}"}], ",", "Nn", ",", 
+     "\"\<arg\>\"", ",", 
+     RowBox[{"-", "xmax"}]}], "]"}]}], ";"}], "\n", 
+ RowBox[{"ListPlot", "[", " ", 
+  RowBox[{"bz", ",", 
+   RowBox[{"Joined", "\[Rule]", "True"}], ",", 
+   RowBox[{"FrameLabel", "->", 
+    RowBox[{"{", 
+     RowBox[{
+     "\"\<X [mm]\>\"", ",", "\"\<Bz [T]\>\"", ",", 
+      "\"\<Y = 1 mm, Z = 1 mm\>\"", ",", "\"\<\>\""}], "}"}]}]}], 
+  "]"}]}], "Input",
+ CellChangeTimes->{{3.3999163030932503`*^9, 3.3999163042338753`*^9}, {
+  3.3999164656557503`*^9, 3.3999164692026253`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ob", "=", "t"}], ";", 
+  RowBox[{"z", "=", "3"}], ";"}], "\n", 
+ RowBox[{"pl", "=", 
+  RowBox[{"Plot3D", "[", 
+   RowBox[{
+    RowBox[{"radFld", "[", 
+     RowBox[{"ob", ",", "\"\<Bz\>\"", ",", 
+      RowBox[{"{", 
+       RowBox[{"x", ",", "y", ",", "z"}], "}"}]}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"x", ",", 
+      RowBox[{
+       RowBox[{"-", "thick"}], "/", "2"}], ",", 
+      RowBox[{"thick", "/", "2"}]}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"y", ",", 
+      RowBox[{
+       RowBox[{"-", "width"}], "/", "2"}], ",", 
+      RowBox[{"width", "/", "2"}]}], "}"}], ",", 
+    RowBox[{"AxesLabel", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{
+      "\"\<X [mm]\>\"", ",", "\"\<Y [mm]\>\"", ",", "\"\<Bz [T]\>\""}], 
+      "}"}]}]}], "]"}]}]}], "Input",
+ CellChangeTimes->{{3.3999163170932503`*^9, 3.3999163989995003`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ob", "=", "t"}], ";"}], "\n", 
+ RowBox[{"Plot", "[", 
+  RowBox[{
+   RowBox[{"radFldInt", "[", 
+    RowBox[{"ob", ",", "\"\<inf\>\"", ",", "\"\<ibz\>\"", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", "1"}], ",", "y", ",", "z"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "y", ",", "z"}], "}"}]}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"y", ",", 
+     RowBox[{"-", "20"}], ",", "20"}], "}"}], ",", "\n", 
+   RowBox[{"FrameLabel", "->", 
+    RowBox[{"{", 
+     RowBox[{
+     "\"\<Y [mm]\>\"", ",", "\"\<Iz [T mm]\>\"", ",", "\"\<Z = 0\>\"", ",", 
+      "\"\<\>\""}], "}"}]}]}], "]"}]}], "Input",
+ CellChangeTimes->{3.3999161785776253`*^9}]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Magnetic Force ", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[TextData[StyleBox["One computes the force over the element g1 induced by \
+the whole structure. One should be cautious that the cpu time to compute the \
+force can be very long and one must set the segmentation parameter k to the \
+lowest values consistent with   sufficient precision . Taking into account \
+the symmetry with respect to the x axis {1,0,0}  would remove the Fx \
+component and double the Fy and Fz components. ",
+ Evaluatable->False,
+ AspectRatioFixed->True]], "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"k", "=", 
+   RowBox[{"{", 
+    RowBox[{"1", ",", "1", ",", "2"}], "}"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"t1", "=", 
+   RowBox[{"AbsoluteTime", "[", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"fr", "=", 
+   RowBox[{"radFldEnrFrc", "[", 
+    RowBox[{"g1", ",", "t", ",", "\"\<\>\"", ",", "k"}], "]"}]}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"t2", "=", 
+   RowBox[{"AbsoluteTime", "[", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"Print", "[", 
+   RowBox[{"\"\<{Fx, Fy, Fz} = \>\"", ",", 
+    RowBox[{"N", "[", 
+     RowBox[{"fr", ",", "3"}], "]"}], ",", "\"\< Newton\>\""}], "]"}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"Print", " ", "[", 
+   RowBox[{"\"\<cpu time : \>\"", ",", 
+    RowBox[{"N", "[", 
+     RowBox[{
+      RowBox[{"t2", "-", "t1"}], ",", "3"}], "]"}], ",", "\"\< seconds\>\""}],
+    "]"}], ";"}]}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Creating the Model and Solving with Rectangular Segmentation in the Corner\
+\>", "Section",
+ Evaluatable->False,
+ CellChangeTimes->{{3.3999162137026253`*^9, 3.3999162186088753`*^9}},
+ AspectRatioFixed->True],
+
+Cell["\<\
+The same model is created but the segmentation in the corner is made with \
+parallelepipedic sub-elements. The precision of the field in the gap is much \
+poorer. It can be improved by using larger values of n3 and n5 such as \
+{nx,4,4} or {nx,6,6},  but the CPU time and memory requirements grow  \
+quickly.\
+\>", "Text",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell["\<\
+(* Geometry Parameters *)
+
+gap=10;  \t\t\t\t\t(* in mm  *)
+thick=50;\t\t\t\t\t(* in mm  *)
+width=40;\t\t\t\t\t(* in mm  *)
+chamfer=8;\t\t\t\t\t(* in mm  *)
+current=-2000;\t\t\t\t(* in Ampere  *)
+
+(* Segmentation Parameters *)
+
+nx=2;\t\t\t\t\t\t
+nbp=2;nbr=2; \t\t\t\t(* for the corners *)
+n1={nx,3,2};\t\t\t\t(* pole faces *)
+n2={nx,2,2};\t\t\t\t(* Small Vert. Arm *)
+n3={nx,2,2};\t\t\t\t
+n4={nx,2,2};\t\t\t\t(* Horiz.  Arm  *)
+n5={nx,2,2};\t\t\t\t
+n6={nx,2,2};\t\t\t\t(* Inside the Coil *)
+
+(* Build the geometry *)
+
+t0=AbsoluteTime[];
+radUtiDelAll[];
+ironmat=radMatSatIso[{20000,2},{0.1,2},{0.1,2}];
+geom[0];
+
+(* Solve the geometry *)
+
+t1=AbsoluteTime[];
+res=RadSolve[t,0.0001,1500];
+t2=AbsoluteTime[];
+
+(* Print The results *)
+
+b0=radFld[t,\"Bz\",{0,0,0}];
+bampere=(-4*Pi*current/gap)/10000;
+r=b0/bampere;
+
+Print[\"Mag_Max  H_Max  N_Iter = \",N[res[[2]],3],\" T \",N[res[[3]],3],\" T \
+\",res[[4]]];
+Print[\"Built & Solved in \",Round[t1-t0],\" & \",Round[t2-t1], \" seconds\"]
+Print[\"Bz = \", N[b0,4],\" T,   Bz Computed / Bz Ampere Law  = \",N[r,4]]
+
+draw=radObjDrw[t];
+RadPlot3DOptions[];
+Show[Graphics3D[draw]
+,ViewPoint->{5,-1.5,1}
+,PlotRange->All]
+ 
+Print[\"Segmenting iron corners into parallellepiped should be avoided. \
+Instead, one should use a circular or ellipsoidal segmentation.\"]\
+\>", "Input",
+ CellChangeTimes->{{3.3999181570620003`*^9, 3.3999181941245003`*^9}},
+ AspectRatioFixed->True]
+}, Closed]]
+},
+ScreenStyleEnvironment->"Working",
+PrintingStyleEnvironment->"Working",
+WindowToolbars->{},
+CellGrouping->Manual,
+WindowSize->{776, 955},
+WindowMargins->{{160, Automatic}, {Automatic, 3}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrivateNotebookOptions->{"ColorPalette"->{RGBColor, 128}},
+ShowCellLabel->False,
+ShowCellTags->False,
+RenderingOptions->{"ObjectDithering"->True,
+"RasterDithering"->False},
+CharacterEncoding->"MacintoshAutomaticEncoding",
+FrontEndVersion->"6.0 for Microsoft Windows (32-bit) (June 19, 2007)",
+StyleDefinitions->Notebook[{
+   Cell[
+    CellGroupData[{
+      Cell["Style Definitions", "Subtitle"], 
+      Cell[
+      "\nModify the definitions below to change the default appearance of all \
+cells in \na given style.  Make modifications to any definition using \
+commands in the \nFormat menu.\n", "Text"], 
+      Cell[
+       CellGroupData[{
+         Cell["Style Environment Names", "Section"], 
+         Cell[
+          StyleData[All, "Working"], PageWidth -> WindowWidth, ScriptMinSize -> 
+          9], 
+         Cell[
+          StyleData[All, "Presentation"], PageWidth -> WindowWidth, 
+          ScriptMinSize -> 12, FontSize -> 16], 
+         Cell[
+          StyleData[All, "Condensed"], PageWidth -> WindowWidth, 
+          CellBracketOptions -> {"Margins" -> {1, 1}, "Widths" -> {0, 5}}, 
+          ScriptMinSize -> 8, FontSize -> 11], 
+         Cell[
+          StyleData[All, "Printout"], PageWidth -> PaperWidth, ScriptMinSize -> 
+          7, FontSize -> 10, 
+          PrivateFontOptions -> {"FontType" -> "Outline"}]}, Open]], 
+      Cell[
+       CellGroupData[{
+         Cell["Notebook Options", "Section"], 
+         Cell[
+         "\nThe options defined for the style below will be used at the \
+Notebook level.\n", "Text"], 
+         Cell[
+          StyleData["Notebook"], PageHeaders -> {{
+             Cell[
+              TextData[{
+                CounterBox["Page"]}], "PageNumber"], None, 
+             Cell[
+              TextData[{
+                ValueBox["FileName"]}], "Header"]}, {
+             Cell[
+              TextData[{
+                ValueBox["FileName"]}], "Header"], None, 
+             Cell[
+              TextData[{
+                CounterBox["Page"]}], "PageNumber"]}}, 
+          PageHeaderLines -> {True, True}, 
+          PrintingOptions -> {
+           "FacingPages" -> True, "FirstPageHeader" -> False}, 
+          CellFrameLabelMargins -> 6, StyleMenuListing -> None]}, Closed]], 
+      Cell[
+       CellGroupData[{
+         Cell["Styles for Headings", "Section"], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Title"], ShowCellBracket -> False, 
+             CellMargins -> {{0, 0}, {0, 0}}, PageBreakBelow -> False, 
+             LineSpacing -> {1, 0}, CounterIncrements -> "Title", 
+             CounterAssignments -> {{"Section", 0}, {"Equation", 0}, {
+               "Figure", 0}, {"Subtitle", 0}, {"Subsubtitle", 0}}, FontSize -> 
+             34, FontColor -> GrayLevel[1], Background -> 
+             RGBColor[0.571389, 0.19675, 0.570504]], 
+            Cell[
+             StyleData["Title", "Presentation"], 
+             CellMargins -> {{0, 0}, {0, 0}}, LineSpacing -> {1, 0}, FontSize -> 
+             44], 
+            Cell[
+             StyleData["Title", "Condensed"], CellMargins -> {{0, 0}, {0, 0}},
+              FontSize -> 20], 
+            Cell[
+             StyleData["Title", "Printout"], CellMargins -> {{0, 0}, {0, 0}}, 
+             FontSize -> 24, FontTracking -> "Plain", Background -> 
+             GrayLevel[0]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Subtitle"], ShowCellBracket -> False, 
+             CellMargins -> {{0, 0}, {0, 0}}, PageBreakBelow -> False, 
+             LineSpacing -> {1, 3}, ParagraphIndent -> -96, CounterIncrements -> 
+             "Subtitle", 
+             CounterAssignments -> {{"Section", 0}, {"Equation", 0}, {
+               "Figure", 0}, {"Subsubtitle", 0}}, FontFamily -> "Helvetica", 
+             FontSize -> 18, FontColor -> GrayLevel[1], Background -> 
+             RGBColor[0.2, 0.700008, 0.700008]], 
+            Cell[
+             StyleData["Subtitle", "Presentation"], 
+             CellMargins -> {{0, 0}, {0, 0}}, LineSpacing -> {1, 6}, 
+             ParagraphIndent -> -157, FontSize -> 30], 
+            Cell[
+             StyleData["Subtitle", "Condensed"], 
+             CellMargins -> {{0, 0}, {0, 0}}, ParagraphIndent -> -78, 
+             FontSize -> 14], 
+            Cell[
+             StyleData["Subtitle", "Printout"], 
+             CellMargins -> {{0, 0}, {0, 0}}, ParagraphIndent -> -85, 
+             FontSize -> 16, Background -> GrayLevel[0.6]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Subsubtitle"], ShowCellBracket -> False, 
+             CellMargins -> {{10, 4}, {30, 10}}, PageBreakBelow -> False, 
+             CounterIncrements -> "Subsubtitle", 
+             CounterAssignments -> {{"Section", 0}, {"Equation", 0}, {
+               "Figure", 0}}, FontFamily -> "Helvetica", FontSize -> 14, 
+             FontSlant -> "Italic"], 
+            Cell[
+             StyleData["Subsubtitle", "Presentation"], 
+             CellMargins -> {{8, 10}, {40, 20}}, LineSpacing -> {1, 0}, 
+             FontSize -> 24], 
+            Cell[
+             StyleData["Subsubtitle", "Condensed"], 
+             CellMargins -> {{8, 10}, {12, 8}}, FontSize -> 12], 
+            Cell[
+             StyleData["Subsubtitle", "Printout"], 
+             CellMargins -> {{9, 10}, {50, 10}}, FontSize -> 14]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Section"], CellFrame -> {{6, 0}, {0, 1}}, CellDingbat -> 
+             None, CellMargins -> {{12, Inherited}, {4, 24}}, 
+             CellGroupingRules -> {"SectionGrouping", 30}, PageBreakBelow -> 
+             False, CellFrameMargins -> 6, CounterIncrements -> "Section", 
+             CounterAssignments -> {{"Subsection", 0}, {"Subsubsection", 0}}, 
+             FontFamily -> "Helvetica", FontSize -> 16, FontWeight -> "Bold", 
+             FontColor -> RGBColor[0.571389, 0.19675, 0.570504]], 
+            Cell[
+             StyleData["Section", "Presentation"], 
+             CellMargins -> {{10, 10}, {8, 32}}, LineSpacing -> {1, 2}, 
+             FontSize -> 24, FontTracking -> "Condensed"], 
+            Cell[
+             StyleData["Section", "Condensed"], 
+             CellMargins -> {{8, Inherited}, {2, 12}}, FontSize -> 12], 
+            Cell[
+             StyleData["Section", "Printout"], 
+             CellMargins -> {{9, 0}, {2, 50}}, FontSize -> 14, FontTracking -> 
+             "Plain", FontColor -> GrayLevel[0]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Subsection"], 
+             CellMargins -> {{12, Inherited}, {8, 20}}, 
+             CellGroupingRules -> {"SectionGrouping", 40}, PageBreakBelow -> 
+             False, CounterIncrements -> "Subsection", 
+             CounterAssignments -> {{"Subsubsection", 0}}, FontFamily -> 
+             "Helvetica", FontSize -> 13, FontWeight -> "Bold"], 
+            Cell[
+             StyleData["Subsection", "Presentation"], 
+             CellMargins -> {{11, 10}, {8, 32}}, LineSpacing -> {1, 0}, 
+             FontSize -> 22], 
+            Cell[
+             StyleData["Subsection", "Condensed"], 
+             CellMargins -> {{8, Inherited}, {2, 12}}, FontSize -> 12], 
+            Cell[
+             StyleData["Subsection", "Printout"], 
+             CellMargins -> {{9, 0}, {4, 40}}, FontSize -> 12]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Subsubsection"], CellDingbat -> "\[FilledSquare]", 
+             CellMargins -> {{25, Inherited}, {8, 12}}, 
+             CellGroupingRules -> {"SectionGrouping", 50}, PageBreakBelow -> 
+             False, CounterIncrements -> "Subsubsection", FontFamily -> 
+             "Times", FontSize -> 13, FontWeight -> "Bold"], 
+            Cell[
+             StyleData["Subsubsection", "Presentation"], 
+             CellMargins -> {{29, 10}, {8, 26}}, LineSpacing -> {1, 0}, 
+             FontSize -> 18], 
+            Cell[
+             StyleData["Subsubsection", "Condensed"], 
+             CellMargins -> {{22, Inherited}, {2, 12}}, FontSize -> 10], 
+            Cell[
+             StyleData["Subsubsection", "Printout"], 
+             CellMargins -> {{21, 0}, {4, 20}}, FontSize -> 11]}, Closed]]}, 
+        Closed]], 
+      Cell[
+       CellGroupData[{
+         Cell["Styles for Body Text", "Section"], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Text"], CellMargins -> {{12, 10}, {5, 5}}, 
+             LineSpacing -> {1, 3}, ParagraphSpacing -> {0, 12}, 
+             CounterIncrements -> "Text", FontFamily -> "Times"], 
+            Cell[
+             StyleData["Text", "Presentation"], 
+             CellMargins -> {{13, 10}, {8, 8}}, LineSpacing -> {1, 5}, 
+             ParagraphSpacing -> {0, 12}], 
+            Cell[
+             StyleData["Text", "Condensed"], CellMargins -> {{8, 10}, {4, 4}},
+              LineSpacing -> {1, 1}, ParagraphSpacing -> {0, 4}], 
+            Cell[
+             StyleData["Text", "Printout"], CellMargins -> {{9, 0}, {4, 4}}, 
+             ParagraphSpacing -> {0, 6}]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["SmallText"], CellMargins -> {{12, 10}, {5, 5}}, 
+             LineSpacing -> {1, 3}, ParagraphSpacing -> {0, 6}, 
+             CounterIncrements -> "SmallText", FontFamily -> "Helvetica", 
+             FontSize -> 9], 
+            Cell[
+             StyleData["SmallText", "Presentation"], 
+             CellMargins -> {{13, 10}, {8, 8}}, LineSpacing -> {1, 5}, 
+             FontSize -> 12], 
+            Cell[
+             StyleData["SmallText", "Condensed"], 
+             CellMargins -> {{8, 10}, {2, 2}}, LineSpacing -> {1, 2}, 
+             FontSize -> 9], 
+            Cell[
+             StyleData["SmallText", "Printout"], 
+             CellMargins -> {{9, 0}, {4, 4}}, FontSize -> 7]}, Closed]]}, 
+        Closed]], 
+      Cell[
+       CellGroupData[{
+         Cell["Styles for Input/Output", "Section"], 
+         Cell[
+         "\nThe cells in this section define styles used for input and output \
+to the \nkernel.  Be careful when modifying, renaming, or removing these \
+styles, \nbecause the front end associates special meanings with these style \
+names.\n", "Text"], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Input"], CellFrame -> {{3, 0}, {0, 0}}, 
+             CellMargins -> {{52, 10}, {8, 8}}, Evaluatable -> True, 
+             CellGroupingRules -> "InputGrouping", CellHorizontalScrolling -> 
+             True, PageBreakWithin -> False, GroupPageBreakWithin -> False, 
+             CellLabelMargins -> {{5, Inherited}, {Inherited, Inherited}}, 
+             DefaultFormatType -> DefaultInputFormatType, FormatType -> 
+             InputForm, ShowStringCharacters -> True, NumberMarks -> True, 
+             CounterIncrements -> "Input", FontWeight -> "Bold", Background -> 
+             RGBColor[1, 0.8, 0.4]], 
+            Cell[
+             StyleData["Input", "Presentation"], 
+             CellMargins -> {{62, Inherited}, {10, 10}}, 
+             LineSpacing -> {1, 0}], 
+            Cell[
+             StyleData["Input", "Condensed"], 
+             CellMargins -> {{40, 10}, {4, 4}}], 
+            Cell[
+             StyleData["Input", "Printout"], CellMargins -> {{44, 0}, {6, 6}},
+              Background -> GrayLevel[0.8]]}, Closed]], 
+         Cell[
+          StyleData["InlineInput"], Evaluatable -> True, CellGroupingRules -> 
+          "InputGrouping", CellHorizontalScrolling -> True, PageBreakWithin -> 
+          False, GroupPageBreakWithin -> False, DefaultFormatType -> 
+          DefaultInputFormatType, AutoItalicWords -> {}, FormatType -> 
+          InputForm, ShowStringCharacters -> True, NumberMarks -> True, 
+          CounterIncrements -> "Input", FontWeight -> "Bold"], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Output"], CellFrame -> {{3, 0}, {0, 0}}, 
+             CellMargins -> {{52, 10}, {8, 8}}, CellEditDuplicate -> True, 
+             CellGroupingRules -> "OutputGrouping", CellHorizontalScrolling -> 
+             True, PageBreakWithin -> False, GroupPageBreakWithin -> False, 
+             GeneratedCell -> True, CellAutoOverwrite -> True, 
+             CellLabelMargins -> {{3, Inherited}, {Inherited, Inherited}}, 
+             DefaultFormatType -> DefaultOutputFormatType, FormatType -> 
+             InputForm, CounterIncrements -> "Output", Background -> 
+             RGBColor[1, 0.900008, 0.900008]], 
+            Cell[
+             StyleData["Output", "Presentation"], 
+             CellMargins -> {{62, Inherited}, {12, 5}}, 
+             LineSpacing -> {1, 0}], 
+            Cell[
+             StyleData["Output", "Condensed"], 
+             CellMargins -> {{40, Inherited}, {4, 1}}], 
+            Cell[
+             StyleData["Output", "Printout"], 
+             CellMargins -> {{44, 0}, {6, 2}}, Background -> 
+             GrayLevel[0.900008]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Message"], 
+             CellMargins -> {{62, Inherited}, {Inherited, Inherited}}, 
+             CellGroupingRules -> "OutputGrouping", PageBreakWithin -> False, 
+             GroupPageBreakWithin -> False, GeneratedCell -> True, 
+             CellAutoOverwrite -> True, ShowCellLabel -> False, 
+             DefaultFormatType -> DefaultOutputFormatType, FormatType -> 
+             InputForm, CounterIncrements -> "Message", StyleMenuListing -> 
+             None, FontColor -> RGBColor[1, 0, 0]], 
+            Cell[
+             StyleData["Message", "Presentation"], 
+             CellMargins -> {{74, Inherited}, {Inherited, Inherited}}, 
+             LineSpacing -> {1, 0}], 
+            Cell[
+             StyleData["Message", "Condensed"], 
+             CellMargins -> {{50, Inherited}, {Inherited, Inherited}}], 
+            Cell[
+             StyleData["Message", "Printout"], 
+             CellMargins -> {{54, Inherited}, {Inherited, Inherited}}, 
+             FontColor -> GrayLevel[0]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Print"], 
+             CellMargins -> {{62, Inherited}, {Inherited, Inherited}}, 
+             CellGroupingRules -> "OutputGrouping", CellHorizontalScrolling -> 
+             True, PageBreakWithin -> False, GroupPageBreakWithin -> False, 
+             GeneratedCell -> True, CellAutoOverwrite -> True, ShowCellLabel -> 
+             False, DefaultFormatType -> DefaultOutputFormatType, FormatType -> 
+             InputForm, CounterIncrements -> "Print", StyleMenuListing -> 
+             None], 
+            Cell[
+             StyleData["Print", "Presentation"], 
+             CellMargins -> {{74, Inherited}, {Inherited, Inherited}}, 
+             LineSpacing -> {1, 0}], 
+            Cell[
+             StyleData["Print", "Condensed"], 
+             CellMargins -> {{50, Inherited}, {Inherited, Inherited}}], 
+            Cell[
+             StyleData["Print", "Printout"], 
+             CellMargins -> {{54, Inherited}, {Inherited, Inherited}}]}, 
+           Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Graphics"], 
+             CellMargins -> {{62, Inherited}, {Inherited, Inherited}}, 
+             CellGroupingRules -> "GraphicsGrouping", CellHorizontalScrolling -> 
+             True, PageBreakWithin -> False, GeneratedCell -> True, 
+             CellAutoOverwrite -> True, ShowCellLabel -> False, 
+             DefaultFormatType -> DefaultOutputFormatType, FormatType -> 
+             InputForm, CounterIncrements -> "Graphics", StyleMenuListing -> 
+             None], 
+            Cell[
+             StyleData["Graphics", "Presentation"], 
+             CellMargins -> {{74, Inherited}, {Inherited, Inherited}}], 
+            Cell[
+             StyleData["Graphics", "Condensed"], 
+             CellMargins -> {{52, Inherited}, {Inherited, Inherited}}, 
+             ImageSize -> {175, 175}], 
+            Cell[
+             StyleData["Graphics", "Printout"], 
+             CellMargins -> {{54, Inherited}, {Inherited, Inherited}}, 
+             ImageSize -> {250, 250}]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["CellLabel"], StyleMenuListing -> None, FontFamily -> 
+             "Helvetica", FontSize -> 11, FontWeight -> "Bold", FontColor -> 
+             RGBColor[0.571389, 0.19675, 0.570504]], 
+            Cell[
+             StyleData["CellLabel", "Presentation"], FontSize -> 12], 
+            Cell[
+             StyleData["CellLabel", "Condensed"], FontSize -> 8], 
+            Cell[
+             StyleData["CellLabel", "Printout"], FontSize -> 8, FontColor -> 
+             GrayLevel[0]]}, Closed]]}, Closed]], 
+      Cell[
+       CellGroupData[{
+         Cell["Unique Styles", "Section"], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Author"], ShowCellBracket -> False, 
+             CellMargins -> {{10, 4}, {2, 10}}, FontSize -> 16, FontSlant -> 
+             "Italic"], 
+            Cell[
+             StyleData["Author", "Presentation"], 
+             CellMargins -> {{12, 10}, {2, 12}}, LineSpacing -> {1, 5}, 
+             ParagraphSpacing -> {0, 12}, FontSize -> 20], 
+            Cell[
+             StyleData["Author", "Condensed"], 
+             CellMargins -> {{8, 10}, {1, 4}}, LineSpacing -> {1, 1}, 
+             ParagraphSpacing -> {0, 4}, FontSize -> 12], 
+            Cell[
+             StyleData["Author", "Printout"], 
+             CellMargins -> {{9, 0}, {4, 12}}, ParagraphSpacing -> {0, 6}, 
+             FontSize -> 14]}, Open]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Copyright"], ShowCellBracket -> False, 
+             CellMargins -> {{10, 10}, {40, 2}}, FontFamily -> "Helvetica", 
+             FontSize -> 9], 
+            Cell[
+             StyleData["Copyright", "Presentation"], 
+             CellMargins -> {{12, 10}, {50, 2}}, LineSpacing -> {1, 5}, 
+             FontSize -> 12], 
+            Cell[
+             StyleData["Copyright", "Condensed"], 
+             CellMargins -> {{8, 10}, {12, 1}}, LineSpacing -> {1, 2}, 
+             FontSize -> 9], 
+            Cell[
+             StyleData["Copyright", "Printout"], 
+             CellMargins -> {{9, 0}, {72, 4}}, FontSize -> 7]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Example"], CellMargins -> {{12, 10}, {5, 12}}, 
+             LineSpacing -> {1, 3}, ParagraphSpacing -> {0, 12}, 
+             CounterIncrements -> "Example", FontFamily -> "Times", 
+             FontWeight -> "Bold"], 
+            Cell[
+             StyleData["Example", "Presentation"], 
+             CellMargins -> {{18, 10}, {8, 20}}, LineSpacing -> {1, 5}, 
+             ParagraphSpacing -> {0, 12}], 
+            Cell[
+             StyleData["Example", "Condensed"], 
+             CellMargins -> {{8, 10}, {4, 8}}, LineSpacing -> {1, 1}, 
+             ParagraphSpacing -> {0, 4}], 
+            Cell[
+             StyleData["Example", "Printout"], 
+             CellMargins -> {{9, 0}, {4, 10}}, ParagraphSpacing -> {0, 6}]}, 
+           Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Definition"], CellFrame -> {{3, 0}, {0, 0}}, 
+             CellMargins -> {{52, 10}, {8, 8}}, PageBreakWithin -> False, 
+             GroupPageBreakWithin -> False, 
+             CellLabelMargins -> {{23, Inherited}, {Inherited, Inherited}}, 
+             ShowStringCharacters -> True, CounterIncrements -> "Definition", 
+             FontFamily -> "Helvetica", FontWeight -> "Bold", FontColor -> 
+             GrayLevel[1], Background -> RGBColor[0.2, 0.700008, 0.700008]], 
+            Cell[
+             StyleData["Definition", "Presentation"], 
+             CellMargins -> {{62, Inherited}, {5, 12}}, 
+             LineSpacing -> {1, 0}], 
+            Cell[
+             StyleData["Definition", "Condensed"], 
+             CellMargins -> {{40, 10}, {1, 4}}], 
+            Cell[
+             StyleData["Definition", "Printout"], 
+             CellMargins -> {{44, 0}, {2, 6}}, Background -> GrayLevel[0.6]]},
+            Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Theorem"], CellFrame -> {{3, 0}, {0, 0}}, 
+             CellMargins -> {{52, 10}, {8, 8}}, PageBreakWithin -> False, 
+             GroupPageBreakWithin -> False, 
+             CellLabelMargins -> {{23, Inherited}, {Inherited, Inherited}}, 
+             ShowStringCharacters -> True, CounterIncrements -> "Theorem", 
+             FontFamily -> "Helvetica", FontWeight -> "Bold", FontColor -> 
+             GrayLevel[1], Background -> 
+             RGBColor[0.571389, 0.19675, 0.570504]], 
+            Cell[
+             StyleData["Theorem", "Presentation"], 
+             CellMargins -> {{62, Inherited}, {5, 12}}, 
+             LineSpacing -> {1, 0}], 
+            Cell[
+             StyleData["Theorem", "Condensed"], 
+             CellMargins -> {{40, 10}, {1, 4}}], 
+            Cell[
+             StyleData["Theorem", "Printout"], 
+             CellMargins -> {{44, 0}, {2, 6}}, Background -> GrayLevel[0.4]]},
+            Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["ExerciseMain"], CellFrame -> {{6, 0}, {0, 1}}, 
+             CellMargins -> {{12, Inherited}, {4, 20}}, 
+             CellGroupingRules -> {"SectionGrouping", 30}, PageBreakBelow -> 
+             False, CellFrameColor -> RGBColor[0.571389, 0.19675, 0.570504], 
+             CounterIncrements -> "Subsection", 
+             CounterAssignments -> {{"Subsubsection", 0}}, FontFamily -> 
+             "Helvetica", FontSize -> 16, FontWeight -> "Bold", FontColor -> 
+             RGBColor[0.571389, 0.19675, 0.570504]], 
+            Cell[
+             StyleData["ExerciseMain", "Presentation"], 
+             CellMargins -> {{18, 10}, {8, 32}}, LineSpacing -> {1, 2}, 
+             FontSize -> 24, FontTracking -> "Condensed"], 
+            Cell[
+             StyleData["ExerciseMain", "Condensed"], 
+             CellMargins -> {{8, Inherited}, {2, 12}}, FontSize -> 12], 
+            Cell[
+             StyleData["ExerciseMain", "Printout"], 
+             CellMargins -> {{9, 0}, {2, 50}}, CellFrameColor -> 
+             GrayLevel[0.500008], FontSize -> 14, FontTracking -> "Plain", 
+             FontColor -> GrayLevel[0]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Exercise"], CellDingbat -> "\[FilledDownTriangle]", 
+             CellMargins -> {{23, Inherited}, {4, 18}}, 
+             CellGroupingRules -> {"SectionGrouping", 50}, PageBreakBelow -> 
+             False, CounterIncrements -> "Subsubsection", FontFamily -> 
+             "Times", FontSize -> 13, FontWeight -> "Bold", FontColor -> 
+             RGBColor[0.571389, 0.19675, 0.570504]], 
+            Cell[
+             StyleData["Exercise", "Presentation"], 
+             CellMargins -> {{33, 10}, {8, 26}}, LineSpacing -> {1, 0}, 
+             FontSize -> 18], 
+            Cell[
+             StyleData["Exercise", "Condensed"], 
+             CellMargins -> {{17, Inherited}, {2, 12}}, FontSize -> 10], 
+            Cell[
+             StyleData["Exercise", "Printout"], 
+             CellFrame -> {{0, 0}, {0.5, 0}}, CellDingbat -> None, 
+             CellMargins -> {{9, 0}, {6, 20}}, FontSize -> 11, FontColor -> 
+             GrayLevel[0]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["ExerciseText"], CellMargins -> {{62, 10}, {5, 5}}, 
+             LineSpacing -> {1, 3}, ParagraphSpacing -> {0, 8}, 
+             CounterIncrements -> "ExcersiceText", FontFamily -> "Times"], 
+            Cell[
+             StyleData["ExerciseText", "Presentation"], 
+             CellMargins -> {{74, 10}, {8, 8}}, LineSpacing -> {1, 5}, 
+             ParagraphSpacing -> {0, 12}], 
+            Cell[
+             StyleData["ExerciseText", "Condensed"], 
+             CellMargins -> {{52, 10}, {2, 2}}, LineSpacing -> {1, 1}, 
+             ParagraphSpacing -> {0, 4}], 
+            Cell[
+             StyleData["ExerciseText", "Printout"], 
+             CellMargins -> {{54, 0}, {4, 4}}, ParagraphSpacing -> {0, 6}]}, 
+           Closed]]}, Open]], 
+      Cell[
+       CellGroupData[{
+         Cell["Formulas and Programming", "Section"], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["DisplayFormula"], CellMargins -> {{62, 10}, {2, 10}}, 
+             CellHorizontalScrolling -> True, ScriptLevel -> 0, 
+             SingleLetterItalics -> True, 
+             UnderoverscriptBoxOptions -> {LimitsPositioning -> True}], 
+            Cell[
+             StyleData["DisplayFormula", "Presentation"], 
+             CellMargins -> {{74, 10}, {2, 10}}, FontSize -> 10], 
+            Cell[
+             StyleData["DisplayFormula", "Condensed"], 
+             CellMargins -> {{52, 10}, {2, 10}}, FontSize -> 10], 
+            Cell[
+             StyleData["DisplayFormula", "Printout"], 
+             CellMargins -> {{54, 10}, {2, 10}}, FontSize -> 10]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["ChemicalFormula"], CellMargins -> {{62, 10}, {2, 10}},
+              AutoSpacing -> False, ScriptBaselineShifts -> {0.6, Automatic}, 
+             ScriptLevel -> 1, SingleLetterItalics -> False, ZeroWidthTimes -> 
+             True], 
+            Cell[
+             StyleData["ChemicalFormula", "Presentation"], 
+             CellMargins -> {{74, 10}, {2, 10}}, FontSize -> 10], 
+            Cell[
+             StyleData["ChemicalFormula", "Condensed"], 
+             CellMargins -> {{52, 10}, {2, 10}}, FontSize -> 10], 
+            Cell[
+             StyleData["ChemicalFormula", "Printout"], 
+             CellMargins -> {{54, 10}, {2, 10}}, FontSize -> 10]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Program"], CellMargins -> {{12, 10}, {Inherited, 6}}, 
+             FontFamily -> "Courier"], 
+            Cell[
+             StyleData["Program", "Presentation"], 
+             CellMargins -> {{13, 30}, {Inherited, 4}}, FontSize -> 9.5], 
+            Cell[
+             StyleData["Program", "Condensed"], 
+             CellMargins -> {{8, 10}, {Inherited, 4}}, FontSize -> 9.5], 
+            Cell[
+             StyleData["Program", "Printout"], 
+             CellMargins -> {{9, 0}, {Inherited, 4}}, FontSize -> 9.5]}, 
+           Closed]]}, Closed]], 
+      Cell[
+       CellGroupData[{
+         Cell["Styles for Automatic Numbering", "Section"], 
+         Cell[
+         "\nThe following styles are useful for numbered equations, figures, \
+etc.  They \nautomatically give the cell a FrameLabel containing a reference \
+to a \nparticular counter, and also increment that counter.\n", "Text"], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["NumberedEquation"], 
+             CellMargins -> {{62, 10}, {Inherited, Inherited}}, 
+             CellFrameLabels -> {{None, 
+                Cell[
+                 TextData[{"(", 
+                   CounterBox["NumberedEquation"], ")"}]]}, {None, None}}, 
+             DefaultFormatType -> DefaultInputFormatType, CounterIncrements -> 
+             "NumberedEquation", FormatTypeAutoConvert -> False], 
+            Cell[
+             StyleData["NumberedEquation", "Presentation"], 
+             CellMargins -> {{74, 10}, {Inherited, Inherited}}], 
+            Cell[
+             StyleData["NumberedEquation", "Condensed"], 
+             CellMargins -> {{52, 10}, {Inherited, Inherited}}], 
+            Cell[
+             StyleData["NumberedEquation", "Printout"], 
+             CellMargins -> {{54, 0}, {Inherited, Inherited}}]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["NumberedFigure"], 
+             CellMargins -> {{62, 145}, {Inherited, Inherited}}, 
+             CellFrameLabels -> {{None, None}, {
+                Cell[
+                 TextData[{"Figure ", 
+                   CounterBox["NumberedFigure"]}]], None}}, CounterIncrements -> 
+             "NumberedFigure", 
+             ImageMargins -> {{43, Inherited}, {Inherited, 0}}, 
+             FormatTypeAutoConvert -> False], 
+            Cell[
+             StyleData["NumberedFigure", "Presentation"]], 
+            Cell[
+             StyleData["NumberedFigure", "Condensed"]], 
+            Cell[
+             StyleData["NumberedFigure", "Printout"]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["NumberedTable"], 
+             CellMargins -> {{62, 145}, {Inherited, Inherited}}, 
+             CellFrameLabels -> {{None, None}, {
+                Cell[
+                 TextData[{"Table ", 
+                   CounterBox["NumberedTable"]}]], None}}, TextAlignment -> 
+             Center, CounterIncrements -> "NumberedTable", 
+             FormatTypeAutoConvert -> False], 
+            Cell[
+             StyleData["NumberedTable", "Presentation"]], 
+            Cell[
+             StyleData["NumberedTable", "Condensed"]], 
+            Cell[
+             StyleData["NumberedTable", "Printout"]]}, Closed]]}, Closed]], 
+      Cell[
+       CellGroupData[{
+         Cell["Styles for Headers and Footers", "Section"], 
+         Cell[
+          StyleData["Header"], CellMargins -> {{0, 0}, {4, 1}}, 
+          StyleMenuListing -> None, FontFamily -> "Helvetica", FontSize -> 9, 
+          FontSlant -> "Italic"], 
+         Cell[
+          StyleData["Footer"], CellMargins -> {{0, 0}, {0, 4}}, 
+          StyleMenuListing -> None, FontFamily -> "Helvetica", FontSize -> 6],
+          
+         Cell[
+          StyleData["PageNumber"], CellMargins -> {{0, 0}, {4, 1}}, 
+          StyleMenuListing -> None, FontFamily -> "Helvetica", FontSize -> 9, 
+          FontWeight -> "Bold"]}, Closed]], 
+      Cell[
+       CellGroupData[{
+         Cell["Hyperlink Styles", "Section"], 
+         Cell[
+         "\nThe cells below define styles useful for making hypertext \
+ButtonBoxes.  The \n\"Hyperlink\" style is for links within the same \
+Notebook, or between \nNotebooks.\n", "Text"], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["Hyperlink"], StyleMenuListing -> None, 
+             ButtonStyleMenuListing -> Automatic, FontColor -> GrayLevel[1], 
+             Background -> RGBColor[1, 0.4, 0], 
+             ButtonBoxOptions -> {
+              Active -> True, ButtonFrame -> "None", 
+               ButtonFunction :> (FrontEndExecute[{
+                  FrontEnd`NotebookLocate[#2]}]& ), ButtonNote -> 
+               ButtonData}], 
+            Cell[
+             StyleData["Hyperlink", "Presentation"]], 
+            Cell[
+             StyleData["Hyperlink", "Condensed"]], 
+            Cell[
+             StyleData["Hyperlink", "Printout"], FontColor -> GrayLevel[0], 
+             Background -> GrayLevel[1]]}, Closed]], 
+         Cell[
+         "\nThe following styles are for linking automatically to the on-line \
+help \nsystem.\n", "Text"], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["MainBookLink"], StyleMenuListing -> None, 
+             ButtonStyleMenuListing -> Automatic, FontColor -> GrayLevel[1], 
+             Background -> RGBColor[1, 0.4, 0], 
+             ButtonBoxOptions -> {
+              Active -> True, ButtonFrame -> "None", 
+               ButtonFunction :> (FrontEndExecute[{
+                  FrontEnd`HelpBrowserLookup["MainBook", #]}]& )}], 
+            Cell[
+             StyleData["MainBookLink", "Presentation"]], 
+            Cell[
+             StyleData["MainBookLink", "Condensed"]], 
+            Cell[
+             StyleData["MainBookLink", "Printout"], FontColor -> GrayLevel[0],
+              Background -> GrayLevel[1]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["AddOnsLink"], StyleMenuListing -> None, 
+             ButtonStyleMenuListing -> Automatic, FontFamily -> "Courier", 
+             FontColor -> GrayLevel[1], Background -> RGBColor[1, 0.4, 0], 
+             ButtonBoxOptions -> {
+              Active -> True, ButtonFrame -> "None", 
+               ButtonFunction :> (FrontEndExecute[{
+                  FrontEnd`HelpBrowserLookup["AddOns", #]}]& )}], 
+            Cell[
+             StyleData["AddOnsLink", "Presentation"]], 
+            Cell[
+             StyleData["AddOnsLink", "Condensed"]], 
+            Cell[
+             StyleData["AddOnLink", "Printout"], FontColor -> GrayLevel[0], 
+             Background -> GrayLevel[1]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["RefGuideLink"], StyleMenuListing -> None, 
+             ButtonStyleMenuListing -> Automatic, FontFamily -> "Courier", 
+             FontColor -> GrayLevel[1], Background -> RGBColor[1, 0.4, 0], 
+             ButtonBoxOptions -> {
+              Active -> True, ButtonFrame -> "None", 
+               ButtonFunction :> (FrontEndExecute[{
+                  FrontEnd`HelpBrowserLookup["RefGuideLink", #]}]& )}], 
+            Cell[
+             StyleData["RefGuideLink", "Presentation"]], 
+            Cell[
+             StyleData["RefGuideLink", "Condensed"]], 
+            Cell[
+             StyleData["RefGuideLink", "Printout"], FontColor -> GrayLevel[0],
+              Background -> GrayLevel[1]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["GettingStartedLink"], StyleMenuListing -> None, 
+             ButtonStyleMenuListing -> Automatic, FontColor -> GrayLevel[1], 
+             Background -> RGBColor[1, 0.4, 0], 
+             ButtonBoxOptions -> {
+              Active -> True, ButtonFrame -> "None", 
+               ButtonFunction :> (FrontEndExecute[{
+                  FrontEnd`HelpBrowserLookup["GettingStarted", #]}]& )}], 
+            Cell[
+             StyleData["GettingStartedLink", "Presentation"]], 
+            Cell[
+             StyleData["GettingStartedLink", "Condensed"]], 
+            Cell[
+             StyleData["GettingStartedLink", "Printout"], FontColor -> 
+             GrayLevel[0], Background -> GrayLevel[1]]}, Closed]], 
+         Cell[
+          CellGroupData[{
+            Cell[
+             StyleData["OtherInformationLink"], StyleMenuListing -> None, 
+             ButtonStyleMenuListing -> Automatic, FontColor -> GrayLevel[1], 
+             Background -> RGBColor[1, 0.4, 0], 
+             ButtonBoxOptions -> {
+              Active -> True, ButtonFrame -> "None", 
+               ButtonFunction :> (FrontEndExecute[{
+                  FrontEnd`HelpBrowserLookup["OtherInformation", #]}]& )}], 
+            Cell[
+             StyleData["OtherInformationLink", "Presentation"]], 
+            Cell[
+             StyleData["OtherInformationLink", "Condensed"]], 
+            Cell[
+             StyleData["OtherInformationLink", "Printout"], FontColor -> 
+             GrayLevel[0], Background -> GrayLevel[1]]}, Closed]]}, Closed]]},
+      Open]]}, Visible -> False, FrontEndVersion -> 
+  "6.0 for Microsoft Windows (32-bit) (June 19, 2007)", StyleDefinitions -> 
+  "Default.nb"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[568, 21, 133, 3, 43, "Title",
+ Evaluatable->False],
+Cell[704, 26, 169, 4, 25, "Text",
+ Evaluatable->False],
+Cell[CellGroupData[{
+Cell[898, 34, 77, 2, 54, "Section",
+ Evaluatable->False],
+Cell[978, 38, 4527, 66, 850, "Text",
+ Evaluatable->False]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[5542, 109, 90, 2, 34, "Section",
+ Evaluatable->False],
+Cell[5635, 113, 280, 6, 25, "Text",
+ Evaluatable->False],
+Cell[5918, 121, 177, 6, 65, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[6132, 132, 149, 3, 34, "Section",
+ Evaluatable->False],
+Cell[6284, 137, 95, 2, 25, "Text",
+ Evaluatable->False],
+Cell[6382, 141, 2019, 79, 1323, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[8438, 225, 95, 2, 34, "Section",
+ Evaluatable->False],
+Cell[8536, 229, 2543, 38, 313, "Text",
+ Evaluatable->False],
+Cell[11082, 269, 1231, 47, 762, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[12350, 321, 157, 3, 34, "Section",
+ Evaluatable->False],
+Cell[12510, 326, 182, 4, 25, "Text",
+ Evaluatable->False],
+Cell[12695, 332, 866, 20, 189, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[13598, 357, 138, 6, 34, "Section",
+ Evaluatable->False],
+Cell[13739, 365, 189, 5, 25, "Text",
+ Evaluatable->False],
+Cell[13931, 372, 650, 19, 129, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[14618, 396, 86, 2, 34, "Section",
+ Evaluatable->False],
+Cell[14707, 400, 1724, 27, 205, "Text",
+ Evaluatable->False],
+Cell[16434, 429, 1071, 30, 109, "Input"],
+Cell[17508, 461, 877, 26, 89, "Input"],
+Cell[18388, 489, 704, 20, 89, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[19129, 514, 80, 2, 34, "Section",
+ Evaluatable->False],
+Cell[19212, 518, 536, 9, 61, "Text",
+ Evaluatable->False],
+Cell[19751, 529, 861, 28, 149, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[20649, 562, 217, 5, 34, "Section",
+ Evaluatable->False],
+Cell[20869, 569, 378, 8, 61, "Text",
+ Evaluatable->False],
+Cell[21250, 579, 1419, 54, 864, "Input"]
+}, Closed]]
+}
+]
+*)
+
+(* End of internal cache information *)

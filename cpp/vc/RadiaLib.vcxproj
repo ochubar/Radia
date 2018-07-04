@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C66E3422-C0DD-475D-B16B-0D596F188465}</ProjectGuid>
+    <RootNamespace>test_lib2</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\src\core;..\src\ext\triangle;..\src\ext\auxparse;..\src\ext\genmath;..\src\ext\glut_viewer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_LIB;ALPHA__LIB__;_WITH_GLUT;FFTW_ENABLE_FLOAT;_CRT_SECURE_NO_DEPRECATE;NO_TIMER;ANSI_DECLARATORS;TRILIBRARY;_GM_WITHOUT_BASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AssemblerListingLocation>.\win32/$(ProjectName)/Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\win32/$(ProjectName)/Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\win32/$(ProjectName)/Debug/</ProgramDataBaseFileName>
+    </ClCompile>
+    <Lib>
+      <OutputFile>radia_win32.lib</OutputFile>
+      <AdditionalDependencies>..\..\ext_lib\fftw_f.lib;..\..\ext_lib\GlutViewerd.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\src\core;..\src\ext\triangle;..\src\ext\auxparse;..\src\ext\genmath;..\src\ext\glut_viewer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_LIB;ALPHA__LIB__;_WITH_GLUT;FFTW_ENABLE_FLOAT;_CRT_SECURE_NO_DEPRECATE;NO_TIMER;ANSI_DECLARATORS;TRILIBRARY;_GM_WITHOUT_BASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AssemblerListingLocation>.\x64/$(ProjectName)/Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\x64/$(ProjectName)/Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\x64/$(ProjectName)/Debug/</ProgramDataBaseFileName>
+    </ClCompile>
+    <Lib>
+      <OutputFile>radia_x64.lib</OutputFile>
+      <AdditionalDependencies>..\..\ext_lib\fftw64_f.lib;..\..\ext_lib\GlutViewer64d.lib;version.lib</AdditionalDependencies>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\src\core;..\src\ext\triangle;..\src\ext\auxparse;..\src\ext\genmath;..\src\ext\glut_viewer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_LIB;ALPHA__LIB__;_WITH_GLUT;FFTW_ENABLE_FLOAT;_CRT_SECURE_NO_DEPRECATE;NO_TIMER;ANSI_DECLARATORS;TRILIBRARY;_GM_WITHOUT_BASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AssemblerListingLocation>.\win32/$(ProjectName)/Release/</AssemblerListingLocation>
+      <ObjectFileName>.\win32/$(ProjectName)/Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\win32/$(ProjectName)/Release/</ProgramDataBaseFileName>
+    </ClCompile>
+    <Lib>
+      <OutputFile>radia_win32.lib</OutputFile>
+      <AdditionalDependencies>..\..\ext_lib\fftw_f.lib;..\..\ext_lib\GlutViewer.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\src\core;..\src\ext\triangle;..\src\ext\auxparse;..\src\ext\genmath;..\src\ext\glut_viewer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_LIB;ALPHA__LIB__;_WITH_GLUT;FFTW_ENABLE_FLOAT;_CRT_SECURE_NO_DEPRECATE;NO_TIMER;ANSI_DECLARATORS;TRILIBRARY;_GM_WITHOUT_BASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AssemblerListingLocation>.\x64/$(ProjectName)/Release/</AssemblerListingLocation>
+      <ObjectFileName>.\x64/$(ProjectName)/Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\x64/$(ProjectName)/Release/</ProgramDataBaseFileName>
+    </ClCompile>
+    <Lib>
+      <OutputFile>radia_x64.lib</OutputFile>
+      <AdditionalDependencies>..\..\ext_lib\fftw64_f.lib;..\..\ext_lib\GlutViewer64.lib;version.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\ext\auxparse\auxparse.cpp" />
+    <ClCompile Include="..\src\ext\genmath\gmfft.cpp" />
+    <ClCompile Include="..\src\ext\genmath\gmtrans.cpp" />
+    <ClCompile Include="..\src\core\radapl1.cpp" />
+    <ClCompile Include="..\src\core\radapl2.cpp" />
+    <ClCompile Include="..\src\core\radapl3.cpp" />
+    <ClCompile Include="..\src\core\radapl4.cpp" />
+    <ClCompile Include="..\src\core\radapl5.cpp" />
+    <ClCompile Include="..\src\core\radapl6.cpp" />
+    <ClCompile Include="..\src\core\radapl7.cpp" />
+    <ClCompile Include="..\src\core\radarccu.cpp" />
+    <ClCompile Include="..\src\core\radcast.cpp" />
+    <ClCompile Include="..\src\core\radexpgn.cpp" />
+    <ClCompile Include="..\src\core\radflm.cpp" />
+    <ClCompile Include="..\src\core\radg3d.cpp" />
+    <ClCompile Include="..\src\core\radg3dgr.cpp" />
+    <ClCompile Include="..\src\core\radgroup.cpp" />
+    <ClCompile Include="..\src\core\radinter.cpp" />
+    <ClCompile Include="..\src\core\radintrc.cpp" />
+    <ClCompile Include="..\src\core\radiobuf.cpp" />
+    <ClCompile Include="..\src\core\radmamet.cpp" />
+    <ClCompile Include="..\src\core\radmater.cpp" />
+    <ClCompile Include="..\src\core\radplnr1.cpp" />
+    <ClCompile Include="..\src\core\radplnr2.cpp" />
+    <ClCompile Include="..\src\core\radptrj.cpp" />
+    <ClCompile Include="..\src\core\radrec.cpp" />
+    <ClCompile Include="..\src\core\radrlmet.cpp" />
+    <ClCompile Include="..\src\core\radsbdac.cpp" />
+    <ClCompile Include="..\src\core\radsbdep.cpp" />
+    <ClCompile Include="..\src\core\radsbdrc.cpp" />
+    <ClCompile Include="..\src\core\radsbdvp.cpp" />
+    <ClCompile Include="..\src\core\radsend.cpp" />
+    <ClCompile Include="..\src\core\radvlpgn.cpp" />
+    <ClCompile Include="..\src\ext\triangle\triangle.c" />
+    <ClCompile Include="..\src\lib\radentry.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\ext\auxparse\auxparse.h" />
+    <ClInclude Include="..\src\ext\genmath\gmfft.h" />
+    <ClInclude Include="..\src\ext\genmath\gminterf.h" />
+    <ClInclude Include="..\src\ext\genmath\gmtrans.h" />
+    <ClInclude Include="..\src\ext\genmath\gmvect.h" />
+    <ClInclude Include="..\src\ext\genmath\gmvectf.h" />
+    <ClInclude Include="..\src\core\radapl1.h" />
+    <ClInclude Include="..\src\core\radappl.h" />
+    <ClInclude Include="..\src\core\radarccu.h" />
+    <ClInclude Include="..\src\core\radcast.h" />
+    <ClInclude Include="..\src\core\radexpgn.h" />
+    <ClInclude Include="..\src\core\radflm.h" />
+    <ClInclude Include="..\src\core\radg3d.h" />
+    <ClInclude Include="..\src\core\radg3dgr.h" />
+    <ClInclude Include="..\src\core\radgroup.h" />
+    <ClInclude Include="..\src\core\radintrc.h" />
+    <ClInclude Include="..\src\core\radiobuf.h" />
+    <ClInclude Include="..\src\core\radmamet.h" />
+    <ClInclude Include="..\src\core\radmater.h" />
+    <ClInclude Include="..\src\core\radptrj.h" />
+    <ClInclude Include="..\src\core\radrec.h" />
+    <ClInclude Include="..\src\core\radrlmet.h" />
+    <ClInclude Include="..\src\core\radsbdac.h" />
+    <ClInclude Include="..\src\core\radsbdep.h" />
+    <ClInclude Include="..\src\core\radsbdrc.h" />
+    <ClInclude Include="..\src\core\radsbdvp.h" />
+    <ClInclude Include="..\src\core\radsend.h" />
+    <ClInclude Include="..\src\core\radtrans.h" />
+    <ClInclude Include="..\src\core\radvlpgn.h" />
+    <ClInclude Include="..\src\ext\triangle\triangle.h" />
+    <ClInclude Include="..\src\lib\radentry.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

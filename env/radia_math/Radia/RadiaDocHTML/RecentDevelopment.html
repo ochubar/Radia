@@ -1,0 +1,199 @@
+<html>
+	<head>
+		<title>Recent Developments</title>
+		<meta name="GENERATOR" content="Microsoft FrontPage 3.0"/>
+		<meta name="AUTHOR" content="Elleaume"/>
+	</head>
+	<body BGCOLOR="#ffffff" LINK="#0000ff" VLINK="#ff0000" ALINK="#ff0000">
+		<p ALIGN="center"><br>
+		</p>
+		<h1 ALIGN="center">Recent Developments in the <font color="#ff0000">Radia </font><font color="#000000">Project</font>
+		</h1>
+		<h4>
+		</h4>
+		<p><font size="+1">The following new features were implemented in the most recent version:</font>
+		</p>
+		<p><font color="#ff0000"><big>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<big>Radia 4.29</big></big></font></p>
+			<ul>
+                <li><font size="+1">New function <tt><big><b>radObjMltExtPgnCur[z:0,a:"z",{{{x1,y1},{x2,y2},...},{{R1,T1,H1},{R2,T2,H2},...}},I,Frame->Loc|Lab]</b></big></tt> has been added. 
+                        This function attempts to create a set of current-carrying convex polyhedron objects by applying a generalized extrusion to the initial planar convex polygon. 
+                        The initial polygon is defined for the "attitude" <tt><big><b>z</b></big></tt> (0 by default) by the list of 2D points" <tt><big><b>{{x1,y1},{x2,y2},...}</b></big></tt>, 
+                        with the  a  character specifying orientation of this polygon normal in 3D space: if <tt><big><b>a = "z"</b></big></tt> (default orientation), the polygon is assumed 
+                        to be parallel to XY plane of the laboratory frame (<tt><big><b>"y"</b></big></tt> for <tt><big><b>ZX</b></big></tt> plane, <tt><big><b>"x"</b></big></tt> for <tt><big><b>YZ</b></big></tt> plane). 
+                        The extrusion can consist of a number of "steps", with each step creating one convex polyhedron defined optionally by one (or combination of) rotation(s), and/or translation(s), 
+                        and/or one homothety: <tt><big><b>{Rk,Tk,Hk}, k = 1,2,...</b></big></tt>, applied to the base polygon (i.e. either the initial base polygon, or the polygon obtained 
+                        by previous extrusion step). In case if k-th extrusion step contains one rotation <tt><big><b>Rk</b></big></tt> about an axis, it is defined as 
+                        <tt><big><b>{{xRk,yRk,zRk},{vxRk,vyRk,vzRk},phRk}}</b></big></tt>, where <tt><big><b>{xRk,yRk,zRk}</b></big></tt> and <tt><big><b>{vxRk,vyRk,vzRk}</b></big></tt> are 
+                        respectively 3D coordinates of a point and a vector difining the rotation axis, and <tt><big><b>phRk</b></big></tt> the rotation angle in radians; in case if 
+                        <tt><big><b>Rk</b></big></tt> is a combination of "atomic" rotations about different axes, it should be defined as list: <tt><big><b>{Rk1,Rk2,...}</b></big></tt>. 
+                        If k-th extrusion step includes translation <tt><big><b>Tk</b></big></tt>, it must be defined by vector <tt><big><b>{vxTk,vyTk,vzTk}</b></big></tt>; optional homothety 
+                        with respect to the base polygon center of gravity should be defined either by two coefficients <tt><big><b>{pxHk,pyHk}</b></big></tt> with respect to two orthogonal 
+                        axes of the base polygon local frame, or by nested list <tt><big><b>{{pxHk,pyHk},phHk}</b></big></tt>, where <tt><big><b>phHk</b></big></tt> is rotation angle of the 
+                        two homothety axes in radians. The real number <tt><big><b>I</b></big></tt> defines average current in Amperes along the extrusion path. The <tt><big><b>Frame->Loc</b></big></tt> 
+                        or <tt><big><b>Frame->Lab</b></big></tt> option specifies whether the transformations at each step of the extrusion path are defined in the frame of the previous base polygon 
+                        (<tt><big><b>Frame->Loc</b></big></tt>, default), or all the transformations are defined in the laboratory frame (<tt><big><b>Frame->Lab</b></big></tt>).<br/>&nbsp;</font> 
+                </li>
+				<li>
+					<font size="+1">Functions <tt><big><b>radFldFocKickPer</b></big></tt> and <tt><big><b>radFldFocKick</b></big></tt> have been updated to include calculation of longitudinally-integrated squared transverse magnetic field 
+					    created by accelerator magnets and insertion devices, for the estimation of synchrotron radiation effects on electron dynamics in accelerators. See help records to these functions for details.</font>
+				</li>
+			</ul>
+		<p>&nbsp;</p>
+		<p><big>New features in previous versions:</big></p>
+		<p><big>&nbsp;&nbsp;&nbsp; Radia 4.26</big></p>
+			<ul>
+				<li>
+					<font size="+1">Analytical calculation of vector potential, magnetic field induction, strength and magnetic field integral (along infinite strate line) created by a polyhedron with constant or linearly-varying current density has been implemented. 
+					    To make use of this new feture, one has to create polyhedron(s) by calling the existing function <tt><big><b>radObjPolyhdr</b></big></tt> with new optional parameters:<tt><big><b> radObjPolyhdr[...,J->DataJ,Lin->Rel|Abs]</b></big></tt>,
+					    where <tt><big><b>DataJ</b></big></tt> can be<tt><big><b> {Jx0,Jy0,Jz0} </b></big></tt>or<tt><big><b> {{Jx0,Jy0,Jz0},{{dJxdx,dJxdy,dJxdz},{dJydx,dJydy,dJydz},{dJzdx,dJzdy,dJzdz}}}</b></big></tt>, 
+					    with<tt><big><b> Jx0,Jy0,Jz0 </b></big></tt>being three constant Cartesian-frame current density components (in [A/mm^2]) and<tt><big><b> dJxdx,dJxdy,dJxdz, dJydx,dJydy,dJydz, dJzdx,dJzdy,dJzdz </b></big></tt>linear coefficients (in [A/mm^3]) 
+					    for each of the three current density components. The other new option can have two values:<tt><big><b> Lin->Rel </b></big></tt>(default) or<tt><big><b> Lin->Abs</b></big></tt>. In the first case (Lin->Rel) the current density linear dependence is treated as defined 
+					    with respect to the polyhedron center, i.e. the current density at point <tt><big><b>{x,y,z}</b></big></tt> inside the polyhedron is:<br/><tt><big><b> J = {Jx0 + dJxdx*(x-xc) + dJxdy*(y-yc) + dJxdz*(z-zc),<br/> 
+					    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jy0 + dJydx*(x-xc) + dJydy*(y-yc) + dJydz*(z-zc),<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jz0 + dJzdx*(x-xc) + dJzdy*(y-yc) + dJzdz*(z-zc)}</b></big></tt>, <br/>where<tt><big><b> {xc,yc,zc} </b></big></tt> are coordinates of the polyhedron center. 
+					    In the second case (Lin->Abs) the current density is assumed to be:<br/><tt><big><b> J = {Jx0 + dJxdx*x + dJxdy*y + dJxdz*z,<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jy0 + dJydx*x + dJydy*y + dJydz*z,<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jz0 + dJzdx*x + dJzdy*y + dJzdz*z}</b></big></tt>.
+					    <br/>After the polyhedron object with constant or linearly-varying current density is created, the vector potential, magnetic field and field integral from this object can be calculated using existing functions 
+					    <tt><big><b> radFld, radFldLst, radFldInt</b></big></tt>. The current density can be defined in a polyhedron (using option <tt><big><b>J->...</b></big></tt>) only if magnetization in that polyhedron is zero or not defined.<br/>&nbsp;</font> 
+				</li>
+                <li><font size="+1">New function<tt><big><b> radObjCenFld[obj,"A|B|H|J|M"]</b></big></tt> has been added. This function returns coordinates of the object <tt><big><b>obj</b></big></tt> center point and a requested field characteristic 
+                        - vector potemtial ("A"), magnetic field induction ("B"), magnetic field strength ("H"), current density ("J") or magnetization ("M") of <tt><big><b>obj</b></big></tt> at that point.<br/>&nbsp;</font> 
+                </li>
+				<li>
+					<font size="+1">Bug fixes.</font>
+				</li>
+			</ul>
+		<p><big>&nbsp;&nbsp;&nbsp; Radia 4.25</big></p>
+			<ul>
+				<li>
+					<font size="+1">Automatic segmentation by extruded triangles has been added. 
+					    One can make use of this new feature by creating, via the new function <tt><big><b>radObjMltExtTri[...]</b></big></tt>, 
+					    a "multiple extruded triangle", i.e. a straight prism with its base being, in general case, a non-convex triangulated 
+					    polygon. The triangulation parameters must be passed as arguments to this function at creation of the 3D object 
+					    (as different from other segmentation methods, which are applied to previously-created volumes by the function <tt><big><b>radObjDivMag</b></big></tt>). 
+					    In the new function, the "Triangle" - free 2D triangulation library by Jonathan Richard Shewchuk (http://www.cs.cmu.edu/~quake/triangle.html) was used.</font> 
+				</li>
+                <li><font size="+1">New function <tt><big><b>radObjScaleCur[obj,k]</b></big></tt> has been added to scale current (density) in the object obj by multiplying it by k (if obj is a current-carrying object). 
+                        If obj is a container, the current (density) scaling applies to all its members.</font> 
+                </li>
+                
+                <li><font size="+1">New function <tt><big><b>radRlxUpdSrc[intrc]</b></big></tt> has been added to allow updating external field data for the relaxation 
+                        (to take into account e.g. modification of currents in coils, if any) without re-building the interaction matrix.</font> 
+                </li>
+                <li><font size="+1">New option has been added to the existing function <tt><big><b>radRlxAuto[...,ZeroM->False]</b></big></tt>. 
+                        "ZeroM->True" (default) sets magnetizations in all sub-volumes to 0 before starting the "automatic" relaxation; 
+                        "ZeroM->False" just uses the existing magnetization values in sub-volumes for the first iteration of the relaxation.</font> 
+                </li>
+                <li>
+					<font size="+1">New detailed Radia example - "Example#7.nb" - has been added. 
+					    This new example treats ESRF-type quadrupole magnet id 2D and in 3D, making use of the new triangulation 
+					    and the current scaling and interaction matrix update functionalities. The simulation of any other quadrupole can 
+					    be derived from this example notebook by changing the routines / parameters in the "Iron, Coil, Yoke and Build Functions" section. 
+					    Dipole and sextupole could also be bilt in a similar fashion. This example is longer and quite more involved than any other Radia example (#1 to #6).</font> 
+				</li>
+				<li>
+					<font size="+1">Miscellaneous small improvements.</font>
+				</li>
+			</ul>
+        <p><big>&nbsp;&nbsp;&nbsp; Radia 4.116</big></p>
+			<ul>
+				<li>
+					<font size="+1">Radia for Igor Pro for Windows released</font><font size="+1">. </font>
+				</li>
+				<li>
+					<font size="+1">A function for calculation of 2nd order kick matrices for 
+						trajectories of relativistic charged particles in periodic magnetic field was 
+						added (<tt><big><b>radFldFocKickPer</b></big></tt> - this function&nbsp;has the 
+						functionality of the "RadiaToTrack.nb" Mathematica notebook developed by 
+						P.Elleaume).</font>
+				</li>
+				<li>
+					<font size="+1">Miscellaneous small improvements.</font>
+				</li>
+			</ul>
+        <p><big>&nbsp;&nbsp;&nbsp; Radia 4.097</big></p>
+			<ul>
+				<li>
+					<font size="+1">More flexible definition of non-linear isotropic magnetic material 
+						(the </font><b><tt><big><big>radMatSatIso</big></big></tt></b><font size="+1"> function 
+						accepts the definition of M vs H dependence by a list of points, see 
+						Example#3).</font>
+				</li>
+				<li>
+					<font size="+1">More robust relaxation. The new relaxation method (No. 4) is more 
+						stable for strongly non-linear material dependencies. It is set now as a 
+						default method in the </font><b><tt><big><big>radRlxAuto</big></big></tt></b><font size="+1">
+						function.</font> 
+				</li>
+                <li>
+					<font size="+1">The main magnetic field computation function </font><b><tt><big><big>radFld</big></big></tt></b><font size="+1">
+						allows the field computation in many arbitrarily spaced points by only one 
+						function call.</font> 
+				</li>
+                <li>
+					<font size="+1">Miscellaneous small improvements: bug fixes in force and torque 
+						computation methods.</font>
+				</li>
+			</ul>
+		
+		<p><big>&nbsp;&nbsp;&nbsp; Radia 4.09</big></p>
+			<ul>
+				<li>
+					<font size="+1">New methods of segmentation: subdivision according to elliptic 
+						cylinder and by a set of parallel planes (new options in </font><b><tt><big><big>radObjDivMag</big></big></tt></b><font size="+1">). 
+						The new methods of segmentation allow to strongly improve the efficiency of 
+						solving the iron-dominated geometries.</font>
+				</li>
+				<li>
+					<font size="+1">New examples illustrating the use of the new subdivision methods 
+						for the efficient simulation of dipole and multipole magnets for particle 
+						accelerators.</font>
+				</li>
+				<li>
+					<font size="+1">Miscellaneous small improvements: a possibility of "releasing" 
+						symmetries at duplication of the objects with the symmetries applied (new 
+						option in </font><b><tt><big><big>radObjDpl</big></big></tt></b><font size="+1">); 
+						axes of the laboratory Cartesian frame in active 3D graphics (new options in </font>
+					<b><tt><big><big>radObjDrwQD3D</big></big></tt></b><font size="+1">); bug fixes.</font>
+				</li>
+			</ul>
+		
+		<p><big>&nbsp;&nbsp;&nbsp; Radia 4.08</big></p>
+			<ul>
+				<li>
+					<font size="+1">Active 3D graphics facilitated by QuickDraw 3D library from Apple 
+						(new function&nbsp;&nbsp;</font><b><tt><big><big>radObjDrwQD3D</big></big></tt></b><font size="+1">). 
+						To make use of this new functionality, one needs to have the QuickDraw 3D 1.5 
+						or later installed on one's system. The versions of QuickDraw 3D for Power 
+						Macintosh and Windows 95/NT can be downloaded from the Apple Web site for free 
+						(</font><big><a href="http://www.apple.com/quicktime/qd3d/">http://www.apple.com/quicktime/</a></big><font size="+1">).</font>
+				</li>
+			</ul>
+		<p><big>&nbsp;&nbsp;&nbsp; Radia 4.07</big></p>
+			<ul>
+				<li>
+					<font size="+1">More simple definition of complicated geometries: Automatic 
+						generation of convex polyhedrons based on the information on their horizontal 
+						slices (new functions</font><b><tt><big><big> radObjMltExtPgn</big></big></tt></b><font size="+1">
+						and </font><b><tt><big><big>radObjMltExtRtg</big></big></tt></b><font size="+1">).</font>
+				</li>
+				<li>
+					<font size="+1">More flexible segmentation: Arbitrary cutting of objects by a 
+						plane; subdivision of objects in their local frames and in the laboratory frame 
+						(new function&nbsp;&nbsp;</font><b><tt><big><big>radObjCutMag</big></big></tt></b><font size="+1">
+						and new options in </font><b><tt><big><big>radObjDivMag</big></big></tt></b><font size="+1">).</font>
+				</li>
+			</ul>
+		<p>&nbsp;</p>
+		<p><br/>
+			<font size="+1">For the details of the new functions see the Radia <a href="ReferenceGuideMath/ReferenceFrameSet.html">
+					Reference Guide</a>.</font>
+		</p>
+		<p><br/>
+		</p>
+		<hr ALIGN="right"/>
+		<p>
+		</p>
+		<p>Last modified:&nbsp;May 2009. <a href="mailto:oleg.chubar@synchrotron-soleil.fr">
+				Comments, suggestions or questions</a> &nbsp;are welcome. <!--__________________________________ SIGNATURE ____________________________________________-->
+		</p>
+	</body>
+</html>

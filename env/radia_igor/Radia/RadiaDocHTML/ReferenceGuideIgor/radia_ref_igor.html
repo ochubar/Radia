@@ -1,0 +1,2872 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=Generator content="Microsoft Word 11 (filtered)">
+<title>•</title>
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Geneva;
+	panose-1:0 0 0 0 0 0 0 0 0 0;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin-top:0in;
+	margin-right:-17.0pt;
+	margin-bottom:0in;
+	margin-left:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:Geneva;}
+p.Subtopic, li.Subtopic, div.Subtopic
+	{margin-top:5.0pt;
+	margin-right:19.0pt;
+	margin-bottom:3.0pt;
+	margin-left:1.0in;
+	text-indent:-58.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:Geneva;
+	font-weight:bold;
+	text-decoration:underline;}
+p.FunctionBody1, li.FunctionBody1, div.FunctionBody1
+	{margin-top:0in;
+	margin-right:37.0pt;
+	margin-bottom:3.0pt;
+	margin-left:27.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:Geneva;}
+p.Topic, li.Topic, div.Topic
+	{margin-top:6.0pt;
+	margin-right:19.0pt;
+	margin-bottom:6.0pt;
+	margin-left:13.0pt;
+	text-indent:-13.0pt;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:Geneva;
+	font-weight:bold;
+	text-decoration:underline;}
+p.TopicBody, li.TopicBody, div.TopicBody
+	{margin-top:0in;
+	margin-right:55.0pt;
+	margin-bottom:0in;
+	margin-left:13.0pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:Geneva;}
+ /* Page Definitions */
+ @page Section1
+	{size:595.0pt 841.0pt;
+	margin:.75in .75in .75in .75in;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=EN-US style='text-justify-trim:punctuation'>
+
+<div class=Section1>
+
+<p class=Topic><span style='font-weight:normal;text-decoration:none'>•   </span>About
+Radia<span style='text-decoration:none'>     </span></p>
+
+<p class=TopicBody>Thanks for trying Radia.</p>
+
+<p class=TopicBody>&nbsp;</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>Radia is a general-purpose 3D
+magnetostatics computer code.</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>It was written with a primary
+goal to facilitate design of Insertion Devices for Synchrotron Radiation
+Sources. However, it has also proved its efficiency in solving many other types
+of 3D boundary problems of magnetostatics.</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>&nbsp;</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>Current version: 4.25</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>This version of Radia was
+developed as an extension to Igor Pro (WaveMetrics). </p>
+
+<p class=TopicBody style='margin-right:37.0pt'>Release date: May 2008</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>&nbsp;</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>Radia is copyright European
+Synchrotron Radiation Facility (1997-2002)</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>portions copyright Synchrotron
+SOLEIL (2002-2008)</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>&nbsp;</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>Authors: </p>
+
+<p class=TopicBody style='margin-right:37.0pt'>O. Chubar
+(oleg.chubar@synchrotron-soleil.fr)</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>P. Elleaume (elleaume@esrf.fr)</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>J. Chavanne (chavanne@esrf.fr)</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>&nbsp;</p>
+
+<p class=TopicBody>&nbsp;</p>
+
+<p class=Topic><span style='font-weight:normal;text-decoration:none'>•   </span>Radia
+Functions</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>Radia for Igor Pro is mainly a
+set of additional functions available in the Igor Pro macro language. These
+functions should be used to define 3D geometries, magnetic materials, boundary
+conditions, to solve problems of magnetostatics, and to display the resulting
+magnetic field in graphs.</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>&nbsp;</p>
+
+<p class=TopicBody style='margin-right:37.0pt'>Radia functions can be easily
+recognized: all of them start with &quot;rad&quot;. The reference to these
+functions is available in this file; besides, it is accessible via Igor Pro
+Help Browser (menu &quot;Help-&gt;Igor Help Browser&quot;, and then tab
+&quot;Command Help&quot;).</p>
+
+<p class=TopicBody>&nbsp;</p>
+
+<p class=TopicBody>&nbsp;</p>
+<a name="1. Field Sources"></a>
+<p class=Subtopic style='margin-right:.5in'><a name="radObjRecMag"></a>radObjRecMag<span style='font-weight:
+normal;text-decoration:none'>(P, D, M)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, D, M</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a uniformly magnetized rectangular
+parallelepiped block. </p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>P is block's center point (wave of 3 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>D is array of block dimensions (wave of 3 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>M is magnetization vector inside the block (wave of 3
+elements).</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns an integer number referencing the object
+created.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjThckPgn"></a>radObjThckPgn<span
+style='font-weight:normal;text-decoration:none'>(x, lx, P, t, M)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable x, lx</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, M</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a uniformly magnetized extruded polygonal
+block. </p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>x is the
+position of the block's center of gravity in the extrusion direction;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>lx is the
+thickness;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is a wave
+of cartesian coordinates of points describing the polygon in 2D (to be created
+e.g. as <i>make/O P={{y1,z1},{y2,z2},{y3,z3},...}</i>);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is string
+character defining the orientation of the extrusion axis; it can be
+&quot;x&quot;, &quot;y&quot; or &quot;z&quot;;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>M is
+block's magnetization vector (wave of 3 elements).</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns an
+integer number referencing the object created.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjCylMag"></a>radObjCylMag<span style='font-weight:
+normal;text-decoration:none'>(P, r, h, n, t, M)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, M</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable r, h, n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a uniformly magnetized extruded right
+polygonal block, which approaches cylindrical shape at large number of segments
+n. </p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is a wave
+of 3 cartesian coordinates of the cylinder center point, to be created e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O P={x,y,z}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>r is the
+cylinder base radius;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>h is the
+cylinder height;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is number
+of segments of the base polygon approximating a circle;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is string
+character defining the orientation of the extrusion axis; it can be
+&quot;x&quot;, &quot;y&quot; or &quot;z&quot;;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>M is
+block's magnetization vector (wave of 3 elements).</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns an
+integer number referencing the object created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjPolyhdr"></a>radObjPolyhdr<span
+style='font-weight:normal;text-decoration:none'>(P, F, L, M)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, F, L, M</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a uniformly magnetized polyhedron (closed
+volume limited by planes).</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is 2D
+array of cartesian coordinates of the polyhedron vertex points, to be created
+e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+P={{x1,y1,z1},{x2,y2,z2},{x3,y3,z3},...}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>F is flat
+array of indexes of vertex points defining the polyhedron faces, to be created
+e.g. as</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O P={f1i1, f1i2,...,
+f2i1, f2i2,...}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>L is array
+of integer numbers equal to the numbers of vertex points in each face of the
+polyhedron; the order of the faces is the same as in the array F (the length of
+the array F is equal to the sum of elements of the array L);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>M is
+block's magnetization vector (wave of 3 elements).</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns an
+integer number referencing the object created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjArcPgnMag"></a>radObjArcPgnMag<span
+style='font-weight:normal;text-decoration:none'>(P, t1, F, A, n, t2, M)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, F, A, M</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t1, t2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a uniformly magnetized finite-length arc of
+polygonal cross-section, which is approximated by n segment polyhedrons. </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is a wave
+of 2 cartesian coordinates defining the position of the rotation axis in the
+plane perpendicular to this axis, to be created e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O P={x,y}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t1 is
+string character defining the orientation of the rotation axis; it can be
+&quot;x&quot;, &quot;y&quot; or &quot;z&quot;;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>F is array
+of radial and axial coordinates of vertex points of the cross-section polygon,
+to be created e.g. as <i>make/O F={{r1,z1},{r2,z2},...}</i>;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>A wave of 2 numbers -  initial and final azimuth
+angles, to be created e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O A={a1,a2}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is number
+of segments;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t2 is
+string which can be either &quot;sym&quot; or &quot;nosym&quot;; depending on
+the value of this switch, the magnetization vectors in n sector polyhedrons
+either will be linked by rotational symmetry (&quot;sym&quot;), or will behave
+as independent magnetization vectors at any subsequent relaxation;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>M is
+magnetization vector (wave of 3 elements).</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns an
+integer number referencing the object created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjMltExtPgn"></a>radObjMltExtPgn<span
+style='font-weight:normal;text-decoration:none'>(P, N, H, M)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, N, H, M</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Attempts to create a convex polyhedron or a set of
+convex polyhedrons based on horizontal slices, which should be convex planar
+polygons. </p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is
+&quot;flat&quot; 2D array of the slice polygons' coordinates, to be created
+e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+P={{x11,y11},{x12,y12},{x13,y13},...,{x21,y21},{x22,y22},{x23,y23},...}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>N is array
+of integer values representing numbers of points in the slice polygons, to be
+created e.g. as <i>make/O N={n1,n2,n3,...}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>H is array
+of attitudes (vertical positions) of the slice polygons, to be created e.g. as</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O H={h1,h2,h3,...}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>M is
+block's magnetization vector (wave of 3 elements).</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns an
+integer number referencing the object created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjMltExtRtg"></a>radObjMltExtRtg<span
+style='font-weight:normal;text-decoration:none'>(P, D, M)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, D, M</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Attempts to create one uniformly magnetized convex
+polyhedron or a set of convex polyhedrons based on rectangular slices. The
+rectangular slices are assumed to be parallel to the XY plane.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is
+&quot;flat&quot; 2D array of the slice rectagles' center points (to be created
+e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+P={{x1,y1,z1},{x2,y2,z2},...}</i>);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>D is
+&quot;flat&quot; array of dimensions of the slice rectangles along x and y (to
+be created e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+D={{dx1,dy1},{dx2,dy2},...}</i>);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>M is
+block's magnetization vector (wave of 3 elements).</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns an
+integer number referencing the object created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjMltExtTri"></a>radObjMltExtTri<span
+style='font-weight:normal;text-decoration:none'>(x, lx, P, S, t1, M, t2)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable x, lx</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, S, M</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t1, t2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Attempts to create a triangulated extruded polygon
+block, i.e. a straight prism with its base being (possibly con-convex) 2D
+polygon subdivided by triangulation.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>x is the
+position of the block's center of gravity in the extrusion direction;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>lx is the
+prism height (or &quot;thickess&quot;);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is a wave
+of cartesian coordinates of points describing the polygon in 2D (to be created
+e.g. as <i>make/O P={{y1,z1},{y2,z2},...}</i>);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>S is array of subdivision (triangulation) parameters,
+to be created e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+S={{k1,q1},{k2,q2},...}</i></p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>where k1,k2,... are, depending
+on the value of the option &quot;ki-&gt;Numb|Size&quot; numbers of parts or
+average sizes of segments to be produced by triangulation; q1,q2,... are the
+corresponding ratios of the last-to-first part lengths;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t1 is
+character defining the orientation of the rotation axis; it can be
+&quot;x&quot;, &quot;y&quot; or &quot;z&quot;;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>M is
+block's magnetization vector (wave of 3 elements).</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t2 is
+option string which can be &quot;ki-&gt;Numb&quot; (default) or
+&quot;ki-&gt;Size&quot; for the subdivision parameters to be interpreted as
+numbers of segments or their average lengths; &quot;TriAngMin-&gt;...&quot;
+with a real positive number in place of &quot;...&quot; to specify minimal
+angle of triangles to be produced by th etriangulation of the base polygon (in
+degrees, default value is 20); &quot;TriAreaMax-&gt;...&quot; with a real
+positive number in place of &quot;...&quot; to specify maximal area of
+traingles to be produced (in mm^2, not defined by default); t can contain
+composition of these sub-strings separated by &quot;;&quot;, e.g.:
+&quot;ki-&gt;Size;TriAngMin-&gt;25;TriAreaMax-&gt;10&quot;.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns an
+integer number referencing the object created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjRecCur"></a>radObjRecCur<span style='font-weight:
+normal;text-decoration:none'>(P, D, J)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, D, J</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a current carrying rectangular parallelepiped
+block.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>P is block's center point (wave of 3 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>D is array of block dimensions (wave of 3 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>J is current density vector inside the block (wave of
+3 elements).</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns an integer number referencing the object
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjArcCur"></a>radObjArcCur<span style='font-weight:
+normal;text-decoration:none'>(P, R, A, h, n, t1, t2, j)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, R, A</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable h, n, j</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t1, t2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a current carrying finite-length arc of
+rectangular cross-section.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>P is array of 3 cartesian coordinates of the arc
+center point (wave of 3 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>R is array of 2 numbers - inner and outer radii (wave
+of 2 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>A is array of 2 numbers -  initial and final azimuth
+angles (wave of 2 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>h is height;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is number of segments;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t1 is
+string which can be either &quot;man&quot; or &quot;auto&quot;; the magnetic
+field from the arc is then computed based on the number of segments nseg
+(&quot;man&quot;), or on the general absolute precision level specified by the
+functions radFldCmpCrt or radFldCmpPrc (&quot;auto&quot;);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t2 is
+string defining the orientation of the arc rotation axis; it can be
+&quot;x&quot;, &quot;y&quot; or &quot;z&quot;;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>j is azimuthal current density [T/mm^2].</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns an integer number referencing the object
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjRaceTrk"></a>radObjRaceTrk<span
+style='font-weight:normal;text-decoration:none'>(P, R, D, h, n, t1, t2, j)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, R, D</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable h, n, j</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t1, t2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a current-carrying racetrack coil. The coil
+consists of four 90-degree bents connected by four straight parts of
+rectangular cross-section.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>P is array of 3 cartesian coordinates of the racetrack
+center point (wave of 3 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>R is array of 2 numbers - inner and outer radii (wave
+of 2 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>D is array of 2 numbers - racetrack straight section
+lengths (wave of 2 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>h is height;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is number of segments in the arc parts of the
+racetrack;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t1 is
+string which can be either &quot;man&quot; or &quot;auto&quot;; the magnetic
+field from the arc is then computed based on the number of segments nseg
+(&quot;man&quot;), or on the general absolute precision level specified by the
+functions radFldCmpCrt or radFldCmpPrc (&quot;auto&quot;);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t2 is
+string defining the orientation of the racetrack axis; it can be &quot;x&quot;,
+&quot;y&quot; or &quot;z&quot;;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>j is azimuthal current density [T/mm^2].</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns an integer number referencing the object
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjFlmCur"></a>radObjFlmCur<span style='font-weight:
+normal;text-decoration:none'>(P, i)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable i</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a filament polygonal line conductor with
+current. The line conductor is defined by sequence of points in 3D space.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>P is array of cartesian coordinates of the points (to
+be created e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+P={{x1,y1,z1},{x2,y2,z2},...}</i>);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>i is current.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns an integer number referencing the object
+created.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjScaleCur"></a>radObjScaleCur<span
+style='font-weight:normal;text-decoration:none'>(n, k)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, k</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Scales current (density) in the object n by
+multiplying it by k coefficient (if n is a current-carying object). If n is a
+container, the current (density) scaling applies to all its members.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is integer number referencying an object;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>k is current scaling coefficient.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjBckg"></a>radObjBckg<span style='font-weight:
+normal;text-decoration:none'>(B)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave B</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a source of uniform background magnetic field.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>B is magnetic field vector (wave of 3 elements).</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns an integer number referencing the object
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjCnt"></a>radObjCnt<span style='font-weight:
+normal;text-decoration:none'>(N)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave N</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a container of magnetic field source objects.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>N is array of reference numbers of the objects (to be
+created e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O N={n1,n2,n3,...}</i>).</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns an integer number referencing the object
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjCnt0"></a>radObjCnt0<span style='font-weight:
+normal;text-decoration:none'>()</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates an empty container.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns an integer number referencing the object
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjAddToCnt"></a>radObjAddToCnt<span
+style='font-weight:normal;text-decoration:none'>(n0, N)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n0</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave N</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Adds objects to the container object referenced by n0.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n0 is integer number referencying the container;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>N is array of reference numbers of the objects to add,
+to be created e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O N={n1,n2,n3,...}</i>.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns n0.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjCntSize"></a>radObjCntSize<span
+style='font-weight:normal;text-decoration:none'>(n)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Calculates the number of objects in the container
+referenced by n.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is integer number referencying the container.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns number of objects calculated.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjCntStuf"></a>radObjCntStuf<span
+style='font-weight:normal;text-decoration:none'>(N, n0)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave N</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n0</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Fills-in an array with reference numbers of objects
+present in the container n0.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>N is array for the reference numbers of the objects in
+the container;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n0 is integer number referencying the container.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns n0.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjFullMag"></a>radObjFullMag<span
+style='font-weight:normal;text-decoration:none'>(P, D, M, K, n, mat, C)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, D, M, K, C</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, mat</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a parallelepiped block with center point P,
+dimensions L and color RGB. The block is magnetized according to M, then
+subdivided according to {K[0],K[1],K[2]}, and added into the container n. n
+should be created in advance by calling the function radObjCnt.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>P is block's center point (wave of 3 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>D is array of block dimensions (wave of 3 elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>M is magnetization vector inside the block (wave of 3
+elements);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>K is wave of 3 subdivision numbers;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is integer number referencying the container;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>mat is integer number referencying the magnetic
+material;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>C is array of 3 numbers from 0 to 1 specifying
+intensities of red, green and blue colors.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns an integer number referencing the object
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjM"></a>radObjM<span style='font-weight:
+normal;text-decoration:none'>(M, n)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave M</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Specifies coordinates of geometrical center point(s)
+and magnetization(s) of the object referenced by n.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>M is array
+of coordinates of geometrical center point(s) and magnetization(s). If n is a
+container, the array includes the container members' center points and their
+magnetizations;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of a magnetic field source object.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjDpl"></a>radObjDpl<span style='font-weight:
+normal;text-decoration:none'>(n, t)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Duplicates the object referenced by n.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of the object to be duplicated;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is a
+string, which can be &quot;FreeSym-&gt;False&quot;,
+&quot;FreeSym-&gt;True&quot; or &quot;&quot;. This specifies whether the
+symmetries (transformations with multiplicity more than one) previously applied
+to the object obj should be simply copied at the duplication
+(&quot;FreeSym-&gt;False&quot; or &quot;&quot;), or a container of new
+independent objects should be created in place of any symmetry previously
+applied to the object n. In both cases the final object created by the
+duplication has exactly the same geometry as the initial object n.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns an integer number referencing the new object -
+a copy of the object referenced by n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjCutMag"></a>radObjCutMag<span style='font-weight:
+normal;text-decoration:none'>(N, n0, P, V, t)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave N, P, V</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n0</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Cuts the object n0 by a plane passing through the
+point P normally to the vector V.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>N is array
+of reference numbers of objects created by cutting of the object n0;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n0 is
+reference number of a 3D object to cut;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is array
+of 3 cartesian coordinates of a point the cutting plane passes through;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>V is array
+of 3 cartesian coordinates of a vector normal to the cutting plane;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is a
+string which can be &quot;Frame-&gt;Lab&quot;, &quot;Frame-&gt;Loc&quot; or
+&quot;&quot;. This specifies whether the cuting plane is defined in the
+laboratory frame (&quot;Frame-&gt;Lab&quot; or &quot;&quot;) or in the local
+frame of the object n0. </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns number ov the objects created by the cutting.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjDivMagPln"></a>radObjDivMagPln<span
+style='font-weight:normal;text-decoration:none'>(n, S, V, t)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave S, V</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Subdivides the object n by sets of parallel planes.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of a 3D object to subdivide;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>S is array of main subdivision parameters, to be
+created e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+S={{k1,q1},{k2,q2},{k3,q3}}</i></p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>where k1,k2,k2 are, depending
+on the value of the option &quot;kxkykz-&gt;Numb|Size&quot; numbers of parts or
+average sizes of objects to be produced in different directions; q1,q2,q3 are
+the corresponding ratios of the last-to-first part sizes;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>V is array
+of cartesian coordinates of 3 vectors normal to the subdivision planes, to be
+created e.g. as: <i>make/O V={{x1,y1,z1},{x2,y2,z2},{x3,y3,z3}}</i></p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is
+options string which can be &quot;kxkykz-&gt;Numb&quot; (default) or
+&quot;kxkykz-&gt;Size&quot; for the subdivision parameters to be interpreted as
+numbers of peices or their average dimensions; &quot;Frame-&gt;Lab&quot;,
+&quot;Frame-&gt;LabTot&quot; or &quot;Frame-&gt;Loc&quot; for the subdivision
+to be performed in the laboratory frame or in local frame of the 3D object. The
+action of &quot;Frame-&gt;Lab&quot; and &quot;Frame-&gt;LabTot&quot; differs
+only for containers: &quot;Frame-&gt;Lab&quot; means that each of the objects
+in the container is subdivided separately; &quot;Frame-&gt;LabTot&quot; means
+that all objects in the container are subdivided as one object, by the same
+planes. t can contain composition of these sub-strings separated by
+&quot;;&quot;, e.g.:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;kxkykz-&gt;Size;Frame-&gt;LabTot&quot;.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the object (container)
+created by subdivision of the object n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjDivMagCyl"></a>radObjDivMagCyl<span
+style='font-weight:normal;text-decoration:none'>(n, S, C, r, t)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, r</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave S, C</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Subdivides the object n by a set of coaxial elliptic
+cylinders.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of a 3D object to subdivide;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>S is array of main subdivision parameters, to be
+created e.g. as </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+S={{k1,q1},{k2,q2},{k3,q3}}</i></p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>where k1,k2,k2 are, depending
+on the value of the option &quot;kxkykz-&gt;Numb|Size&quot; numbers of parts or
+average sizes of objects to be produced in radial, azimuthal, and axial
+directions respectively; q1,q2,q3 are the corresponding ratios of the
+last-to-first part sizes;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>C is array
+of cartesian coordinates of points and vectors specifying positions of
+subdividing coaxial elliptic cylinders in space, to be created e.g. as</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+C={{ax,ay,az},{vx,vy,vz},{px,py,pz}}</i></p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>where the point (ax,ay,az) and
+the vector (vx,vy,vz) define the axis of the subdividing cylinders; one of two
+axes of the cylinder base ellipses is exactly the perpendicular from the point
+(px,py,pz) to the cylinder axis;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>r is the ratio of the base ellipse axes lengths;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is
+options string which can be &quot;kxkykz-&gt;Numb&quot; (default) or
+&quot;kxkykz-&gt;Size&quot; for the subdivision parameters to be interpreted as
+numbers of peices or their average dimensions; &quot;Frame-&gt;Lab&quot;,
+&quot;Frame-&gt;LabTot&quot; or &quot;Frame-&gt;Loc&quot; for the subdivision
+to be performed in the laboratory frame or in local frame of the 3D object. The
+action of &quot;Frame-&gt;Lab&quot; and &quot;Frame-&gt;LabTot&quot; differs
+only for containers: &quot;Frame-&gt;Lab&quot; means that each of the objects
+in the container is subdivided separately; &quot;Frame-&gt;LabTot&quot; means
+that all objects in the container are subdivided as one object, by the same
+planes. t can contain composition of these sub-strings separated by
+&quot;;&quot;, e.g.:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;kxkykz-&gt;Size;Frame-&gt;LabTot&quot;.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the object (container)
+created by subdivision of the object n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjGeoVol"></a>radObjGeoVol<span style='font-weight:
+normal;text-decoration:none'>(n)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes geometrical volume of a 3D object referenced
+by n.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of a 3D object.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns the volume value.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjGeoLim"></a>radObjGeoLim<span style='font-weight:
+normal;text-decoration:none'>(D, n)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave D</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes cartesian coordinates of extremity points of
+the object n in laboratory frame.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>D is array of coordinates of extremity points of the
+object n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of a 3D object.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjDrwOpenGL"></a>radObjDrwOpenGL<span
+style='font-weight:normal;text-decoration:none'>(n, t)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Starts an application for viewing of 3D geometry of
+the object referenced by n. The viewer is based on the GLUT / OpenGL graphics
+library. </p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of a 3D object;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is a
+string specifying optional parameters. The supported options are:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;Axes-&gt;True&quot;
+(default) or &quot;Axes-&gt;False&quot; for showing or not the axes of the
+Cartesian laboratory frame,</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;EdgeLines-&gt;True&quot;
+(default) or &quot;EdgeLines-&gt;False&quot; for highlighting or not the edge
+lines of 3D object(s),</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;Faces-&gt;True&quot;
+(default) or &quot;Faces-&gt;False&quot; for showing or not visible faces of
+the 3D objects.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>The string t can contain any
+composition of these option sub-strings, separated by &quot;;&quot;, e.g.:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;Axes-&gt;False;Faces-&gt;False&quot;.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjDrwQD3D"></a>radObjDrwQD3D<span
+style='font-weight:normal;text-decoration:none'>(n, t)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Starts an application for viewing of 3D geometry of
+the object referenced by n. The viewer is based on the QuickDraw 3D graphics
+library developed by Apple. </p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of a 3D object;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is a
+string specifying optional parameters. The supported options are:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;Axes-&gt;True&quot;
+(default) or &quot;Axes-&gt;False&quot; for showing or not the axes of the
+Cartesian laboratory frame,</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;EdgeLines-&gt;True&quot;
+(default) or &quot;EdgeLines-&gt;False&quot; for highlighting or not the edge
+lines of 3D object(s),</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;Faces-&gt;True&quot;
+(default) or &quot;Faces-&gt;False&quot; for showing or not visible faces of
+the 3D objects.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>The string t can contain any
+composition of these option sub-strings, separated by &quot;;&quot;, e.g.:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;Axes-&gt;False;Faces-&gt;False&quot;.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radObjDrwAtr"></a>radObjDrwAtr<span style='font-weight:
+normal;text-decoration:none'>(n, C, d)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, d</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave C</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Applies drawing attributes - RGB color and line
+thickness to the object referenced by n.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of a 3D object;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>C is array of 3 numbers from 0 to 1 specifying
+intensities of red, green and blue colors;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>d is line thickness parameter.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<a name="3. Space Transformations"></a>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radTrfPlSym"></a>radTrfPlSym<span style='font-weight:
+normal;text-decoration:none'>(P, V)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, V</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a symmetry with respect to plane defined by a
+point and a normal vector.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>P is array of 3 numbers representing cartesian
+coordinates of a point in the plane;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>V is array of 3 numbers representing cartesian
+coordinates of a vector normal to the plane.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the space transformation
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radTrfRot"></a>radTrfRot<span style='font-weight:
+normal;text-decoration:none'>(P, V, a)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, V</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable a</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a rotation.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is array
+of 3 numbers representing cartesian coordinates of a point belonging to the
+rotation axis;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>V is array
+of 3 numbers representing cartesian coordinates of a vector parallel to the
+rotation axis;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>a is rotation angle in radians.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the space transformation
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radTrfTrsl"></a>radTrfTrsl<span style='font-weight:
+normal;text-decoration:none'>(V)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave V</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a translation.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>V is array
+of 3 numbers representing cartesian coordinates of the translation vector.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the space transformation
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radTrfInv"></a>radTrfInv<span style='font-weight:
+normal;text-decoration:none'>()</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a field inversion.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the transformation
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radTrfCmbL"></a>radTrfCmbL<span style='font-weight:
+normal;text-decoration:none'>(s1, s2)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable s1, s2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Multiplies original space transformation s1 by another
+transformation s2 from left.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>s1 is reference number of the original space
+transformation;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>s2 is reference number of another space
+transformation.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the final space
+transformation - the result of the multiplication.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radTrfCmbR"></a>radTrfCmbR<span style='font-weight:
+normal;text-decoration:none'>(s1, s2)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable s1, s2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Multiplies original space transformation s1 by another
+transformation s2 from right.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>s1 is reference number of the original space
+transformation;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>s2 is reference number of another space
+transformation.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the final space
+transformation - the result of the multiplication.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radTrfMlt"></a>radTrfMlt<span style='font-weight:
+normal;text-decoration:none'>(n, s, m)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, s, m</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates m-1 symmetry objects of the object n. Each
+symmetry object is derived from the previous one by applying space
+transformation s to it. Following this, the object n becomes equivalent to m
+different objects.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the original 3D object to
+which symmetries should be applied;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>s is reference number of a space transformation;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>m is multiplicity of the space transformation.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the 3D object with the
+symmetries applied.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radTrfOrnt"></a>radTrfOrnt<span style='font-weight:
+normal;text-decoration:none'>(n, s)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, s</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Orients object n by applying transformation s to it
+once.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the original 3D object to
+which symmetries should be applied;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>s is reference number of a space transformation;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the 3D object with the
+transformation applied.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radTrfZerPara"></a>radTrfZerPara<span
+style='font-weight:normal;text-decoration:none'>(n, P, V)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, V</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates an object mirror with respect to a plane. The
+object mirror possesses the same geometry as n, but its magnetization and/or
+current densities are modified in such a way that the magnetic field produced
+by the n and its mirror in the plane of mirroring is perpendicular to this
+plane.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of a magnetic field source
+object to which the symmetry should be applied;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>P is array of 3 cartesian coordinates of a point in
+the mirror plane;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>V is array of 3 cartesian coordinates of a vector normal
+to the mirror plane.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the final object.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radTrfZerPerp"></a>radTrfZerPerp<span
+style='font-weight:normal;text-decoration:none'>(n, P, V)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, V</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates an object mirror with respect to a plane. The
+object mirror possesses the same geometry as n, but its magnetization and/or
+current densities are modified in such a way that the magnetic field produced
+by the n and its mirror in the plane of mirroring is parallel to this plane.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of a magnetic field source
+object to which the symmetry should be applied;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>P is array of 3 cartesian coordinates of a point in
+the mirror plane;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>V is array of 3 cartesian coordinates of a vector
+normal to the mirror plane.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the final object.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<a name="2. Magnetic Materials"></a>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radMatLin"></a>radMatLin<span style='font-weight:
+normal;text-decoration:none'>(K, M)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave K, M</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a linear anisotropic magnetic material.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>K is array
+of 2 magnetic susceptibility values for the directions parallel and
+perpendicular to the easy magnetization axis;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>M is array of 3 cartesian coordinates of the remanent
+magnetization vector.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the magnetic material
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radMatSatIso"></a>radMatSatIso<span style='font-weight:
+normal;text-decoration:none'>(D, t)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave D</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a nonlinear isotropic magnetic material. The
+dependence of the magnetization magnitude on the magnetic field strength
+magnitude is defined either by the formula:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>M = ms1*tanh(ksi1*H/ms1) +
+ms2*tanh(ksi2*H/ms2) + ms3*tanh(ksi3*H/ms3) </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:19.0pt'>with the constants {{ksi1,ms1},{ksi2,ms2},{ksi3,ms3}}
+given by the array D, or by array of pairs of real numbers
+{{h1,m1},{h2,m2},...}}. Both the magnetization and the magnetic field strength
+should be defined in Tesla.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-8.0pt'>D is 2D
+array defining the dependence of the magnetization magnitude on the magnetic
+field strength magnitude. The interpretation of the array D depends on the
+value of the string variable t. </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>If t is &quot;frm&quot;, D should
+be interpreted as array of material constants for the formula given above, in
+the format:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+D={{ksi1,ms1},{ksi2,ms2},{ksi3,ms3}}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>If t is &quot;tab&quot;, D
+should be interpreted as tabulated dependence M vs H (both in Tesla):</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+D={{h1,m1},{h2,m2},...}}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is a
+string which can be either &quot;frm&quot; or &quot;tab&quot;. This defines how
+the array D should be interpreted.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the magnetic material
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radMatSatLam"></a>radMatSatLam<span style='font-weight:
+normal;text-decoration:none'>(D, t, p, N)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave D, N</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable p</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a nonlinear laminated magnetic material. The
+dependence of the magnetization magnitude on the magnetic field strength
+magnitude for the corresponding isotropic case is defined either by the
+formula:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>M = ms1*tanh(ksi1*H/ms1) +
+ms2*tanh(ksi2*H/ms2) + ms3*tanh(ksi3*H/ms3) </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:19.0pt'>with the constants {{ksi1,ms1},{ksi2,ms2},{ksi3,ms3}}
+given by the array D, or by array of pairs of real numbers
+{{h1,m1},{h2,m2},...}}. Both the magnetization and the magnetic field strength
+should be defined in Tesla.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-8.0pt'>D is 2D
+array defining the dependence of the magnetization magnitude on the magnetic
+field strength magnitude. The interpretation of the array D depends on the
+value of the string variable t. </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>If t is &quot;frm&quot;, D
+should be interpreted as array of material constants for the formula given
+above, in the format:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+D={{ksi1,ms1},{ksi2,ms2},{ksi3,ms3}}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>If t is &quot;tab&quot;, D
+should be interpreted as tabulated dependence M vs H:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+D={{h1,m1},{h2,m2},...}}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is a
+string which can be either &quot;frm&quot; or &quot;tab&quot;. This defines how
+the array D should be interpreted;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>p is the
+lamination stacking factor;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>N is array
+of 3 cartesian coordinates of a vector normal to the lamination planes.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the magnetic material
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radMatSatAniso"></a>radMatSatAniso<span
+style='font-weight:normal;text-decoration:none'>(Dpar, Dper)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave Dpar, Dper</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a nonlinear anisotropic magnetic material. The
+dependence of the magnetization on the magnetic field strength in the
+directions parallel to the easy axis is defined either by:</p>
+
+<p class=FunctionBody1 style='margin-right:-17.0pt'>M =
+ms1*tanh(ksi1*(h-hc1)/ms1) + ms2*tanh(ksi2*(h-hc2)/ms2) +
+ms3*tanh(ksi3*(h-hc3)/ms3) + ksi0*(h-hc0), </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:19.0pt'>or by:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>M = ksi0*h, </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:19.0pt'>with the constants
+{ksi1,ms1,hc1,ksi2,ms2,hc2,ksi3,ms3,hc3,ksi0,hc0} given by the array Dpar.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>The dependence of the magnetization on the magnetic
+field strength in the directions perpendicular to the easy axis is defined
+either by:</p>
+
+<p class=FunctionBody1 style='margin-right:-17.0pt'>M = ms1*tanh(ksi1*h/ms1) +
+ms2*tanh(ksi2*h/ms2) + ms3*tanh(ksi3*h/ms3) + ksi0*h, </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:19.0pt'>or by:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>M = ksi0*h, </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:19.0pt'>with the constants {ksi1,ms1,ksi2,ms2,ksi3,ms3,ksi0}
+given by the array Dper.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:19.0pt'>At least one of the magnetization vector components
+should non-linearly depend on the field strength.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:19.0pt'>The direction of the easy axis should be specified at
+creation of a 3D object to which this material is applied.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-8.0pt'>Dpar is 1D
+array defining the material constants used in the formulae given above in the
+direction parallel to the easy axis, to be created e.g. as:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+Dpar={ksi1,ms1,hc1,ksi2,ms2,hc2,ksi3,ms3,hc3,ksi0,hc0}</i>;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-8.0pt'>Dper is 1D
+array defining the material constants used in the formulae given above in the
+direction perpendicular to the easy magnetization axis, to be created e.g. as:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+Dper={ksi1,ms1,ksi2,ms2,ksi3,ms3,ksi0}</i>;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the magnetic material
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radMatStd"></a>radMatStd<span style='font-weight:
+normal;text-decoration:none'>(t, m)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable m</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a pre-defined magnetic material. The material
+is identified by its name/formula, given by the string t (e.g.
+&quot;NdFeB&quot;, &quot;SmCo5&quot;, &quot;Sm2Co17&quot;, &quot;Ferrite&quot;,
+&quot;XcO6&quot;, &quot;Steel37&quot;, &quot;Steel42&quot;,
+&quot;AFK502&quot;,...).</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>t is string describing the common name of the material;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>m is
+(optional) remanent magnetization parameter of the standard material (is taken
+into account if positive).</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns reference number of the magnetic material
+created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radMatApl"></a>radMatApl<span style='font-weight:
+normal;text-decoration:none'>(n, m)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, m</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Applies magnetic material m to 3D object n.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the 3D object;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>m is reference number of the magnetic material.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radMatMvsH"></a>radMatMvsH<span style='font-weight:
+normal;text-decoration:none'>(M, n, t, H)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave M, H</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes magnetization from magnetic field strength
+vector for a given magnetic material or 3D object with the material applied.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>M is magnetization vector to be computed;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-8.0pt'>n is
+reference number of a magnetic material or a 3D object with magnetic material
+applied;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-7.0pt'>t is string
+specifying the component(s) of the magnetization vector to be computed (can be
+&quot;Mx&quot;, &quot;Mz&quot;,...);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>H is magnetic field strength vector (in Tesla).</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns number of magnetization components computed.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<a name="4. Field Computation"></a>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radRlxPre"></a>radRlxPre<span style='font-weight:
+normal;text-decoration:none'>(n0, n1)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n0, n1</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Builds interaction matrix for the object n0, treating
+the object n1 as additional constant source of magnetic field.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n0 is
+reference number of the main object, for which the interaction matrix should be
+created;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n1 is
+reference number of another object treated as additional constant source of
+magnetic field (can be 0).</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns integer number referencying the interaction
+matrix created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radRlxMan"></a>radRlxMan<span style='font-weight:
+normal;text-decoration:none'>(D, n, m, i, r)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave D</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, m, i, r</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Executes &quot;manual&quot; relaxation procedure for
+the interaction matrix referenced by n.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>D is array of numbers describing the result of the
+relaxation;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the interaction matrix;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>m is an integer number specifying the method of
+relaxation to be used;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>i is an integer number specifying number of iterations
+to be made;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>r is a real number between 0 and 1 specifying the
+relaxation parameter.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns i.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radRlxAuto"></a>radRlxAuto<span style='font-weight:
+normal;text-decoration:none'>(D, n, p, i, m, t)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave D</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, p, i, m</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Executes &quot;automatic&quot; relaxation procedure
+for the interaction matrix referenced by n. The relaxation stops whenever the
+change of magnetization (averaged over all sub-elements) between two successive
+iterations is smaller than p or the number of iterations is larger than i.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>D is array
+of numbers describing the result of the relaxation: D[0] is average absolute
+change in magnetization after previous iteration over all the objects
+participating in the relaxation, D[1] is maximum absolute value of
+magnetization over all the objects participating in the relaxation, D[2] is
+maximum absolute value of magnetic field strength over central points of all
+the objects participating in the relaxation, and D[3] is actual number of
+iterations made. The values D[0]-D[2] are those of the last iteration;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the interaction matrix;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>p is a real
+number specifying an absolute precision value for magnetization (in Tesla), to be
+reached by the end of the relaxation procedure;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>i is an integer number specifying maximum number of
+iterations to be made;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>m is an integer number specifying the method of
+relaxation to be used;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>t is a string specifying optional parameters. The
+supported options are:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&quot;ZeroM-&gt;True&quot;
+(default) or &quot;ZeroM-&gt;False&quot; to specify whether the relaxation
+should be started by setting the magnetization values in all paricipating
+objects to zero, or the existing magnetization values in the objects should be
+used.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns actual number of iterations made.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radRlxUpdSrc"></a>radRlxUpdSrc<span style='font-weight:
+normal;text-decoration:none'>(n)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Updates external field data for the relaxation (to
+take into account e.g. changes of currents in coils, if any) without rebuilding
+the interaction matrix.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the interaction matrix.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radSolve"></a>radSolve<span style='font-weight:
+normal;text-decoration:none'>(D, n, p, i, m)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave D</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, p, i, m</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Builds an interaction matrix for the object referenced
+by n and performs &quot;autimatic&quot; relaxation procedure. The relaxation
+stops whenever the change of magnetization (averaged over all sub-elements)
+between two successive iterations is smaller than p or the number of iterations
+is larger than i. The interaction matrix is deleted after the relaxation. </p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>D is array
+of numbers describing the result of the relaxation: D[0] is average absolute
+change in magnetization after previous iteration over all the objects
+participating in the relaxation, D[1] is maximum absolute value of
+magnetization over all the objects participating in the relaxation, D[2] is
+maximum absolute value of magnetic field strength over central points of all
+the objects participating in the relaxation, and D[3] is actual number of
+iterations made. The values D[0],..., D[2] are those of the last iteration;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the object defining the
+geometry to solve;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>p is a real
+number specifying an absolute precision value for magnetization (in Tesla), to
+be reached by the end of the relaxation procedure;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>i is an integer number specifying maximum number of
+iterations to be made;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>m is an integer number specifying the method of
+relaxation to be used;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns actual number of iterations made.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFld"></a>radFld<span style='font-weight:
+normal;text-decoration:none'>(B, n, t, P)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave B, P</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes magnetic field created by the object n at one
+or many points.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>B is array of magnetic field values (to be computed);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the magnetic field source
+object;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is string
+identifying magnetic field components to be computed (e.g.: &quot;B&quot;,
+&quot;Bx&quot;, &quot;By&quot;, &quot;H&quot;,...);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is 2D
+array of coordinates of all points where the field should be computed, to be
+created e.g. as:</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'><i>make/O
+P={{x1,y1,z1},{x2,y2,z2},...}</i></p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns the first component of the calculated magnetic
+field (B[0]).</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldLst"></a>radFldLst<span style='font-weight:
+normal;text-decoration:none'>(B, n, t, P1, P2, np, s)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave B, P1, P2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, np, s</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes magnetic field created by object obj in np
+equidistant points along a line segment from P1 to P2; the field component is
+specified by the t1 input string.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>B is array of magnetic field values (to be computed);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the magnetic field source
+object;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is string
+identifying magnetic field components to be computed (e.g.: &quot;B&quot; or
+&quot;Bx&quot; or &quot;By&quot; or &quot;H&quot;,...);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P1 is array
+of 3 real numbers specifying cartesian coordinates of an edge point of the line
+segment;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P2 is array
+of 3 real numbers specifying cartesian coordinates of another edge point of the
+line segment;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>np is number of points where the magnetic field should
+be calculated;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>s is start value for the longitudinal position.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns the first component of the calculated magnetic
+field.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldInt"></a>radFldInt<span style='font-weight:
+normal;text-decoration:none'>(I, n, t1, t2, P1, P2)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave I, P1, P2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t1, t2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes magnetic field integral produced by the
+object n along a straight line specified by points P1 and P2; depending on the
+t1 string value, the integral is infinite (&quot;inf&quot;) or finite
+(&quot;fin&quot;), from P1 to P2; the field integral component is specified by
+the t2 string. The unit of the calculated field integral is T*mm.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>I is array of field integral value(s) (to be
+computed);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the magnetic field source
+object;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t1 is
+string specifying the type of field integral: finite (&quot;fin&quot;) or
+infinite (&quot;inf&quot;);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t2 is
+string identifying the field integral component(s) to be computed (e.g.:
+&quot;B&quot; or &quot;Bx&quot; or &quot;By&quot; or &quot;Bz&quot; or
+&quot;H&quot;,...);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-8.0pt'>P1 is array
+of 3 real numbers specifying cartesian coordinates of a point on the
+integration line;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-8.0pt'>P2 is array
+of 3 real numbers specifying cartesian coordinates of another point on the
+integration line.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns the first component of the calculated magnetic
+field component.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldPtcTrj"></a>radFldPtcTrj<span style='font-weight:
+normal;text-decoration:none'>(D, n, e, D0, S, np)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave D, D0, S</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, e, np</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes transverse coordinates and their derivatives
+(angles) of a relativistic charged trajectory in the magnetic field produced by
+object referenced by n, using a Runge-Kutta integration. The charge of the particle
+is that of electron. All positions are in millimeters and angles in radians.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>D is array of computed tragectory parameters;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the magnetic field source
+object;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>e is particle energy in GeV;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>D0 is array
+of 4 real numbers specifying initial transverse coordinates and angles of the
+trajectory: {x0,dxdy0,z0,dzdy0} (y is longitudinal coordinate);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>S is array
+of 2 real numbers specifying limits of the longitudinal position {y1,y2};</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>np is
+number of points where the trajectory should be calculated.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns total number of trajectory data components
+calculated.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldFocPot"></a>radFldFocPot<span style='font-weight:
+normal;text-decoration:none'>(n, P1, P2, np)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, np</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P1, P2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes &quot;focusing potential&quot; for trajectory
+of relativistic charged particle in magnetic field produced by the object
+referenced by n. The integration is made from point P1 to point P2 with np
+steps.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of the magnetic field source object;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P1 is array
+of 3 real numbers specifying cartesian coordinates of the first edge point of
+the integration segment;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P2 is array
+of 3 real numbers specifying cartesian coordinates of an edge point of the
+integration segment;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>np is
+number of steps for the integration.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns the computed focusing potential value.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldFocKickPer"></a>radFldFocKickPer<span
+style='font-weight:normal;text-decoration:none'>(M1, M2, A1, A2, n, P, Ns, per,
+nper, nps, Nt, r1, np1, d1, r2, np2, d2, nh, tc)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave M1, M2, A1, A2, P, Ns,
+Nt</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string tc</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n, per, nper, nps,
+r1, np1, d1, r2, np2, d2, nh</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes matrices of 2nd order kicks for trajectory of
+relativistic charged particle in periodic magnetic field produced by the object
+n. The computed kick matrices can be used in particle tracking codes.  The
+longitudinal integration along one period starts at point P and is done along
+the direction pointed by vector Ns; one direction of the transverse grid is
+pointed by the vector Nt, the other transverse direction is given by vector
+product of Nt and Ns.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>M1 is 2D
+array of real numbers representing the matrix of kick values (to be computed)
+in the first transverse direction given by the Nt vector;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>M2 is 2D
+array of real numbers representing the matrix of kick values (to be computed)
+in the second transverse direction given by vector product of Nt and Ns;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>A1 is 1D
+array of position values in the first transverse direction where kick matrix
+was computed;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>A2 is 1D
+array of position values in the second transverse direction where kick matrix
+was computed;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n is
+reference number of the magnetic field source object;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is array
+of 3 real numbers specifying cartesian coordinates of the integration start
+point;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Ns is array
+of 3 real numbers specifying cartesian coordinates of a vector defining the
+longitudinal direction for the periodic magnetic field;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>per is
+magnetic field period length;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>nper is
+number of full periods of the mafnetic field;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>nps is
+number of longitudinal points;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Nt is array
+of 3 real numbers specifying cartesian coordinates of a vector defining first
+transverse direction;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>r1 is range
+of the transverse grid along direction given by the Nt vector;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>np1 is
+number of points in the transverse grid along direction given by the Nt vector;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>d1 is step
+to calculate derivative along direction given by Nt vector; d1=0 means that the
+step for derivative calculation is equal to the corresponding step of the
+transverse grid where kick matrix is computed;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>r2 is range
+of the transverse grid along direction given by vector product of the vectors
+Nt and Ns;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>np2 is
+number of points in the transverse grid along direction given by vector product
+of the vectors Nt and Ns;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>d2 is step
+to calculate derivative along direction given by vector product of Nt and Ns;
+d2=0 means that the step for derivative calculation is equal to the
+corresponding step of the transverse grid where kick matrix is computed;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>nh is
+maximum number of magnetic field harmonics to take into account;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>tc is
+string with arbitrary comment to be inserted into resulting string t.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns string containing second-order kick matrices
+values in the format compatible with particle tracking computer codes (e.g.
+BETA).</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldEnr"></a>radFldEnr<span style='font-weight:
+normal;text-decoration:none'>(n1, n2, S)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n1, n2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave S</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes potential energy (in Joule) of the object
+referenced by n1 in the field created by the object referenced by n2. If all
+values of the wave S are 0, the function performes the computation based on
+absolute accuracy value for the energy (by default 10 Joule; can be modified by
+the function radFldCmpPrc). Otherwise, the computation is performed based on
+the subdivision numbers (kx=S[0], ky=S[1], kz=S[2]).</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n1 is
+reference number of the object potential energy of which should be computed;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n2 is
+reference number of the source object creating the magnetic field;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>S is array
+of 3 integer numbers specifying subdivision parameters for the energy
+computation (kx=S[0], ky=S[1], kz=S[2]). If S[0]=S[1]=S[2]=0, the function
+performes the computation based on absolute accuracy value for the energy (by
+default 10 Joule, can be modified by the function radFldCmpPrc). </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns potential energy value (in Joule).</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldEnrFrc"></a>radFldEnrFrc<span style='font-weight:
+normal;text-decoration:none'>(F, n1, n2, t, S)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave F, S</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n1, n2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes force (in Newton) acting on the object
+referenced by n1 in the field produced by the object referenced by n2. If all
+values of the wave S are 0, the function performes the computation based on
+absolute accuracy value for the force (by default 10 Newton; can be modified by
+the function radFldCmpPrc). Otherwise, the computation is performed based on
+the subdivision numbers (kx=S[0], ky=S[1], kz=S[2]).</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>F is array
+of force components (to be computed);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n1 is
+reference number of the object potential energy of which should be computed;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n2 is
+reference number of the source object creating the magnetic field;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is string
+identifying the force components to be computed (&quot;fx&quot;,
+&quot;fy&quot;, &quot;fz&quot;);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>S is array
+of 3 integer numbers specifying subdivision parameters for the energy/force
+computation (kx=S[0], ky=S[1], kz=S[2]). If S[0]=S[1]=S[2]=0, the function
+performes the computation based on absolute accuracy value for the force (by
+default 10 Newton, can be modified by the function radFldCmpPrc). </p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns
+first force component computed.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldEnrTrq"></a>radFldEnrTrq<span style='font-weight:
+normal;text-decoration:none'>(F, n1, n2, t, P, S)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave F, P, S</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n1, n2</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes torque (in Newton*mm) with respect to point
+P, acting on the object n1 in the field produced by the object n2. If all
+values of the wave S are 0, the function performes the computation based on
+absolute accuracy value for the torque (by default 10 Newton*mm; can be
+modified by the function radFldCmpPrc). Otherwise, the computation is performed
+based on the subdivision numbers (kx=S[0], ky=S[1], kz=S[2]).</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>F is array
+of torque components (to be computed); </p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n1
+reference number of the object on which the force is acting;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>n2 is
+reference number of the source object creating the magnetic field;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is string
+identifying the force components to be computed (&quot;tx&quot;,
+&quot;ty&quot;, &quot;tz&quot;);</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is array
+of 3 real numbers specifying cartesian coordinates of the point with respect to
+which the torque should be computed;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>S is array
+of 3 integer numbers specifying subdivision parameters for the
+energy/force/torque computation (kx=S[0], ky=S[1], kz=S[2]). If
+S[0]=S[1]=S[2]=0, the function performes the computation based on absolute
+accuracy value for the torque (by default 10 Newton*mm, can be modified by the
+function radFldCmpPrc). </p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns
+first torque component computed.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldFrc"></a>radFldFrc<span style='font-weight:
+normal;text-decoration:none'>(F, n0, n1)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave F</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n0, n1</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Computes force of the field produced by the object n0
+and acting on objects contoured by the shape referenced by n1. n1 can be the
+result of radObjRecMag (parallelepiped) or radFldFrcShpRtg (rectangle). This
+function uses an algorithm based on Maxwell tensor, which may not always
+provide high efficiency. We suggest to use the function radFldEnrFrc instead of
+this function.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>F is array of force components (to be computed);</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n0 is reference number of the magnetic field source
+object;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n1 is reference number of the sape object.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns
+first force component computed.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldCmpCrt"></a>radFldCmpCrt<span style='font-weight:
+normal;text-decoration:none'>(pb, pa, pi, pf, ptc, pta)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable pb, pa, pi, pf,
+ptc, pta</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Sets general absolute accuracy levels for computation
+of magnetic field induction (pb), vector potential (pa), induction integrals
+along straight line (pi), field force (pf), relativistic particle trajectory
+coordinates (ptc) and angles (pta).</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>pb is absolute
+accuracy level for magnetic field induction [T];</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>pa is
+absolute accuracy level for vector potential;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>pi is
+absolute accuracy level for magnetic field induction integrals along straight
+line [T*mm];</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>pf is
+absolute accuracy level for the force [N];</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>ptc is
+absolute accuracy level for particle trajectory coordinate [mm];</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>pta is
+absolute accuracy level for particle trajectory angle [r].</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns 1
+is succeeded, 0 if failed.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldCmpPrc"></a>radFldCmpPrc<span style='font-weight:
+normal;text-decoration:none'>(t)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Sets general absolute accuracy levels for computation
+of magnetic field induction (PrcB), vector potential (PrcA), induction integral
+along straight line (PrcBInt), field force (PrcForce), torque (PrcTorque),
+energy (PrcEnergy); relativistic charged particle trajectory coordinates
+(PrcCoord) and angles (PrcAngle). The function works according to the mechanism
+of string options. The name(s) of the option(s) should be: PrcB , PrcA,
+PrcBInt, PrcForce, PrcTorque, PrcEnergy, PrcCoord, PrcAngle.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>t is
+options strings which can be equal to &quot;PrcB-&gt;...&quot; or
+&quot;PrcA-&gt;...&quot; or &quot;PrcBInt-&gt;...&quot; or
+&quot;PrcForce-&gt;...&quot; or &quot;PrcTorque-&gt;...&quot; or
+&quot;PrcEnergy-&gt;...&quot; or &quot;PrcCoord-&gt;...&quot; or
+&quot;PrcAngle-&gt;...&quot;, where &quot;...&quot; should be replaced by the
+appropriate absolute accuracy level.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns 1
+is succeeded, 0 if failed.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldUnits"></a>radFldUnits<span style='font-weight:
+normal;text-decoration:none'>()</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Shows the physical units currently in use.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns string of physical units currently in use.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldLenRndSw"></a>radFldLenRndSw<span
+style='font-weight:normal;text-decoration:none'>(t)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      string t</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Switches &quot;on&quot; or &quot;off&quot;
+randomization of all the length values at creation of Radia objects. The randomization
+magnitude can be set by the function radFldLenTol.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>t is string equal to either &quot;on&quot; or
+&quot;off&quot;.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns 0 or 1.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldLenTol"></a>radFldLenTol<span style='font-weight:
+normal;text-decoration:none'>(a, r, z)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable a, r, z</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Sets absolute and relative randomization magnitudes
+for all the length values, including coordinates and dimensions of the objects
+producing magnetic field, and coordinates of points where the field is
+computed. Optimal values of the parameters can be: r=1E-11, a=L*r, z=a, where L
+is the distance scale value (in mm) for the problem to be solved. Too small
+randomization magnitudes can result in run-time code errors.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>a is
+absolute position/length randomization magnitude [mm];</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>r is
+relative position/length randomization magnitude;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>z is
+absolute zero tolerance [mm].</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns 1.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radFldFrcShpRtg"></a>radFldFrcShpRtg<span
+style='font-weight:normal;text-decoration:none'>(P, D)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      wave P, D</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Creates a rectangle with central point P and
+dimensions D (to be used for force computation via Maxwell tensor).</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>P is array
+of 3 real numbers specifying cartesian coordinates of the center point;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>D is array
+of 2 real numbers specifying dimensions of the rectangle.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>Returns an
+integer number referencing the object created.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<a name="5. Utilities"></a>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radUtiDel"></a>radUtiDel<span style='font-weight:
+normal;text-decoration:none'>(n)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Deletes object referenced by n.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is reference number of the object to be deleted.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns 0.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radUtiDelAll"></a>radUtiDelAll<span style='font-weight:
+normal;text-decoration:none'>()</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Deletes all previously created objects.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns 0.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radUtiDmp"></a>radUtiDmp<span style='font-weight:
+normal;text-decoration:none'>(n)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable n</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Gives information about object referenced by n.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>n is object to show information for.</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns string containing information about object n.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radUtiIntrptTim"></a>radUtiIntrptTim<span
+style='font-weight:normal;text-decoration:none'>(d)</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      variable d</p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Sets interruption time quanta in seconds for platforms
+with no pre-emptive multitasking.</p>
+
+<p class=MsoNormal style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>d is interruption time quanta [s].</p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns d.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'><a name="radUtiVer"></a>radUtiVer<span style='font-weight:
+normal;text-decoration:none'>()</span></p>
+
+<p class=MsoNormal style='margin-right:.5in'>      </p>
+
+<p class=FunctionBody1 style='margin-top:0in;margin-right:.5in;margin-bottom:
+3.0pt;margin-left:.25in'>Returns the Radia version number.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=FunctionBody1 style='margin-right:.5in;text-indent:-9.0pt'>&nbsp;</p>
+
+<p class=Topic style='margin-right:.5in'><span style='font-weight:normal;
+text-decoration:none'>•   </span>Radia Examples</p>
+
+<p class=TopicBody style='margin-right:.5in'>Radia for Igor Pro includes
+several examples describing basic types of magnetostatic computation. </p>
+
+<p class=TopicBody style='margin-right:.5in'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'>Example#1: Uniformly Magnetized
+Cube<span style='text-decoration:none'>     </span></p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>This is the simplest Radia
+example. A magnetized cube is placed at position {0,0,0}. It is 1 mm in size
+and is magnetized according to the vector  {-0.5,1,0.7} in Tesla. The three
+components of the field at position {0.52,0.6,0.7} are computed. If everything
+goes fine, the computed components of the magnetic field should be equal or
+close to: {0.127365, 0.0286437, 0.0775051}.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'>Example#2: Superconducting Wiggler
+(Coils)<span style='text-decoration:none'>     </span></p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>This example consists in the
+creation of a set of racetrack and circular coils, plotting the coil geometry
+and the magnetic field produced. This geometry corresponds to a 4T
+superconducting wiggler. It is assumed that the reader has some experience with
+Igor Pro and that he has successfully run Example#1.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'>Example#3: Generic Hybrid Undulator<span
+style='text-decoration:none'>     </span></p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>This example creates and
+solves a simple Hybrid Undulator made with rectangular blocks. </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>To see the change in the peak
+field induced by the variation of the magnet size, edit the corresponding
+parameter in the beginning of the procedure RadiaExample3(). To obtain
+acceptable precision on the magnetic field, it is essential to increase the
+segmentation. This is done at the expense of memory and CPU time. The segmentation
+in this example has been set to np={2,2,5} for the pole and nm={1,3,1} for the
+magnet. This corresponds to an absolute error in the peak field of the
+undulator on the order of 1%. The user himself should experience consequences
+of increasing np and nm and see how CPU time and memory increase, and how the
+value of the peak field approaches a limit which is the value looked for. To do
+so, edit the nm or np values in the RadiaExample3() and re-execute this macro.
+Using segmentation which is too large may result in a memory allocation failure
+and even crash of the Igor Pro. It is a fact that iron pieces need much more
+segmentation than the magnets since the magnetization there is very sensitive
+to the external field.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>One can also compute the Field
+Integral produced by such an undulator, forces on the magnets and poles, etc.
+One can build a wedge pole undulator by using polyhedrons or extruded polygons
+instead of rectangular blocks... To learn more, read the Radia documentation,
+make tests and develop experience.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&nbsp;</p>
+
+<p class=Subtopic style='margin-right:.5in'>Example#4: Uniformly Magnetized
+Polyhedron<span style='text-decoration:none'>     </span></p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>This example illustrates the
+use of a polyhedron shape by means of the &quot;radObjMltExtPgn&quot; function.
+A uniformly magnetized polyhedron is created with a magnetization of 1 Tesla.
+The field produced by this polyhedron is computed and shown to be uniform
+inside the volume of the polyhedron and equal to 2/3 Tesla as expected from an
+analytical integration.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>It is assumed that the reader
+has some experience with Mathematica and that he has successfully run the
+Example#1.</p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>Start the procedure
+RadiaExample4() and follow the instructions that may appear. If the execution
+seems successful, try to modify some parameters (see the Reference Guide for
+the explanations on the Radia functions) and re-execute the corresponding
+section. </p>
+
+<p class=FunctionBody1 style='margin-right:.5in'>&nbsp;</p>
+
+<p class=FunctionBody1>&nbsp;</p>
+
+</div>
+
+</body>
+
+</html>

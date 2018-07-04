@@ -1,0 +1,306 @@
+<html>
+	<head>
+		<title>Important Notes</title>
+		<meta NAME="GENERATOR" CONTENT="Microsoft FrontPage 3.0">
+		<meta NAME="AUTHOR" CONTENT="Elleaume">
+	</head>
+	<body BGCOLOR="#ffffff" LINK="#0000ff" VLINK="#ff0000" ALINK="#ff0000">
+		<p><img SRC="ID_esrf.gif" WIDTH="90" HEIGHT="90" ALIGN="left" BORDER="0" NATURALSIZEFLAG="0">
+		</p>
+		<p ALIGN="center"><br>
+		</p>
+		<h1 ALIGN="center">Important Notes
+		</h1>
+		<p ALIGN="center">
+		</p>
+		<h4>
+		</h4>
+		<p><br>
+		</p>
+		<p><br>
+		</p>
+		<p><br>
+		</p>
+		<p><br>
+			<ul>
+				<li>
+					<big><b><a HREF="#Notes">Notes</a></b></big>
+				<li>
+					<b><font SIZE="+1"><a HREF="#Known Problems">Known Problems</a></font></b>
+				<li>
+					<b><font SIZE="+1"><a HREF="#Frequently Asked Questions">Frequently Asked Questions</a></font></b>
+				</li>
+			</ul>
+		<p><br>
+		</p>
+		<hr ALIGN="left">
+		<p><br>
+			<big><big><big><b><a NAME="Notes">Notes</a></b></big></big></big>
+		</p>
+		<p><br>
+			<font SIZE="+1"><big><b>1. Subdivision </b></big></font>
+		</p>
+		<p><font SIZE="+1">After you have properly described your geometry and before solving 
+				the problem, you have to pay a special attention to the subdivision of the 
+				volumes into a number of sub-volumes.</font>
+		</p>
+		<p><big><b>Why the subdivision is needed?</b></big>
+		</p>
+		<p><font SIZE="+1">The computation method used by Radia assumes uniform magnetization 
+				in each volume. This is not a problem for a piece of permanent magnet which 
+				permeability is close to 1 and for which the magnetization is rather uniform 
+				over the volume. However, this is a drastic assumption for iron (or any linear 
+				or non-linear material with large permeability) in which the magnetization is 
+				known to be non-uniform depending on the geometry. To avoid this difficulty, 
+				one <b>must</b> segment the iron into smaller volumes by calling the function</font><font SIZE="+2"><b><tt>&nbsp;radObjDivMag[...]</tt></b><small>.</small><b><tt><big>
+						</big></tt></b></font><font SIZE="+1">As a result, the iron volumes 
+				will be segmented into a number of smaller volumes in which the magnetization 
+				will be assumed uniform. Iron pieces do normally require much stronger 
+				subdivision than permanent magnet blocks (this does not mean that permanent 
+				magnets should not be subdivided at all).</font>
+		</p>
+		<p><font SIZE="+1">On the other hand, please take into account that in 3D, the number 
+				of volumes after subdivision grows very quickly, and the size 
+				of&nbsp;Interaction Matrix needed for the solution scales proportionally to 
+				square of the number of these volumes. So it could be a good&nbsp;strategy to 
+				try to perform computation with minimal subdivision needed for a desired 
+				accuracy.&nbsp;&nbsp;</font>
+		</p>
+		<p><big><b>How to choose the optimal subdivision?</b></big>
+		</p>
+		<p><font SIZE="+1">In the current version of Radia, no mechanism for automatic 
+				subdivision is provided. A user has to make a number of iterations by 
+				specifying different subdivision parameters for the geometry, solving, checking 
+				the magnetic field in some control point(s), changing the subdivision 
+				parameters, etc. The iterations should stop when the magnetic field in the 
+				control point(s) is stable at the desired accuracy level. We recommend to tune 
+				the subdivision numbers for different directions separately: for example, first 
+				find the sufficient subdivision in horizontal direction with no or minimal 
+				subdivision in longitudinal and vertical directions, then find the sufficient 
+				subdivision in longitudinal direction with the previously found subdivision 
+				value for horizontal direction, etc. The subdivision can be applied at once to 
+				the whole geometry (i.e. to the container in which all the objects are present) 
+				or to different parts of the geometry separately. The latter case is favorable 
+				when different parts actually&nbsp;require different subdivision. To have a 
+				visual representation of the subdivided object</font><big><big><b><tt>&nbsp;obj</tt></b></big></big><font SIZE="+1">, 
+				call</font><big><big><b><tt>&nbsp;Show[Graphics3D[radObjDrw[obj]]]</tt></b></big></big><font SIZE="+1">. 
+				The subdivision will be shown by lines on the object surface.</font>
+		</p>
+		<p><br>
+			<font SIZE="+1"><big><b>2. Relaxation </b></big></font>
+		</p>
+		<p><font SIZE="+1">The Relaxation is an important step&nbsp;of solving a problem. The 
+				purpose of the Relaxation is to find the magnetization values for all 
+				the&nbsp;volumes, that satisfy, at a given accuracy level,&nbsp;the given 
+				geometry and&nbsp;material relations. The Relaxation is executed by the 
+				function &nbsp;</font><b><tt><font SIZE="+2">radRlxAuto[intrc, prec, maxiter]</font></tt></b><font SIZE="+1">&nbsp;which 
+				requires reference to the Interaction Matrix </font><b><tt><font SIZE="+2">(intrc)</font></tt></b><font SIZE="+1">, 
+				absolute accuracy with respect to magnetization </font><b><tt><font SIZE="+2">(prec) </font>
+				</tt></b><font SIZE="+1">and maximum number of iterations allowed to be done 
+				while trying to reach the specified absolute accuracy </font><b><tt><font SIZE="+2">(maxiter)</font></tt></b><font SIZE="+1">. 
+				We note that the<tt>&nbsp;</font><b><font SIZE="+2">radRlxAuto </font></b></TT><font SIZE="+1">function 
+				is automatically called by the function</font><b><tt><font SIZE="+2">&nbsp;RadSolve[obj, 
+						prec, maxiter]</font></tt></b><font SIZE="+1">, the latter requiring a 
+				reference to the object describing the geometry </font><b><tt><font SIZE="+2">(obj)</font></tt></b><font SIZE="+1">
+				rather than the corresponding Interaction Matrix (the Interaction Matrix is 
+				created by this function automatically). Both functions have the same output: a 
+				list of four numbers </font><b><tt><font SIZE="+2">{AvPrec, Mmax, Hmax, Niter}</font></tt></b><font SIZE="+1">, 
+				where</font><b><tt><font SIZE="+2">&nbsp;AvPrec </font></tt></b><font SIZE="+1">
+				is an average absolute change in magnetization after last iteration over all 
+				non-subdivided objects participating in the relaxation,</font><b><tt><font SIZE="+2">&nbsp;Mmax
+					</font></tt></b><font SIZE="+1">is</font><font SIZE="+2"> </font><font SIZE="+1">
+				maximum absolute value of magnetization over all the objects,</font><b><tt><font SIZE="+2">&nbsp;Hmax
+					</font></tt></b><font SIZE="+1">is</font><font SIZE="+2"> </font><font SIZE="+1">
+				maximum absolute value of magnetic field strength over central points of all 
+				the objects,</font><b><tt><font SIZE="+2">&nbsp;Niter </font></tt></b><font SIZE="+1">
+				is</font><font SIZE="+2"> </font><font SIZE="+1">actual number of iterations 
+				done.</font>
+		</p>
+		<p><font SIZE="+1"><b>It is very important: </b></font>
+		</p>
+		<p><font SIZE="+1"><b>(a)</b> to set a proper absolute precision level </font><b><tt><font SIZE="+2">
+						(prec) </font></tt></b><font SIZE="+1">and</font> <font SIZE="+1">maximum 
+				number of iterations</font><b><tt><font SIZE="+2"> (maxiter)</font></tt></b><font SIZE="+1">
+				when calling the function</font><b><tt><font SIZE="+2">&nbsp;radRlxAuto[...] </font>
+				</tt></b><font SIZE="+1">or</font><b><tt><font SIZE="+2">&nbsp;RadSolve[...]</font></tt></b><font SIZE="+1">. 
+				For a field of 1 T, a typical value of</font><b><tt><font SIZE="+2">&nbsp;prec </font>
+				</tt></b><font SIZE="+1">is 0.0001 T and a typical value of </font><b><tt><font SIZE="+2">
+						maxiter </font></tt></b><font SIZE="+1">is 1000. Do not hesitate to 
+				reduce/enlarge</font><b><tt><font SIZE="+2">&nbsp;prec </font></tt></b><font SIZE="+1">
+				further in order to check that the field is sufficiently stable. The smaller</font><b><tt><font SIZE="+2">&nbsp;prec
+					</font></tt></b><font SIZE="+1">the more accurate is the field. </font>
+		</p>
+		<p><font SIZE="+1"><b>(b)</b> to ensure that, in the output of the function</font><b><tt><font SIZE="+2">&nbsp;radRlxAuto[...]
+					</font></tt></b><font SIZE="+1">and</font><b><tt><font SIZE="+2"> RadSolve[...]</font></tt></b><font SIZE="+1">, 
+				&nbsp;the parameters: &nbsp;&nbsp;</font><b><tt><font SIZE="+2">AvPrec </font></tt>
+			</b><font SIZE="+1">is smaller than</font><b><tt><font SIZE="+2"> prec </font></tt></b>
+			<font SIZE="+1">and</font><b><tt><font SIZE="+2">&nbsp;Niter </font></tt></b><font SIZE="+1">
+				is smaller than </font><b><tt><font SIZE="+2">maxiter</font></tt></b><font SIZE="+1">. 
+				&nbsp;If not, the relaxation should be declared unsuccessful. There are two 
+				main cases for which relaxation can be unsuccessful. It can either be that</font><b><tt><font SIZE="+2">&nbsp;maxiter
+					</font></tt></b><font SIZE="+1">is set to a too low value or that there is 
+				a problem in the geometry and segmentation resulting in some divergence during 
+				the relaxation. We have faced the problem of <a HREF="#Unsuccessful relaxation">unsuccessful 
+					relaxation</a> in some cases.</font>
+		</p>
+		<p><br>
+		</p>
+		<hr ALIGN="left">
+		<p><br>
+			<big><big><big><b><a NAME="Known Problems">Known Problems</a></b></big></big></big>
+		</p>
+		<p><br>
+			<font SIZE="+1"><big><b>1. <a NAME="Unsuccessful relaxation">Unsuccessful relaxation</a></b></big></font>
+		</p>
+		<p><big>In most of the cases tested, the automatic relaxation function<b><tt> <big>radRlxAuto[intrc, 
+							prec, maxiter, meth :3] </big></tt></b>gives good results. The 
+				signs of successful relaxation are: (1)&nbsp;average absolute change in 
+				magnetization between the last two iterations over all the objects 
+				participating in the relaxation (the first number in the function return 
+				list)&nbsp;is smaller then the value of the<b><tt>&nbsp;<big>prec </big></tt></b>
+				variable; (2) actual number of iterations done (the last number in the function 
+				return list) is smaller than the value of the<b><tt><big> maxiter</big></tt></b>&nbsp;variable.</big>
+		</p>
+		<p><big>However it may happen that the function<tt><b>&nbsp;<big>radRlxAuto[...]</big> </b></tt>
+				gives no signs of successful relaxation. This may occur when the object under 
+				relaxation has an unfavorable shape, such as one dimension being much smaller 
+				or larger than the other two.</big>
+		</p>
+		<p><big>Try to change subdivision parameters or re-structure&nbsp;the objects in order 
+				to obtain closer dimensions for each of the (sub-) objects.</big>
+		</p>
+		<p><br>
+			<font SIZE="+1"><big><b>2. Memory not fully recovered </b></big></font>
+		</p>
+		<p><big>Situations may be encountered where the memory is not fully recovered following 
+				the execution of<b><tt> <big>radUtiDel[...] </big></tt></b>or<b><tt> <big>RadSolve[...]</big></tt></b>. 
+				Such situations may occur when a number of iterations in which a geometry is 
+				created and relaxed are made, and the newly-created objects are not deleted 
+				after use.</big>
+		</p>
+		<p><big>To eliminate this problem, call the function<b><tt><big>&nbsp;radUtiDelAll[] </big></tt>
+				</b>to free all memory in<tt>&nbsp;<big>Radia.exe</big> </tt>each time the 
+				geometry is re-created. After calling<b><tt> <big>radUtiDelAll[]</big></tt></b>, 
+				all the required objects, materials, transformations, interaction matrix, etc., 
+				need to be re-created as well</big>.<big> If still in doubt, reload<tt> <big>Radia.exe</big>
+				</tt>by executing<b><tt>&nbsp;<big>&lt;&lt;Radia` </big></tt></b>again, which 
+				results in the most drastic initialization.</big>
+		</p>
+		<p><br>
+			<font SIZE="+1"><big><b>3. Intermittent division zero by zero</b></big></font>
+		</p>
+		<p><big>Each object producing magnetic field can be represented as a volume limited by 
+				polygons. For example the object created by<b><tt>&nbsp;<big>radObjRecMag[...] </big></tt>
+				</b>is&nbsp;a parallelepiped limited by 6 rectangles. If one computes the 
+				magnetic field at a point which is exactly in the same plane as one of these 
+				rectangles, the computation may result in division of zero by zero, and an 
+				error is reported. To remove these indeterminations, a randomization of the 
+				position and dimensions of the objects has been implemented. At creation, the 
+				position and the dimensions of all the objects are slightly changed in a random 
+				fashion. The amount of randomization is controlled by the function<b><tt><big>&nbsp;radFldLenTol[abs, 
+							rel, zero :0]</big></tt></b></big>. &nbsp;<big>This function is 
+				called when the<tt> Radia.m </tt>is loaded, with parameters<tt><b>&nbsp;abs, rel, zero </b>
+				</tt>optimal for the geometries in the scale of several meters. However, if you 
+				are going to solve the problems in strongly different scale of lengths, you may 
+				still face the problem in question.</big>
+		</p>
+		<p><big>Try to call the<b><tt><big>&nbsp;radFldLenTol[abs, rel, zero :0] </big></tt></b>
+				function with parameters more suitable to the problem. For a detailed 
+				explanation of the function action, please refer to the Reference Guide.</big>
+		</p>
+		<p><br>
+			<font SIZE="+1"><big><b>4. "Artificial" discontinuity of the field components inside 
+						subdivided objects and poor field precision outside the objects very close to 
+						their surfaces</b></big></font>
+		</p>
+		<p><big>With the field computation method used, any non-subdivided object created by<b><tt><big>&nbsp;radObjRecMag[...]
+						</big></tt></b>or<b><tt> <big>radObjThckPgn[...] </big></tt></b>or</big><b><tt>
+					<big><big>radObjPolyhdr[...] </big></tt></b>is treated as the one 
+			having constant magnetization inside. Any subdivided object consists of a 
+			number of non-subdivided sub-objects. After the relaxation of a subdivided iron 
+			object, the magnetizations inside the sub-objects are set to values 
+			corresponding to the minimum of the total interaction energy. However, these 
+			values are still treated as being constants within the sub-objects. As a result 
+			of this: (a) the computed field from the general subdivided object has 
+			artificial discontinuities at the borders between any adjacent sub-objects, (b) 
+			the field computed outside, yet very close to the surface of the subdivided 
+			object, may appear disturbed according to the particular subdivision.</BIG>
+		</p>
+		<p><big>The situation outside the subdivided objects (b)&nbsp;can be improved by 
+				increasing the subdivision. Normally, the field disturbance disappears at a 
+				distance from the object border larger than average size of the sub-objects. 
+				Further improvements to the field computation method are planned.<br>
+			</big>
+		</p>
+		<p><br>
+			<font SIZE="+1"><big><b>5. Corrupted graphics</b></big></font>
+		</p>
+		<p><big>From time to time, graphical presentation of 3D objects created by the 
+				Mathematica-Radia commands <big>&nbsp;<b><tt>Show[Graphics3D[radObjDrw[...]]]</big>
+				</TT></B>may appear slightly corrupted (like small pieces of faces are missing 
+				or extra lines are shown). Typically, this may happen when subdivided volumes 
+				are presented. The reason for this corruption is, probably, a kind of 
+				inconsistency between the drawing method used by Mathematica and randomization 
+				of objects' coordinates applied by Radia to avoid field computation problems.</big>
+		</p>
+		<p><big>One way to improve the graphical presentation is to execute the command<b><tt><big>&nbsp;radFldLenTol[abs, 
+							rel] </big></tt></b>with<b><tt> <big>abs=rel=0 </big></tt></b>before 
+				creating and drawing the geometry. However, this may result in run-time errors 
+				at any field computation done with the geometry created this way. So, before 
+				making any computation after the above trick was applied, one has to either 
+				exit and re-load Radia or execute the command<b><tt><big>&nbsp;radFldLenTol[abs, rel] </big>
+					</tt></b>with the values of<b><tt><big>&nbsp;abs </big></tt></b>and<b><tt><big>&nbsp;rel
+						</big></tt></b>adequate to the geometry under study, and re-create the 
+				geometry.</big> <big>We note that when Radia is loaded, the function<b><tt><big> radFldLenTol[abs, 
+							rel] </big></tt></b>is called from<big><tt>&nbsp;init.m </tt></big>file 
+				with the default values<b><tt><big>&nbsp;abs=rel=10^(-9)</big></tt></b>. More 
+				detailed information about the function<b><tt><big>&nbsp;radFldLenTol[abs, rel] </big></tt>
+				</b>and optimal values of the parameters<b><tt><big>&nbsp;abs </big></tt></b>and<b><tt><big>&nbsp;rel
+						</big></tt></b>can be found in the <a HREF="ReferenceGuideMath/ReferenceFrameSet.html">
+					Reference Guide</a>. </big>
+		</p>
+		<p><br>
+		</p>
+		<hr ALIGN="left">
+		<p><br>
+			<big><big><b><big><a NAME="Frequently Asked Questions">Frequently Asked Questions</a></big></b></big></big>
+		</p>
+		<p><br>
+			<font SIZE="+1"><big><b>1. How can I define and use my own material ?</b></big></font>
+		</p>
+		<p><font SIZE="+1">A linear anisotropic material with different susceptibilities in 
+				directions parallel and perpendicular to easy magnetization axis can be defined 
+				by the function</font><tt><b><big>&nbsp;<big>radMatLin[{ksipar,ksiper}, {mrx,mry,mrz}]</big></big></b></tt><font SIZE="+1">;</font>
+			&nbsp;<font SIZE="+1">a nonlinear isotropic material can be defined by the function<b><tt><big>&nbsp;</font><big>radMatSatIso[{ms1,ms2,ms3},{ks1,ks2,ks3}]</big></BIG></TT></B><font SIZE="+1">. 
+				&nbsp;You may need to perform a numerical fitting in order to represent the 
+				Magnetization vs Field Strength dependence of your material by the function 
+				supported by Radia. See the Reference Guide for information on the Radia 
+				material functions (<tt><big><b>radMat*</b></big></tt>). &nbsp;If you intend to 
+				use your material frequently, you can define the corresponding function in 
+				Mathematica. This function should call</font><tt><b><big>&nbsp;<big>radMatLin</big> </big>
+				</b></tt><font SIZE="+1">or</font><b><tt><big>&nbsp;<big>radMatSatIso</big></big></tt></b><font SIZE="+1">
+				with proper parameters. See how this is done for <tt><b><big>RadMat*</big></b></tt>
+				functions in the Radia<tt>&nbsp;<big>init.m</big> </tt>file.</font>
+		</p>
+		<p><br>
+			<b><big><font SIZE="+1">2. What is the difference between</font><tt><big>&nbsp;radTrfOrnt</big>
+					</tt><font SIZE="+1">and</font><tt><big> radTrfMlt</big> </tt><font SIZE="+1">?</font></big></b>
+		</p>
+		<p><big><tt><b><big>radTrfOrnt[obj,trf]</big> </b></tt>simply orients </big><font SIZE="+1">
+				the object</font><b><tt><big>&nbsp;<big>obj</big> </big></tt></b><font SIZE="+1">
+				by applying the transformation</font><b><tt><big> <big>trf</big> </big></tt></b>
+			<font SIZE="+1">to it once;</font><b><tt><big> <big>radTrfMlt[obj,trf,mlt]</big> </big></tt>
+			</b><font SIZE="+1">being applied with</font><b><tt><big>&nbsp;<big>mlt&gt;1</big>, </big>
+				</tt></b><font SIZE="+1">preserves the original orientation of the object</font><b><tt><big>
+						<big>obj</big> </big></tt></b><font SIZE="+1">and creates</font><b><tt><big>&nbsp;<big>mlt-1</big>
+					</big></tt></b><font SIZE="+1">its symmetry "childs". &nbsp;Normally,</font><b><tt><big>&nbsp;<big>mlt</big>
+					</big></tt></b><font SIZE="+1">should be 2 in the case of a plane symmetry 
+				and can be &gt;= 2 &nbsp;in the case of a rotation.</font>
+		</p>
+		<p><br>
+		</p>
+		<hr ALIGN="left">
+		<p>Last modified: October 27, 1997. <a HREF="mailto:oleg.chubar@synchrotron-soleil.fr">Comments</a> are 
+			welcome. <!--__________________________________ SIGNATURE ____________________________________________--></p>
+	</body>
+</html>

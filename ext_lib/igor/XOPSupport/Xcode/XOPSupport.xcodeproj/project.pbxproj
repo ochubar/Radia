@@ -1,0 +1,341 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		896C71420E3E815100859D7F /* XOPFilesMac.c in Sources */ = {isa = PBXBuildFile; fileRef = 896C71410E3E815100859D7F /* XOPFilesMac.c */; };
+		89A72BF01095F245003AE340 /* NamedFIFO.h in Headers */ = {isa = PBXBuildFile; fileRef = 89A72BEB1095F234003AE340 /* NamedFIFO.h */; };
+		89B041FE08888BAE001DF13D /* XOPWaveAccess.c in Sources */ = {isa = PBXBuildFile; fileRef = AA60AC50057D34FC0010DFAC /* XOPWaveAccess.c */; };
+		89BC6775107526A800F4B149 /* WMTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 89BC6773107526A800F4B149 /* WMTypes.h */; };
+		89BC6776107526A800F4B149 /* IgorErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 89BC6774107526A800F4B149 /* IgorErrors.h */; };
+		AA60AC52057D34FC0010DFAC /* IgorXOP.h in Headers */ = {isa = PBXBuildFile; fileRef = AA60AC43057D34FC0010DFAC /* IgorXOP.h */; };
+		AA60AC53057D34FC0010DFAC /* XOP.h in Headers */ = {isa = PBXBuildFile; fileRef = AA60AC44057D34FC0010DFAC /* XOP.h */; };
+		AA60AC54057D34FC0010DFAC /* XOPDataFolderAccess.c in Sources */ = {isa = PBXBuildFile; fileRef = AA60AC45057D34FC0010DFAC /* XOPDataFolderAccess.c */; };
+		AA60AC55057D34FC0010DFAC /* XOPDialogsMac.c in Sources */ = {isa = PBXBuildFile; fileRef = AA60AC46057D34FC0010DFAC /* XOPDialogsMac.c */; };
+		AA60AC56057D34FC0010DFAC /* XOPFiles.c in Sources */ = {isa = PBXBuildFile; fileRef = AA60AC47057D34FC0010DFAC /* XOPFiles.c */; };
+		AA60AC57057D34FC0010DFAC /* XOPMenus.c in Sources */ = {isa = PBXBuildFile; fileRef = AA60AC48057D34FC0010DFAC /* XOPMenus.c */; };
+		AA60AC58057D34FC0010DFAC /* XOPNumericConversion.c in Sources */ = {isa = PBXBuildFile; fileRef = AA60AC49057D34FC0010DFAC /* XOPNumericConversion.c */; };
+		AA60AC59057D34FC0010DFAC /* XOPResources.h in Headers */ = {isa = PBXBuildFile; fileRef = AA60AC4A057D34FC0010DFAC /* XOPResources.h */; };
+		AA60AC5A057D34FC0010DFAC /* XOPStandardHeaders.h in Headers */ = {isa = PBXBuildFile; fileRef = AA60AC4B057D34FC0010DFAC /* XOPStandardHeaders.h */; };
+		AA60AC5B057D34FC0010DFAC /* XOPSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = AA60AC4C057D34FC0010DFAC /* XOPSupport.c */; };
+		AA60AC5C057D34FC0010DFAC /* XOPSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = AA60AC4D057D34FC0010DFAC /* XOPSupport.h */; };
+		AA60AC5D057D34FC0010DFAC /* XOPSupportMac.c in Sources */ = {isa = PBXBuildFile; fileRef = AA60AC4E057D34FC0010DFAC /* XOPSupportMac.c */; };
+		AA60AC5E057D34FC0010DFAC /* XOPSupportMac.h in Headers */ = {isa = PBXBuildFile; fileRef = AA60AC4F057D34FC0010DFAC /* XOPSupportMac.h */; };
+		AA60AC60057D34FC0010DFAC /* XOPWindows.c in Sources */ = {isa = PBXBuildFile; fileRef = AA60AC51057D34FC0010DFAC /* XOPWindows.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		896C71410E3E815100859D7F /* XOPFilesMac.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPFilesMac.c; path = ../XOPFilesMac.c; sourceTree = SOURCE_ROOT; };
+		89A72BEB1095F234003AE340 /* NamedFIFO.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NamedFIFO.h; path = ../NamedFIFO.h; sourceTree = SOURCE_ROOT; };
+		89A72BEC1095F234003AE340 /* XOPDialogsWin.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPDialogsWin.c; path = ../XOPDialogsWin.c; sourceTree = SOURCE_ROOT; };
+		89A72BED1095F234003AE340 /* XOPFilesWin.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPFilesWin.c; path = ../XOPFilesWin.c; sourceTree = SOURCE_ROOT; };
+		89A72BEE1095F234003AE340 /* XOPSupportWin.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPSupportWin.c; path = ../XOPSupportWin.c; sourceTree = SOURCE_ROOT; };
+		89A72BEF1095F234003AE340 /* XOPSupportWin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XOPSupportWin.h; path = ../XOPSupportWin.h; sourceTree = SOURCE_ROOT; };
+		89BC6773107526A800F4B149 /* WMTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = WMTypes.h; path = ../WMTypes.h; sourceTree = SOURCE_ROOT; };
+		89BC6774107526A800F4B149 /* IgorErrors.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = IgorErrors.h; path = ../IgorErrors.h; sourceTree = SOURCE_ROOT; };
+		AA60AC37057D33F90010DFAC /* libXOPSupport.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libXOPSupport.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA60AC43057D34FC0010DFAC /* IgorXOP.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = IgorXOP.h; path = ../IgorXOP.h; sourceTree = SOURCE_ROOT; };
+		AA60AC44057D34FC0010DFAC /* XOP.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XOP.h; path = ../XOP.h; sourceTree = SOURCE_ROOT; };
+		AA60AC45057D34FC0010DFAC /* XOPDataFolderAccess.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPDataFolderAccess.c; path = ../XOPDataFolderAccess.c; sourceTree = SOURCE_ROOT; };
+		AA60AC46057D34FC0010DFAC /* XOPDialogsMac.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPDialogsMac.c; path = ../XOPDialogsMac.c; sourceTree = SOURCE_ROOT; };
+		AA60AC47057D34FC0010DFAC /* XOPFiles.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPFiles.c; path = ../XOPFiles.c; sourceTree = SOURCE_ROOT; };
+		AA60AC48057D34FC0010DFAC /* XOPMenus.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPMenus.c; path = ../XOPMenus.c; sourceTree = SOURCE_ROOT; };
+		AA60AC49057D34FC0010DFAC /* XOPNumericConversion.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPNumericConversion.c; path = ../XOPNumericConversion.c; sourceTree = SOURCE_ROOT; };
+		AA60AC4A057D34FC0010DFAC /* XOPResources.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XOPResources.h; path = ../XOPResources.h; sourceTree = SOURCE_ROOT; };
+		AA60AC4B057D34FC0010DFAC /* XOPStandardHeaders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XOPStandardHeaders.h; path = ../XOPStandardHeaders.h; sourceTree = SOURCE_ROOT; };
+		AA60AC4C057D34FC0010DFAC /* XOPSupport.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPSupport.c; path = ../XOPSupport.c; sourceTree = SOURCE_ROOT; };
+		AA60AC4D057D34FC0010DFAC /* XOPSupport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XOPSupport.h; path = ../XOPSupport.h; sourceTree = SOURCE_ROOT; };
+		AA60AC4E057D34FC0010DFAC /* XOPSupportMac.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPSupportMac.c; path = ../XOPSupportMac.c; sourceTree = SOURCE_ROOT; };
+		AA60AC4F057D34FC0010DFAC /* XOPSupportMac.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XOPSupportMac.h; path = ../XOPSupportMac.h; sourceTree = SOURCE_ROOT; };
+		AA60AC50057D34FC0010DFAC /* XOPWaveAccess.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPWaveAccess.c; path = ../XOPWaveAccess.c; sourceTree = SOURCE_ROOT; };
+		AA60AC51057D34FC0010DFAC /* XOPWindows.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = XOPWindows.c; path = ../XOPWindows.c; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA60AC35057D33F90010DFAC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		89BC676C1075262700F4B149 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				89A72BEB1095F234003AE340 /* NamedFIFO.h */,
+				89BC6774107526A800F4B149 /* IgorErrors.h */,
+				AA60AC43057D34FC0010DFAC /* IgorXOP.h */,
+				89BC6773107526A800F4B149 /* WMTypes.h */,
+				AA60AC44057D34FC0010DFAC /* XOP.h */,
+				AA60AC45057D34FC0010DFAC /* XOPDataFolderAccess.c */,
+				AA60AC46057D34FC0010DFAC /* XOPDialogsMac.c */,
+				89A72BEC1095F234003AE340 /* XOPDialogsWin.c */,
+				AA60AC47057D34FC0010DFAC /* XOPFiles.c */,
+				896C71410E3E815100859D7F /* XOPFilesMac.c */,
+				89A72BED1095F234003AE340 /* XOPFilesWin.c */,
+				AA60AC48057D34FC0010DFAC /* XOPMenus.c */,
+				AA60AC49057D34FC0010DFAC /* XOPNumericConversion.c */,
+				AA60AC4A057D34FC0010DFAC /* XOPResources.h */,
+				AA60AC4B057D34FC0010DFAC /* XOPStandardHeaders.h */,
+				AA60AC4C057D34FC0010DFAC /* XOPSupport.c */,
+				AA60AC4D057D34FC0010DFAC /* XOPSupport.h */,
+				AA60AC4E057D34FC0010DFAC /* XOPSupportMac.c */,
+				AA60AC4F057D34FC0010DFAC /* XOPSupportMac.h */,
+				89A72BEE1095F234003AE340 /* XOPSupportWin.c */,
+				89A72BEF1095F234003AE340 /* XOPSupportWin.h */,
+				AA60AC50057D34FC0010DFAC /* XOPWaveAccess.c */,
+				AA60AC51057D34FC0010DFAC /* XOPWindows.c */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		AA60AC23057D33820010DFAC = {
+			isa = PBXGroup;
+			children = (
+				89BC676C1075262700F4B149 /* Source */,
+				AA60AC38057D33F90010DFAC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AA60AC38057D33F90010DFAC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA60AC37057D33F90010DFAC /* libXOPSupport.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		AA60AC33057D33F90010DFAC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA60AC52057D34FC0010DFAC /* IgorXOP.h in Headers */,
+				AA60AC53057D34FC0010DFAC /* XOP.h in Headers */,
+				AA60AC59057D34FC0010DFAC /* XOPResources.h in Headers */,
+				AA60AC5A057D34FC0010DFAC /* XOPStandardHeaders.h in Headers */,
+				AA60AC5C057D34FC0010DFAC /* XOPSupport.h in Headers */,
+				AA60AC5E057D34FC0010DFAC /* XOPSupportMac.h in Headers */,
+				89BC6775107526A800F4B149 /* WMTypes.h in Headers */,
+				89BC6776107526A800F4B149 /* IgorErrors.h in Headers */,
+				89A72BF01095F245003AE340 /* NamedFIFO.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		AA60AC36057D33F90010DFAC /* XOPSupport */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8915525A093FB1FE0062870E /* Build configuration list for PBXNativeTarget "XOPSupport" */;
+			buildPhases = (
+				AA60AC33057D33F90010DFAC /* Headers */,
+				AA60AC34057D33F90010DFAC /* Sources */,
+				AA60AC35057D33F90010DFAC /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = XOPSupport;
+			productName = LibXOPSupport;
+			productReference = AA60AC37057D33F90010DFAC /* libXOPSupport.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA60AC27057D33820010DFAC /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 8915525E093FB1FE0062870E /* Build configuration list for PBXProject "XOPSupport" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 1;
+			mainGroup = AA60AC23057D33820010DFAC;
+			productRefGroup = AA60AC38057D33F90010DFAC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AA60AC36057D33F90010DFAC /* XOPSupport */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA60AC34057D33F90010DFAC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA60AC54057D34FC0010DFAC /* XOPDataFolderAccess.c in Sources */,
+				AA60AC55057D34FC0010DFAC /* XOPDialogsMac.c in Sources */,
+				AA60AC56057D34FC0010DFAC /* XOPFiles.c in Sources */,
+				AA60AC57057D34FC0010DFAC /* XOPMenus.c in Sources */,
+				AA60AC58057D34FC0010DFAC /* XOPNumericConversion.c in Sources */,
+				AA60AC5B057D34FC0010DFAC /* XOPSupport.c in Sources */,
+				AA60AC5D057D34FC0010DFAC /* XOPSupportMac.c in Sources */,
+				AA60AC60057D34FC0010DFAC /* XOPWindows.c in Sources */,
+				89B041FE08888BAE001DF13D /* XOPWaveAccess.c in Sources */,
+				896C71420E3E815100859D7F /* XOPFilesMac.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		8915525B093FB1FE0062870E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_VERSION = 4.0;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_STYLE = STATIC;
+				OBJROOT = "$(SYMROOT)";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = XOPSupport;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				SYMROOT = build;
+				WARNING_CFLAGS = "-Wmost";
+			};
+			name = Debug;
+		};
+		8915525C093FB1FE0062870E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_VERSION = 4.0;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_STYLE = STATIC;
+				OBJROOT = "$(SYMROOT)";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = XOPSupport;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				SYMROOT = build;
+				WARNING_CFLAGS = "-Wmost";
+			};
+			name = Release;
+		};
+		8915525D093FB1FE0062870E /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_VERSION = 4.0;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_STYLE = STATIC;
+				OBJROOT = "$(SYMROOT)";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = XOPSupport;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				SYMROOT = build;
+				WARNING_CFLAGS = "-Wmost";
+			};
+			name = Default;
+		};
+		8915525F093FB1FE0062870E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Debug;
+		};
+		89155260093FB1FE0062870E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Release;
+		};
+		89155261093FB1FE0062870E /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8915525A093FB1FE0062870E /* Build configuration list for PBXNativeTarget "XOPSupport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8915525B093FB1FE0062870E /* Debug */,
+				8915525C093FB1FE0062870E /* Release */,
+				8915525D093FB1FE0062870E /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		8915525E093FB1FE0062870E /* Build configuration list for PBXProject "XOPSupport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8915525F093FB1FE0062870E /* Debug */,
+				89155260093FB1FE0062870E /* Release */,
+				89155261093FB1FE0062870E /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AA60AC27057D33820010DFAC /* Project object */;
+}

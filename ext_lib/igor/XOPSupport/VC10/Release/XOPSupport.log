@@ -1,0 +1,12 @@
+﻿  XOPDataFolderAccess.c
+  XOPDialogsWin.c
+  XOPFiles.c
+  XOPFilesWin.c
+  XOPMenus.c
+  XOPNumericConversion.c
+  XOPSupport.c
+  XOPSupportWin.c
+  XOPWaveAccess.c
+  XOPWindows.c
+  Generating Code...
+  XOPSupport.vcxproj -> C:\SoftwareDevelopments\Shared\lib\igor\XOPSupport\VC10\./XOPSupport.lib
