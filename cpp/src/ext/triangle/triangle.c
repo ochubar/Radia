@@ -657,7 +657,9 @@ REAL o3derrboundA, o3derrboundB, o3derrboundC;
 
 /* Random number seed is not constant, but I've made it global anyway.       */
 
-unsigned long randomseed;                     /* Current random number seed. */
+//unsigned long randomseed;                     /* Current random number seed. */
+/*OC30072018*/
+unsigned long long randomseed;                     /* Current random number seed. */
 
 
 /* Mesh data structure.  Triangle operates on only one mesh, but the mesh    */
@@ -944,17 +946,28 @@ int minus1mod3[3] = {2, 0, 1};
 /* decode() converts a pointer to an oriented triangle.  The orientation is  */
 /*   extracted from the two least significant bits of the pointer.           */
 
+/*
 #define decode(ptr, otri)                                                     \
   (otri).orient = (int) ((unsigned long) (ptr) & (unsigned long) 3l);         \
   (otri).tri = (triangle *)                                                   \
                   ((unsigned long) (ptr) ^ (unsigned long) (otri).orient)
+*/
+/*OC30072018*/
+#define decode(ptr, otri)                                                     \
+  (otri).orient = (int)((unsigned long long) (ptr) & (unsigned long long) 3l);\
+  (otri).tri = (triangle *)                                                   \
+             ((unsigned long long) (ptr) ^ (unsigned long long) (otri).orient)
 
 /* encode() compresses an oriented triangle into a single pointer.  It       */
 /*   relies on the assumption that all triangles are aligned to four-byte    */
 /*   boundaries, so the two least significant bits of (otri).tri are zero.   */
-
+/*
 #define encode(otri)                                                          \
   (triangle) ((unsigned long) (otri).tri | (unsigned long) (otri).orient)
+*/
+/*OC30072018*/
+#define encode(otri)                                                          \
+  (triangle)((unsigned long long)(otri).tri | (unsigned long long)(otri).orient)
 
 /* The following handle manipulation primitives are all described by Guibas  */
 /*   and Stolfi.  However, Guibas and Stolfi use an edge-based data          */
@@ -1115,19 +1128,34 @@ int minus1mod3[3] = {2, 0, 1};
 
 /* Primitives to infect or cure a triangle with the virus.  These rely on    */
 /*   the assumption that all subsegments are aligned to four-byte boundaries.*/
-
+/*
 #define infect(otri)                                                          \
   (otri).tri[6] = (triangle)                                                  \
                     ((unsigned long) (otri).tri[6] | (unsigned long) 2l)
-
+*/
+/*OC30072018*/
+#define infect(otri)                                                          \
+  (otri).tri[6] = (triangle)                                                  \
+                ((unsigned long long) (otri).tri[6] | (unsigned long long) 2l)
+/*
 #define uninfect(otri)                                                        \
   (otri).tri[6] = (triangle)                                                  \
                     ((unsigned long) (otri).tri[6] & ~ (unsigned long) 2l)
+*/
+/*OC30072018*/
+#define uninfect(otri)                                                        \
+  (otri).tri[6] = (triangle)                                                  \
+              ((unsigned long long) (otri).tri[6] & ~ (unsigned long long) 2l)
 
 /* Test a triangle for viral infection.                                      */
 
+/*OC30072018*/
+/*
 #define infected(otri)                                                        \
   (((unsigned long) (otri).tri[6] & (unsigned long) 2l) != 0l)
+*/
+#define infected(otri)                                                        \
+  (((unsigned long long) (otri).tri[6] & (unsigned long long) 2l) != 0l)
 
 /* Check or set a triangle's attributes.                                     */
 
@@ -1164,17 +1192,27 @@ int minus1mod3[3] = {2, 0, 1};
 /*   least significant bits (one for orientation, one for viral infection)   */
 /*   are masked out to produce the real pointer.                             */
 
+/*
 #define sdecode(sptr, osub)                                                   \
   (osub).ssorient = (int) ((unsigned long) (sptr) & (unsigned long) 1l);      \
-  (osub).ss = (subseg *)                                                      \
-              ((unsigned long) (sptr) & ~ (unsigned long) 3l)
+  (osub).ss = (subseg *) ((unsigned long) (sptr) & ~ (unsigned long) 3l)
+*/
+/*OC30072018*/
+#define sdecode(sptr, osub)                                                   \
+  (osub).ssorient = (int) ((unsigned long long) (sptr) & (unsigned long long) 1l);      \
+  (osub).ss = (subseg *) ((unsigned long long) (sptr) & ~ (unsigned long long) 3l)
 
 /* sencode() compresses an oriented subsegment into a single pointer.  It    */
 /*   relies on the assumption that all subsegments are aligned to two-byte   */
 /*   boundaries, so the least significant bit of (osub).ss is zero.          */
 
+/*
 #define sencode(osub)                                                         \
   (subseg) ((unsigned long) (osub).ss | (unsigned long) (osub).ssorient)
+*/
+/*OC30072018*/
+#define sencode(osub)                                                         \
+  (subseg) ((unsigned long long) (osub).ss | (unsigned long long) (osub).ssorient)
 
 /* ssym() toggles the orientation of a subsegment.                           */
 
@@ -3682,67 +3720,75 @@ struct otri *t;
   struct osub printsh;
   vertex printvertex;
 
-  printf("triangle x%lx with orientation %d:\n", (unsigned long) t->tri,
-         t->orient);
+  /*printf("triangle x%lx with orientation %d:\n", (unsigned long) t->tri, t->orient);*/
+  /*OC30072018*/
+  printf("triangle x%llx with orientation %d:\n", (unsigned long long) t->tri, t->orient);
+
   decode(t->tri[0], printtri);
   if (printtri.tri == m->dummytri) {
     printf("    [0] = Outer space\n");
   } else {
-    printf("    [0] = x%lx  %d\n", (unsigned long) printtri.tri,
-           printtri.orient);
-  }
+    /*printf("    [0] = x%lx  %d\n", (unsigned long) printtri.tri, printtri.orient);*/
+	/*OC30072018*/
+    printf("    [0] = x%llx  %d\n", (unsigned long long) printtri.tri, printtri.orient);
+ }
   decode(t->tri[1], printtri);
   if (printtri.tri == m->dummytri) {
     printf("    [1] = Outer space\n");
   } else {
-    printf("    [1] = x%lx  %d\n", (unsigned long) printtri.tri,
-           printtri.orient);
+    /*printf("    [1] = x%lx  %d\n", (unsigned long) printtri.tri, printtri.orient);*/
+	/*OC30072018*/
+    printf("    [1] = x%llx  %d\n", (unsigned long long) printtri.tri, printtri.orient);
   }
   decode(t->tri[2], printtri);
   if (printtri.tri == m->dummytri) {
     printf("    [2] = Outer space\n");
   } else {
-    printf("    [2] = x%lx  %d\n", (unsigned long) printtri.tri,
-           printtri.orient);
+    /*printf("    [2] = x%lx  %d\n", (unsigned long) printtri.tri, printtri.orient);*/
+	/*OC30072018*/
+    printf("    [2] = x%llx  %d\n", (unsigned long long) printtri.tri, printtri.orient);
   }
 
   org(*t, printvertex);
   if (printvertex == (vertex) NULL)
     printf("    Origin[%d] = NULL\n", (t->orient + 1) % 3 + 3);
   else
-    printf("    Origin[%d] = x%lx  (%.12g, %.12g)\n",
-           (t->orient + 1) % 3 + 3, (unsigned long) printvertex,
-           printvertex[0], printvertex[1]);
+    /*printf("    Origin[%d] = x%lx  (%.12g, %.12g)\n", (t->orient + 1) % 3 + 3, (unsigned long) printvertex, printvertex[0], printvertex[1]);*/
+	/*OC30072018*/
+    printf("    Origin[%d] = x%llx  (%.12g, %.12g)\n", (t->orient + 1) % 3 + 3, (unsigned long long) printvertex, printvertex[0], printvertex[1]);
   dest(*t, printvertex);
   if (printvertex == (vertex) NULL)
     printf("    Dest  [%d] = NULL\n", (t->orient + 2) % 3 + 3);
   else
-    printf("    Dest  [%d] = x%lx  (%.12g, %.12g)\n",
-           (t->orient + 2) % 3 + 3, (unsigned long) printvertex,
-           printvertex[0], printvertex[1]);
+    /*printf("    Dest  [%d] = x%lx  (%.12g, %.12g)\n", (t->orient + 2) % 3 + 3, (unsigned long) printvertex, printvertex[0], printvertex[1]);*/
+	/*OC30072018*/
+    printf("    Dest  [%d] = x%llx  (%.12g, %.12g)\n", (t->orient + 2) % 3 + 3, (unsigned long long) printvertex, printvertex[0], printvertex[1]);
   apex(*t, printvertex);
   if (printvertex == (vertex) NULL)
     printf("    Apex  [%d] = NULL\n", t->orient + 3);
   else
-    printf("    Apex  [%d] = x%lx  (%.12g, %.12g)\n",
-           t->orient + 3, (unsigned long) printvertex,
-           printvertex[0], printvertex[1]);
+    /*printf("    Apex  [%d] = x%lx  (%.12g, %.12g)\n", t->orient + 3, (unsigned long) printvertex, printvertex[0], printvertex[1]);*/
+	/*OC30072018*/
+    printf("    Apex  [%d] = x%llx  (%.12g, %.12g)\n", t->orient + 3, (unsigned long long) printvertex, printvertex[0], printvertex[1]);
 
   if (b->usesegments) {
     sdecode(t->tri[6], printsh);
     if (printsh.ss != m->dummysub) {
-      printf("    [6] = x%lx  %d\n", (unsigned long) printsh.ss,
-             printsh.ssorient);
+      /*printf("    [6] = x%lx  %d\n", (unsigned long) printsh.ss, printsh.ssorient);*/
+	  /*OC30072018*/
+      printf("    [6] = x%llx  %d\n", (unsigned long long) printsh.ss, printsh.ssorient);
     }
     sdecode(t->tri[7], printsh);
     if (printsh.ss != m->dummysub) {
-      printf("    [7] = x%lx  %d\n", (unsigned long) printsh.ss,
-             printsh.ssorient);
+      /*printf("    [7] = x%lx  %d\n", (unsigned long) printsh.ss, printsh.ssorient);*/
+	  /*OC30072018*/
+      printf("    [7] = x%llx  %d\n", (unsigned long long) printsh.ss, printsh.ssorient);
     }
     sdecode(t->tri[8], printsh);
     if (printsh.ss != m->dummysub) {
-      printf("    [8] = x%lx  %d\n", (unsigned long) printsh.ss,
-             printsh.ssorient);
+      /*printf("    [8] = x%lx  %d\n", (unsigned long) printsh.ss, printsh.ssorient);*/
+	  /*OC30072018*/
+      printf("    [8] = x%llx  %d\n", (unsigned long long) printsh.ss, printsh.ssorient);
     }
   }
 
@@ -3776,67 +3822,73 @@ struct osub *s;
   struct otri printtri;
   vertex printvertex;
 
-  printf("subsegment x%lx with orientation %d and mark %d:\n",
-         (unsigned long) s->ss, s->ssorient, mark(*s));
+  /*printf("subsegment x%lx with orientation %d and mark %d:\n", (unsigned long) s->ss, s->ssorient, mark(*s));*/
+  /*OC30072018*/
+  printf("subsegment x%llx with orientation %d and mark %d:\n", (unsigned long long) s->ss, s->ssorient, mark(*s));
+  
   sdecode(s->ss[0], printsh);
   if (printsh.ss == m->dummysub) {
     printf("    [0] = No subsegment\n");
   } else {
-    printf("    [0] = x%lx  %d\n", (unsigned long) printsh.ss,
-           printsh.ssorient);
+    /*printf("    [0] = x%lx  %d\n", (unsigned long) printsh.ss, printsh.ssorient);*/
+	/*OC30072018*/
+    printf("    [0] = x%llx  %d\n", (unsigned long long) printsh.ss, printsh.ssorient);
   }
   sdecode(s->ss[1], printsh);
   if (printsh.ss == m->dummysub) {
     printf("    [1] = No subsegment\n");
   } else {
-    printf("    [1] = x%lx  %d\n", (unsigned long) printsh.ss,
-           printsh.ssorient);
+    /*printf("    [1] = x%lx  %d\n", (unsigned long) printsh.ss, printsh.ssorient);*/
+	/*OC30072018*/
+    printf("    [1] = x%llx  %d\n", (unsigned long long) printsh.ss, printsh.ssorient);
   }
 
   sorg(*s, printvertex);
   if (printvertex == (vertex) NULL)
     printf("    Origin[%d] = NULL\n", 2 + s->ssorient);
   else
-    printf("    Origin[%d] = x%lx  (%.12g, %.12g)\n",
-           2 + s->ssorient, (unsigned long) printvertex,
-           printvertex[0], printvertex[1]);
+    /*printf("    Origin[%d] = x%lx  (%.12g, %.12g)\n", 2 + s->ssorient, (unsigned long) printvertex, printvertex[0], printvertex[1]);*/
+	/*OC30072018*/
+    printf("    Origin[%d] = x%llx  (%.12g, %.12g)\n", 2 + s->ssorient, (unsigned long long) printvertex, printvertex[0], printvertex[1]);
   sdest(*s, printvertex);
   if (printvertex == (vertex) NULL)
     printf("    Dest  [%d] = NULL\n", 3 - s->ssorient);
   else
-    printf("    Dest  [%d] = x%lx  (%.12g, %.12g)\n",
-           3 - s->ssorient, (unsigned long) printvertex,
-           printvertex[0], printvertex[1]);
+    /*printf("    Dest  [%d] = x%lx  (%.12g, %.12g)\n", 3 - s->ssorient, (unsigned long) printvertex, printvertex[0], printvertex[1]);*/
+	/*OC30072018*/
+    printf("    Dest  [%d] = x%llx  (%.12g, %.12g)\n", 3 - s->ssorient, (unsigned long long) printvertex, printvertex[0], printvertex[1]);
 
   decode(s->ss[6], printtri);
   if (printtri.tri == m->dummytri) {
     printf("    [6] = Outer space\n");
   } else {
-    printf("    [6] = x%lx  %d\n", (unsigned long) printtri.tri,
-           printtri.orient);
+    /*printf("    [6] = x%lx  %d\n", (unsigned long) printtri.tri, printtri.orient);*/
+	/*OC30072018*/
+    printf("    [6] = x%llx  %d\n", (unsigned long long) printtri.tri, printtri.orient);
   }
   decode(s->ss[7], printtri);
   if (printtri.tri == m->dummytri) {
     printf("    [7] = Outer space\n");
   } else {
-    printf("    [7] = x%lx  %d\n", (unsigned long) printtri.tri,
-           printtri.orient);
+    /*printf("    [7] = x%lx  %d\n", (unsigned long) printtri.tri, printtri.orient);*/
+	/*OC30072018*/
+    printf("    [7] = x%llx  %d\n", (unsigned long long) printtri.tri, printtri.orient);
   }
 
   segorg(*s, printvertex);
   if (printvertex == (vertex) NULL)
     printf("    Segment origin[%d] = NULL\n", 4 + s->ssorient);
   else
-    printf("    Segment origin[%d] = x%lx  (%.12g, %.12g)\n",
-           4 + s->ssorient, (unsigned long) printvertex,
-           printvertex[0], printvertex[1]);
+    /*printf("    Segment origin[%d] = x%lx  (%.12g, %.12g)\n", 4 + s->ssorient, (unsigned long) printvertex, printvertex[0], printvertex[1]);*/
+	/*OC30072018*/
+    printf("    Segment origin[%d] = x%llx  (%.12g, %.12g)\n", 4 + s->ssorient, (unsigned long long) printvertex, printvertex[0], printvertex[1]);
   segdest(*s, printvertex);
   if (printvertex == (vertex) NULL)
     printf("    Segment dest  [%d] = NULL\n", 5 - s->ssorient);
   else
-    printf("    Segment dest  [%d] = x%lx  (%.12g, %.12g)\n",
-           5 - s->ssorient, (unsigned long) printvertex,
-           printvertex[0], printvertex[1]);
+    /*printf("    Segment dest  [%d] = x%lx  (%.12g, %.12g)\n", 5 - s->ssorient, (unsigned long) printvertex, printvertex[0], printvertex[1]);*/
+	/*OC30072018*/
+    printf("    Segment dest  [%d] = x%llx  (%.12g, %.12g)\n", 5 - s->ssorient, (unsigned long long) printvertex, printvertex[0], printvertex[1]);
 }
 
 /**                                                                         **/
@@ -3898,7 +3950,8 @@ struct memorypool *pool;
 #endif /* not ANSI_DECLARATORS */
 
 {
-  unsigned long alignptr;
+  //unsigned long alignptr;
+  unsigned long long alignptr; /*OC30072018*/
 
   pool->items = 0;
   pool->maxitems = 0;
@@ -3906,11 +3959,18 @@ struct memorypool *pool;
   /* Set the currently active block. */
   pool->nowblock = pool->firstblock;
   /* Find the first item in the pool.  Increment by the size of (VOID *). */
-  alignptr = (unsigned long) (pool->nowblock + 1);
+  //alignptr = (unsigned long) (pool->nowblock + 1);
+  alignptr = (unsigned long long) (pool->nowblock + 1); /*OC30072018*/
+
   /* Align the item on an `alignbytes'-byte boundary. */
+  //pool->nextitem = (VOID *)
+  //  (alignptr + (unsigned long) pool->alignbytes -
+  //   (alignptr % (unsigned long) pool->alignbytes));
+  /*OC30072018*/
   pool->nextitem = (VOID *)
-    (alignptr + (unsigned long) pool->alignbytes -
-     (alignptr % (unsigned long) pool->alignbytes));
+    (alignptr + (unsigned long long) pool->alignbytes -
+     (alignptr % (unsigned long long) pool->alignbytes));
+
   /* There are lots of unallocated items left in this block. */
   pool->unallocateditems = pool->itemsfirstblock;
   /* The stack of deallocated items is empty. */
@@ -4015,7 +4075,9 @@ struct memorypool *pool;
 {
   VOID *newitem;
   VOID **newblock;
-  unsigned long alignptr;
+  /*unsigned long alignptr;*/
+  /*OC30072018*/
+  unsigned long long alignptr;
 
   /* First check the linked list of dead items.  If the list is not   */
   /*   empty, allocate an item from the list rather than a fresh one. */
@@ -4040,11 +4102,20 @@ struct memorypool *pool;
       pool->nowblock = (VOID **) *(pool->nowblock);
       /* Find the first item in the block.    */
       /*   Increment by the size of (VOID *). */
-      alignptr = (unsigned long) (pool->nowblock + 1);
-      /* Align the item on an `alignbytes'-byte boundary. */
+      /* alignptr = (unsigned long) (pool->nowblock + 1); */
+      /*OC30072018*/
+	  alignptr = (unsigned long long) (pool->nowblock + 1);
+     /* Align the item on an `alignbytes'-byte boundary. */
+	  /*
       pool->nextitem = (VOID *)
         (alignptr + (unsigned long) pool->alignbytes -
          (alignptr % (unsigned long) pool->alignbytes));
+	  */
+	  /*OC30072018*/
+      pool->nextitem = (VOID *)
+        (alignptr + (unsigned long long) pool->alignbytes -
+         (alignptr % (unsigned long long) pool->alignbytes));
+
       /* There are lots of unallocated items left in this block. */
       pool->unallocateditems = pool->itemsperblock;
     }
@@ -4099,16 +4170,28 @@ struct memorypool *pool;
 #endif /* not ANSI_DECLARATORS */
 
 {
-  unsigned long alignptr;
+  /*unsigned long alignptr;*/
+  /*OC30072018*/
+  unsigned long long alignptr;
 
   /* Begin the traversal in the first block. */
   pool->pathblock = pool->firstblock;
   /* Find the first item in the block.  Increment by the size of (VOID *). */
-  alignptr = (unsigned long) (pool->pathblock + 1);
+  /*alignptr = (unsigned long) (pool->pathblock + 1);*/
+  /*OC30072018*/
+  alignptr = (unsigned long long) (pool->pathblock + 1);
+
   /* Align with item on an `alignbytes'-byte boundary. */
+  /*
   pool->pathitem = (VOID *)
     (alignptr + (unsigned long) pool->alignbytes -
      (alignptr % (unsigned long) pool->alignbytes));
+  */
+  /*OC30072018*/
+  pool->pathitem = (VOID *)
+    (alignptr + (unsigned long long) pool->alignbytes -
+     (alignptr % (unsigned long long) pool->alignbytes));
+
   /* Set the number of items left in the current block. */
   pool->pathitemsleft = pool->itemsfirstblock;
 }
@@ -4136,7 +4219,9 @@ struct memorypool *pool;
 
 {
   VOID *newitem;
-  unsigned long alignptr;
+  /*unsigned long alignptr;*/
+  /*OC30072018*/
+  unsigned long long alignptr;
 
   /* Stop upon exhausting the list of items. */
   if (pool->pathitem == pool->nextitem) {
@@ -4148,11 +4233,20 @@ struct memorypool *pool;
     /* Find the next block. */
     pool->pathblock = (VOID **) *(pool->pathblock);
     /* Find the first item in the block.  Increment by the size of (VOID *). */
-    alignptr = (unsigned long) (pool->pathblock + 1);
+    /*alignptr = (unsigned long) (pool->pathblock + 1);*/
+	/*OC30072018*/
+    alignptr = (unsigned long long) (pool->pathblock + 1);
     /* Align with item on an `alignbytes'-byte boundary. */
+	/*
     pool->pathitem = (VOID *)
       (alignptr + (unsigned long) pool->alignbytes -
        (alignptr % (unsigned long) pool->alignbytes));
+	*/
+	/*OC30072018*/
+    pool->pathitem = (VOID *)
+      (alignptr + (unsigned long long) pool->alignbytes -
+       (alignptr % (unsigned long long) pool->alignbytes));
+
     /* Set the number of items left in the current block. */
     pool->pathitemsleft = pool->itemsperblock;
   }
@@ -4204,16 +4298,26 @@ int subsegbytes;
 #endif /* not ANSI_DECLARATORS */
 
 {
-  unsigned long alignptr;
+  /*unsigned long alignptr;*/
+  /*OC30072018*/
+  unsigned long long alignptr;
 
   /* Set up `dummytri', the `triangle' that occupies "outer space." */
-  m->dummytribase = (triangle *) trimalloc(trianglebytes +
-                                           m->triangles.alignbytes);
+  m->dummytribase = (triangle *) trimalloc(trianglebytes + m->triangles.alignbytes);
   /* Align `dummytri' on a `triangles.alignbytes'-byte boundary. */
-  alignptr = (unsigned long) m->dummytribase;
+  /*alignptr = (unsigned long) m->dummytribase;*/
+  /*OC30072018*/
+  alignptr = (unsigned long long) m->dummytribase;
+  /*
   m->dummytri = (triangle *)
     (alignptr + (unsigned long) m->triangles.alignbytes -
      (alignptr % (unsigned long) m->triangles.alignbytes));
+  */
+  /*OC30072018*/
+  m->dummytri = (triangle *)
+    (alignptr + (unsigned long long) m->triangles.alignbytes -
+     (alignptr % (unsigned long long) m->triangles.alignbytes));
+
   /* Initialize the three adjoining triangles to be "outer space."  These  */
   /*   will eventually be changed by various bonding operations, but their */
   /*   values don't really matter, as long as they can legally be          */
@@ -4233,10 +4337,19 @@ int subsegbytes;
     m->dummysubbase = (subseg *) trimalloc(subsegbytes +
                                            m->subsegs.alignbytes);
     /* Align `dummysub' on a `subsegs.alignbytes'-byte boundary. */
-    alignptr = (unsigned long) m->dummysubbase;
+    /*alignptr = (unsigned long) m->dummysubbase;*/
+	/*OC30072018*/
+    alignptr = (unsigned long long) m->dummysubbase;
+	/*
     m->dummysub = (subseg *)
       (alignptr + (unsigned long) m->subsegs.alignbytes -
        (alignptr % (unsigned long) m->subsegs.alignbytes));
+	*/
+	/*OC30072018*/
+    m->dummysub = (subseg *)
+      (alignptr + (unsigned long long) m->subsegs.alignbytes -
+       (alignptr % (unsigned long long) m->subsegs.alignbytes));
+
     /* Initialize the two adjoining subsegments to be the omnipresent      */
     /*   subsegment.  These will eventually be changed by various bonding  */
     /*   operations, but their values don't really matter, as long as they */
@@ -4593,7 +4706,9 @@ int number;
 {
   VOID **getblock;
   char *foundvertex;
-  unsigned long alignptr;
+  /*unsigned long alignptr;*/
+  /*OC30072018*/
+  unsigned long long alignptr;
   int current;
 
   getblock = m->vertices.firstblock;
@@ -4610,9 +4725,15 @@ int number;
   }
 
   /* Now find the right vertex. */
+  /*
   alignptr = (unsigned long) (getblock + 1);
   foundvertex = (char *) (alignptr + (unsigned long) m->vertices.alignbytes -
                           (alignptr % (unsigned long) m->vertices.alignbytes));
+  */
+  /*OC30072018*/
+  alignptr = (unsigned long long) (getblock + 1);
+  foundvertex = (char *) (alignptr + (unsigned long long) m->vertices.alignbytes -
+                          (alignptr % (unsigned long long) m->vertices.alignbytes));
   return (vertex) (foundvertex + m->vertices.itembytes * (number - current));
 }
 
@@ -6674,9 +6795,13 @@ struct mesh *m;
 /*****************************************************************************/
 
 #ifdef ANSI_DECLARATORS
-unsigned long randomnation(unsigned int choices)
+/*unsigned long randomnation(unsigned int choices)*/
+/*OC30072018*/
+unsigned long long randomnation(unsigned int choices)
 #else /* not ANSI_DECLARATORS */
-unsigned long randomnation(choices)
+/*unsigned long randomnation(choices)*/
+/*OC30072018*/
+unsigned long long randomnation(choices)
 unsigned int choices;
 #endif /* not ANSI_DECLARATORS */
 
@@ -7668,11 +7793,19 @@ struct otri *searchtri;
   char *firsttri;
   struct otri sampletri;
   vertex torg, tdest;
-  unsigned long alignptr;
+  /*unsigned long alignptr;*/
+  /*OC30072018*/
+  unsigned long long alignptr;
   REAL searchdist, dist;
   REAL ahead;
+  /*
   long samplesperblock, totalsamplesleft, samplesleft;
   long population, totalpopulation;
+  */
+  /*OC30072018*/
+  long long samplesperblock, totalsamplesleft, samplesleft;
+  long long population, totalpopulation;
+
   triangle ptr;                         /* Temporary variable used by sym(). */
 
   if (b->verbose > 2) {
@@ -7740,11 +7873,19 @@ struct otri *searchtri;
       population = totalpopulation;
     }
     /* Find a pointer to the first triangle in the block. */
+	/*
     alignptr = (unsigned long) (sampleblock + 1);
     firsttri = (char *) (alignptr +
                          (unsigned long) m->triangles.alignbytes -
                          (alignptr %
                           (unsigned long) m->triangles.alignbytes));
+	*/
+	/*OC30072018*/
+    alignptr = (unsigned long long) (sampleblock + 1);
+    firsttri = (char *) (alignptr +
+                         (unsigned long long) m->triangles.alignbytes -
+                         (alignptr %
+                          (unsigned long long) m->triangles.alignbytes));
 
     /* Choose `samplesleft' randomly sampled triangles in this block. */
     do {
@@ -11109,12 +11250,25 @@ struct behavior *b;
 #ifdef TRILIBRARY
 
 #ifdef ANSI_DECLARATORS
+/*
 int reconstruct(struct mesh *m, struct behavior *b, int *trianglelist,
                 REAL *triangleattriblist, REAL *trianglearealist,
                 int elements, int corners, int attribs,
                 int *segmentlist,int *segmentmarkerlist, int numberofsegments)
+*/
+/*OC30072018*/
+long reconstruct(struct mesh *m, struct behavior *b, int *trianglelist,
+                REAL *triangleattriblist, REAL *trianglearealist,
+                int elements, int corners, int attribs,
+                int *segmentlist,int *segmentmarkerlist, int numberofsegments)
 #else /* not ANSI_DECLARATORS */
+/*
 int reconstruct(m, b, trianglelist, triangleattriblist, trianglearealist,
+                elements, corners, attribs, segmentlist, segmentmarkerlist,
+                numberofsegments)
+*/
+/*OC30072018*/
+long reconstruct(m, b, trianglelist, triangleattriblist, trianglearealist,
                 elements, corners, attribs, segmentlist, segmentmarkerlist,
                 numberofsegments)
 struct mesh *m;
@@ -11312,8 +11466,7 @@ FILE *polyfile;
       corner[j] = trianglelist[vertexindex++];
       if ((corner[j] < b->firstnumber) ||
           (corner[j] >= b->firstnumber + m->invertices)) {
-        printf("Error:  Triangle %ld has an invalid vertex index.\n",
-               elementnumber);
+        printf("Error:  Triangle %ld has an invalid vertex index.\n", elementnumber);
         triexit(1);
       }
     }
@@ -11494,8 +11647,7 @@ FILE *polyfile;
       for (j = 0; j < 2; j++) {
         if ((end[j] < b->firstnumber) ||
             (end[j] >= b->firstnumber + m->invertices)) {
-          printf("Error:  Segment %ld has an invalid vertex index.\n", 
-                 segmentnumber);
+          printf("Error:  Segment %ld has an invalid vertex index.\n", segmentnumber);
           triexit(1);
         }
       }

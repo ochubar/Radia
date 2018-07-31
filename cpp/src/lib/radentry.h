@@ -200,19 +200,19 @@ The rectangular slices are assumed to be parallel to the XY plane.
 */
 EXP int CALL RadObjMltExtRtg(int* n, double* FlatCenPts, double* FlatRtgSizes, int ns, double* M);
 
-///** Creates triangulated extruded polygon block, i.e. an extruded polygon with its bases subdivided by triangulation.
-//@param n [out] reference number of the object created
-//@param xc [in] the horizontal coordinate of the block center of gravity
-//@param lx [in] the thickness (extrusion size)
-//@param FlatVert [in] flat array of y and z coordinates (y1, z1, y2, z2,...) of vertex points describing the polygon in 2D
-//@param FlatSubd [in] flat array of subdivision parameters for base polygon segments, two numbers for each segment: the first defining number of sub-segments, the second - "gradient" of the segmentation
-//@param nv [in] number of vertex points of the 2D polygon (the length of the FlatVert and FlatSubd arrays is 2*nv)
-//@param a [in] character identifying extrusion direction (can be 'x', 'y' or 'z')
-//@param M [in] array of 3 cartesian coordinates of the magnetization vector inside the block
-//@param opt [in] pointer to options string, which can be "TriAngMin->...", "TriAreaMax->...", "ExtOpt->..." or 0. 
-//@return integer error code (0 : no error, >0 : error number, <0 : warning number)
-//@author O.C.
-//*/
+/** Creates triangulated extruded polygon block, i.e. an extruded polygon with its bases subdivided by triangulation.
+@param n [out] reference number of the object created
+@param xc [in] the horizontal coordinate of the block center of gravity
+@param lx [in] the thickness (extrusion size)
+@param FlatVert [in] flat array of y and z coordinates (y1, z1, y2, z2,...) of vertex points describing the polygon in 2D
+@param FlatSubd [in] flat array of subdivision parameters for base polygon segments, two numbers for each segment: the first defining number of sub-segments, the second - "gradient" of the segmentation
+@param nv [in] number of vertex points of the 2D polygon (the length of the FlatVert and FlatSubd arrays is 2*nv)
+@param a [in] character identifying extrusion direction (can be 'x', 'y' or 'z')
+@param M [in] array of 3 cartesian coordinates of the magnetization vector inside the block
+@param opt [in] pointer to options string, which can be e.g. "ki->...,TriAngMin->...,TriAreaMax->...,ExtOpt->..." or each of these tokens separately, or 0; default values are "ki->Numb" (rather than "ki->Size"), "TriAngMin->20"
+@return integer error code (0 : no error, >0 : error number, <0 : warning number)
+@author O.C.
+*/
 EXP int CALL RadObjMltExtTri(int* n, double xc, double lx, double* FlatVert, double* FlatSubd, int nv, char a, double* M, char* opt);
 
 /** Creates a finite-length arc magnet of rectangular cross-section.

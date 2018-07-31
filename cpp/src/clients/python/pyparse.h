@@ -31,6 +31,7 @@ using namespace std;
 //-------------------------------------------------------------------------
 	
 static const char strEr_BadArray[] = "Incorrect or no Python Array structure";
+static const char strEr_BadList[] = "Incorrect or no Python List structure";
 static const char strEr_BadListArray[] = "Incorrect or no Python List or Array structure";
 static const char strEr_BadNum[] = "Incorrect or no Python number";
 static const char strEr_BadStr[] = "Error at parsing / converting Python string";
@@ -175,13 +176,12 @@ public:
 	 * arType can be 'i', 'f' or 'd'
 	 * Supports both Py lists and arrays
 	 * If obj is neither List nor Array - returns without thowing error
+	 * If the length of Py list or array is larger than nElem at input, then nElemTooSmall is set to true
 	 ***************************************************************************/
-	 //template<class T> void CopyPyListElemsToNumArray(PyObject* obj, char arType, T*& ar, int& nElem) //throw(...)
-	template<class T> static char CopyPyListElemsToNumArray(PyObject* obj, char arType, T*& ar, int& nElem)
+	template<class T> static char CopyPyListElemsToNumArray(PyObject* obj, char arType, T*& ar, int& nElem, bool& nElemTooSmall)
+	//template<class T> static char CopyPyListElemsToNumArray(PyObject* obj, char arType, T*& ar, int& nElem)
 	{
-		//const char strEr_BadArray[] = "Incorrect or no Python Array structure";
-		//const char strEr_BadListArray[] = "Incorrect or no Python List or Array structure";
-		//const char strEr_BadNum[] = "Incorrect or no Python number";
+		nElemTooSmall = false; //OC29072018
 
 		//if(obj == 0) return;
 		//if(!((arType == 'i') || (arType == 'l') || (arType == 'f') || (arType == 'd'))) return;
@@ -288,6 +288,7 @@ public:
 		else
 		{
 			if(nElem > nElemInList) nElem = nElemInList;
+			else if(nElem < nElemInList) nElemTooSmall = true; //OC29072018
 		}
 
 		T *t_ar = ar;
@@ -316,6 +317,25 @@ public:
 		if(pOldBuf != 0) Py_DECREF(pOldBuf);
 
 		return isList ? 'l' : 'a'; //OC03092016
+	}
+
+	/************************************************************************//**
+	 * Copies elements of Py list or array of known length to a numerical array
+	 * The output T *ar is expected to be allocated in calling function
+	 * arType can be 'i', 'f' or 'd'
+	 * Supports both Py lists only
+	 ***************************************************************************/
+	template<class T> static void CopyPyListElemsToNumArrayKnownLen(PyObject* o, char arType, T* ar, int nElem, const char* sEr=0)
+	{
+		if(o == 0) return;
+
+		bool lenIsSmall = false;
+		int len = nElem;
+		CPyParse::CopyPyListElemsToNumArray(o, arType, ar, len, lenIsSmall);
+		if(sEr != 0)
+		{
+			if((len != nElem) || lenIsSmall) throw sEr;
+		}
 	}
 
 	/************************************************************************//**
@@ -437,6 +457,89 @@ public:
 	}
 
 	/************************************************************************//**
+	 * Find lengths of Py lists or arrays that are elements of a list
+	 * ATTENTION: it can allocate int *arLen !
+	 ***************************************************************************/
+	static void FindLengthsOfElemListsOrArrays(PyObject* oList, int*& arLens, int& nElem)
+	{
+		if(oList == 0) throw strEr_BadList;
+		if(!PyList_Check(oList)) throw strEr_BadList;
+
+		int nElemAct = (int)(int)PyList_Size(oList);
+		if(nElemAct <= 0) return;
+
+		if(arLens == 0)
+		{
+			arLens = new int[nElemAct];
+			nElem = nElemAct;
+		}
+		else
+		{
+			if(nElem > nElemAct) nElem = nElemAct;
+		}
+
+		int *t_arLens = arLens;
+		for(int i=0; i<nElem; i++)
+		{
+			PyObject *o = PyList_GetItem(oList, (Py_ssize_t)i);
+			if(o == 0) throw strEr_BadListArray;
+
+			bool isList = PyList_Check(o);
+			bool isArray = false;
+			if(!isList) isArray = PyObject_CheckBuffer(o);
+
+#if PY_MAJOR_VERSION >= 3
+
+			if(!(isList || isArray)) throw strEr_BadListArray;
+
+#endif
+
+			int nElemCur = 0;
+			if(isList) 
+			{
+				nElemCur = (int)PyList_Size(o);
+			}
+			else
+			{
+				void *pVoidBuffer = 0;
+				Py_ssize_t sizeBuf = 0;
+
+				Py_buffer pb;
+				PyObject *pOldBuf = 0;
+
+				if(isArray)
+				{
+					if(PyObject_GetBuffer(o, &pb, PyBUF_SIMPLE)) throw strEr_BadListArray;
+					pVoidBuffer = pb.buf;
+					sizeBuf = pb.len;
+				}
+
+#if PY_MAJOR_VERSION < 3
+
+				else
+				{
+					pOldBuf = PyBuffer_FromReadWriteObject(obj, 0, Py_END_OF_BUFFER);
+					if(pOldBuf != 0)
+					{
+						if(PyObject_AsWriteBuffer(pOldBuf, &pVoidBuffer, &sizeBuf)) throw strEr_BadListArray;
+						isArray = true;
+					}
+					else
+					{
+						PyErr_Clear();
+						throw strEr_BadListArray;
+					}
+				}
+
+#endif
+
+				nElemCur = (int)sizeBuf;
+			}
+			*(t_arLens++) = nElemCur;
+		}
+	}
+
+	/************************************************************************//**
 	 * Copies elements of Py string to a C string (assumed to be allocated outside)
 	 ***************************************************************************/
 	static void CopyPyStringToC(PyObject* pObj, char* c_str, int maxLenStr)
@@ -549,7 +652,7 @@ public:
 	}
 
 	/************************************************************************//**
-	* Sets up output list (eventually of lists) data from array
+	* Sets up output list (eventually of lists) data from an array
 	***************************************************************************/
 	static PyObject* SetDataListOfLists(double* arB, int nB, int nP)
 	{
@@ -588,7 +691,6 @@ public:
 		}
 		return oResB;
 	}
-
 };
 
 //-------------------------------------------------------------------------

@@ -71,7 +71,7 @@ void CAuxParse::StringSplitSimple(const char* c_strTot, int maxNumSymb, char cSe
 //-------------------------------------------------------------------------
 
 void CAuxParse::StringSplit(char* TotStr, char** SepStrArr, int AmOfSepStr, char* SymbToCut, vector<string>& ResStrings)
-{
+{//OC30072018: this function does not seem to work as expected; use StringSplitNested insted
 	if(TotStr == 0) return;
 	long LenTotStr = (long)strlen(TotStr);
 	if(LenTotStr <= 0) return;
