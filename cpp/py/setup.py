@@ -4,7 +4,7 @@ import os
 radia = Extension(
     'radia',
     define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
-    include_dirs=[os.path.abspath('../src/lib')],
+    include_dirs=[os.path.abspath('../src/lib'), os.path.abspath('../src/ext/auxparse')],
     libraries=['radia', 'm', 'fftw'],
     library_dirs=[os.path.abspath('../gcc'), os.path.abspath('../../ext_lib')],
     sources=[os.path.abspath('../src/clients/python/radpy.cpp')])

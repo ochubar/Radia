@@ -252,9 +252,9 @@ int CALL RadObjMltExtTri(int* n, double xc, double lx, double* pFlatVert, double
 		//char *SepStrArr[] = {";", ","};
 		//CAuxParse::StringSplit(sOpt, SepStrArr, 2, " ", AuxStrings);
 		//OC30072018 
-		int lenStrOpt = strlen(sOpt);
+		int lenStrOpt = (int)strlen(sOpt);
 		char *sOptLoc = new char[lenStrOpt];
-		CAuxParse::StringSymbolsRemove(sOpt, " ", sOptLoc);
+		CAuxParse::StringSymbolsRemove(sOpt, (char*)" ", sOptLoc);
 		CAuxParse::StringSplitNested(sOptLoc,";,", AuxStrings);
 		delete[] sOptLoc;
 
@@ -490,8 +490,9 @@ int CALL RadObjDivMagPln(int* n, int Obj, double* pSbdPar, int nSbdPar, double* 
 	vector<string> AuxStrings;
 	if(Opt != 0)
 	{
-		char *SepStrArr[] = {";", ","};
-		CAuxParse::StringSplit(Opt, SepStrArr, 2, " ", AuxStrings);
+		//char *SepStrArr[] = {";", ","};
+		char *SepStrArr[] = {(char*)";", (char*)","}; //OC04082018 (to please GCC 4.9)
+		CAuxParse::StringSplit(Opt, SepStrArr, 2, (char*)" ", AuxStrings);
 		int AmOfTokens = (int)AuxStrings.size();
 		if(AmOfTokens > 0) Opt1 = (AuxStrings[0]).c_str();
 		if(AmOfTokens > 1) Opt2 = (AuxStrings[1]).c_str();
@@ -524,8 +525,9 @@ int CALL RadObjDivMagCyl(int* n, int Obj, double* pSbdPar, int nSbdPar, double* 
 	vector<string> AuxStrings;
 	if(Opt != 0)
 	{
-		char *SepStrArr[] = {";", ","};
-		CAuxParse::StringSplit(Opt, SepStrArr, 2, " ", AuxStrings);
+		//char *SepStrArr[] = {";", ","};
+		char *SepStrArr[] = {(char*)";", (char*)","};  //OC04082018 (to please GCC 4.9)
+		CAuxParse::StringSplit(Opt, SepStrArr, 2, (char*)" ", AuxStrings);
 		int AmOfTokens = (int)AuxStrings.size();
 		if(AmOfTokens > 0) Opt1 = (AuxStrings[0]).c_str();
 		if(AmOfTokens > 1) Opt2 = (AuxStrings[1]).c_str();
@@ -1138,8 +1140,9 @@ int CALL RadFldCmpPrc(int* n, char* Opt)
 	vector<string> AuxStrings;
 	if(Opt != 0)
 	{
-		char *SepStrArr[] = {";", ","};
-		CAuxParse::StringSplit(Opt, SepStrArr, 2, " ", AuxStrings);
+		//char *SepStrArr[] = {";", ","};
+		char *SepStrArr[] = {(char*)";", (char*)","}; //OC04082018 (to please GCC 4.9)
+		CAuxParse::StringSplit(Opt, SepStrArr, 2, (char*)" ", AuxStrings);
 		int AmOfTokens = (int)AuxStrings.size();
 		if(AmOfTokens > 0) Opt1 = (AuxStrings[0]).c_str();
 		if(AmOfTokens > 1) Opt2 = (AuxStrings[1]).c_str();
@@ -1223,8 +1226,9 @@ int CALL RadObjDrwQD3D(int Obj, char* Opt)
 	vector<string> AuxStrings;
 	if(Opt != 0)
 	{
-		char *SepStrArr[] = {";", ","};
-		CAuxParse::StringSplit(Opt, SepStrArr, 2, " ", AuxStrings);
+		//char *SepStrArr[] = {";", ","};
+		char *SepStrArr[] = {(char*)";", (char*)","}; //OC04082018 (to please GCC 4.9)
+		CAuxParse::StringSplit(Opt, SepStrArr, 2, (char*)" ", AuxStrings);
 		int AmOfTokens = (int)AuxStrings.size();
 		if(AmOfTokens > 0) Opt1 = (AuxStrings[0]).c_str();
 		if(AmOfTokens > 1) Opt2 = (AuxStrings[1]).c_str();
@@ -1244,8 +1248,8 @@ int CALL RadObjDrwOpenGL(int Obj, char* Opt)
 	vector<string> AuxStrings;
 	if(Opt != 0)
 	{
-		char *SepStrArr[] = {";", ","};
-		CAuxParse::StringSplit(Opt, SepStrArr, 2, " ", AuxStrings);
+		char *SepStrArr[] = {(char*)";", (char*)","};
+		CAuxParse::StringSplit(Opt, SepStrArr, 2, (char*)" ", AuxStrings);
 		int AmOfTokens = (int)AuxStrings.size();
 		if(AmOfTokens > 0) Opt1 = (AuxStrings[0]).c_str();
 		if(AmOfTokens > 1) Opt2 = (AuxStrings[1]).c_str();
