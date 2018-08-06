@@ -518,7 +518,7 @@ public:
 
 				else
 				{
-					pOldBuf = PyBuffer_FromReadWriteObject(obj, 0, Py_END_OF_BUFFER);
+					pOldBuf = PyBuffer_FromReadWriteObject(o, 0, Py_END_OF_BUFFER);
 					if(pOldBuf != 0)
 					{
 						if(PyObject_AsWriteBuffer(pOldBuf, &pVoidBuffer, &sizeBuf)) throw strEr_BadListArray;
