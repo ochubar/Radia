@@ -437,7 +437,8 @@ public:
 
 	static void StringSplitNested(const char* c_strTot, const char* c_strSep, vector<string>& vsSepRes) //OC30072018
 	{
-		if((c_strTot == NULL) || (c_strSep == NULL)) return;
+		//if((c_strTot == NULL) || (c_strSep == NULL)) return;
+		if((c_strTot == NULL) || (strlen(c_strTot) == 0) || (c_strSep == NULL) || (strlen(c_strSep) == 0)) return; //OC22092018
 
 		bool simpleSplitMade = false; 
 		int sizeVect = (int)vsSepRes.size();

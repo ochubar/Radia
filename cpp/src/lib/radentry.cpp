@@ -44,6 +44,8 @@ void CutElementG3DOpt( int, double,double,double, double,double,double, const ch
 void SubdivideElementG3DOpt( int, double*, char, double*, int, const char*, const char*, const char* );
 void GeometricalVolume( int );
 void GeometricalLimits( int );
+void NumberOfDegOfFreedom( int );
+
 void MagnOfObj( int );
 void ObjField( int, char* );
 void SetObjMagn( int, double,double,double );
@@ -111,6 +113,7 @@ void InterruptTime( double );
 void RadiaVersion();
 //void DumpElem( int );
 void DumpElemOpt( int*, int, const char* );
+void DumpElemParseOpt( const unsigned char*, int );
 
 void GenDump();
 
@@ -168,7 +171,10 @@ int CALL RadErrGetSize(int* siz,int er)
 
 int CALL RadErrGetText(char* t,int er)
 {
-	strcpy(t,ioBuffer.GetError(er));
+	//strcpy(t,ioBuffer.GetError(er));
+	//OC02102018 (to avoid a need to have a separate call-back function for warning in an interface):
+	if(er > 0) strcpy(t,ioBuffer.GetError(er));
+	else strcpy(t,ioBuffer.GetWarning(er));
 	return OK;
 }
 
@@ -253,16 +259,25 @@ int CALL RadObjMltExtTri(int* n, double xc, double lx, double* pFlatVert, double
 		//CAuxParse::StringSplit(sOpt, SepStrArr, 2, " ", AuxStrings);
 		//OC30072018 
 		int lenStrOpt = (int)strlen(sOpt);
-		char *sOptLoc = new char[lenStrOpt];
+		char *sOptLoc = new char[lenStrOpt + 1];
 		CAuxParse::StringSymbolsRemove(sOpt, (char*)" ", sOptLoc);
 		CAuxParse::StringSplitNested(sOptLoc,";,", AuxStrings);
 		delete[] sOptLoc;
 
 		int AmOfTokens = (int)AuxStrings.size();
-		if(AmOfTokens > 0) sOpt1 = (AuxStrings[0]).c_str();
-		if(AmOfTokens > 1) sOpt2 = (AuxStrings[1]).c_str();
-		if(AmOfTokens > 2) sOpt3 = (AuxStrings[2]).c_str();
-		if(AmOfTokens > 3) sOpt4 = (AuxStrings[3]).c_str();
+		if(AmOfTokens > 0) 
+		{
+			sOpt1 = (AuxStrings[0]).c_str();
+			if(AmOfTokens > 1) 
+			{
+				sOpt2 = (AuxStrings[1]).c_str();
+				if(AmOfTokens > 2) 
+				{
+					sOpt3 = (AuxStrings[2]).c_str();
+					if(AmOfTokens > 3) sOpt4 = (AuxStrings[3]).c_str();
+				}
+			}
+		}
 	}
 	
 	MultGenExtrTriangleDLL(xc, lx, pFlatVert, pFlatSubd, nv, a, pM, sOpt1, sOpt2, sOpt3, sOpt4);
@@ -398,6 +413,7 @@ int CALL RadObjAddToCnt(int Cnt, int* pKeys, int NumKeys)
 int CALL RadObjCntSize(int* n, int Cnt)
 {
 	OutGroupSize(Cnt);
+	//OutGroupSize(Cnt, deep);
 
 	*n = ioBuffer.OutInt();
 	return ioBuffer.OutErrorStatus();
@@ -429,8 +445,12 @@ int CALL RadObjDpl(int* n, int Obj, char* Opt1)
 
 //-------------------------------------------------------------------------
 
-int CALL RadObjM(double* pM, int Obj)
+int CALL RadObjM(double* pM, int* arMesh, int Obj) //OC21092018
+//int CALL RadObjM(int* arMesh, int Obj) //OC15092018
+//int CALL RadObjM(double* pM, int Obj)
 {
+	arMesh[0] = 0; //OC15092018
+
 	MagnOfObj(Obj);
 
 	int ErrStat = ioBuffer.OutErrorStatus();
@@ -438,13 +458,23 @@ int CALL RadObjM(double* pM, int Obj)
 
 	int Dims[20];
 	int NumDims;
-	ioBuffer.OutMultiDimArrayOfDouble(pM, Dims, NumDims);
+	//ioBuffer.OutMultiDimArrayOfDouble(0, Dims, NumDims); //OC15092018
+	ioBuffer.OutMultiDimArrayOfDouble(pM, Dims, NumDims); //OC27092018
+
+	if(arMesh != 0)
+	{
+		arMesh[0] = NumDims; //OC15092018
+		for(int i=0; i<NumDims; i++) arMesh[i+1] = Dims[i];
+	}
+
 	return ErrStat;
 }
 
 //-------------------------------------------------------------------------
 
-int CALL RadObjCenFld(double* pM, int Obj, char type)
+int CALL RadObjCenFld(double* pM, int* arMesh, int Obj, char type) //OC27092018
+//int CALL RadObjCenFld(int* arMesh, int Obj, char type) //OC22092018
+//int CALL RadObjCenFld(double* pM, int Obj, char type)
 {
 	ObjField(Obj, &type);
 
@@ -453,7 +483,15 @@ int CALL RadObjCenFld(double* pM, int Obj, char type)
 
 	int Dims[20];
 	int NumDims;
-	ioBuffer.OutMultiDimArrayOfDouble(pM, Dims, NumDims);
+	//ioBuffer.OutMultiDimArrayOfDouble(0, Dims, NumDims); //OC22092018
+	ioBuffer.OutMultiDimArrayOfDouble(pM, Dims, NumDims); //OC27092018
+
+	if(arMesh != 0)
+	{
+		arMesh[0] = NumDims; //OC22092018
+		for(int i=0; i<NumDims; i++) arMesh[i+1] = Dims[i];
+	}
+
 	return ErrStat;
 }
 
@@ -484,18 +522,35 @@ int CALL RadObjCutMag(int* pIndexes, int* pAmOfIndexes, int Obj, double* pP, dou
 
 //-------------------------------------------------------------------------
 
-int CALL RadObjDivMagPln(int* n, int Obj, double* pSbdPar, int nSbdPar, double* pFlatNormals, char* Opt)
+int CALL RadObjDivMagPln(int* n, int Obj, double* pSbdPar, int nSbdPar, double* pFlatNormals, char* sOpt) //OC22092018
+//int CALL RadObjDivMagPln(int* n, int Obj, double* pSbdPar, int nSbdPar, double* pFlatNormals, char* Opt)
 {
-	const char *Opt1=0, *Opt2=0;
+	const char *sOpt1=0, *sOpt2=0;
+	//const char *Opt1=0, *Opt2=0;
 	vector<string> AuxStrings;
-	if(Opt != 0)
+	if((sOpt != 0) && (strlen(sOpt) > 0)) //OC22092018
+	//if(Opt != 0)
 	{
-		//char *SepStrArr[] = {";", ","};
-		char *SepStrArr[] = {(char*)";", (char*)","}; //OC04082018 (to please GCC 4.9)
-		CAuxParse::StringSplit(Opt, SepStrArr, 2, (char*)" ", AuxStrings);
+		//char *SepStrArr[] = {(char*)";", (char*)","}; //OC04082018 (to please GCC 4.9)
+		//CAuxParse::StringSplit(Opt, SepStrArr, 2, (char*)" ", AuxStrings);
+		//int AmOfTokens = (int)AuxStrings.size();
+		//if(AmOfTokens > 0) Opt1 = (AuxStrings[0]).c_str();
+		//if(AmOfTokens > 1) Opt2 = (AuxStrings[1]).c_str();
+		//OC22092018
+		int lenStrOpt = (int)strlen(sOpt);
+		char *sOptLoc = new char[lenStrOpt + 1];
+		CAuxParse::StringSymbolsRemove(sOpt, (char*)" ", sOptLoc);
+		CAuxParse::StringSplitNested(sOptLoc,";,", AuxStrings);
+		delete[] sOptLoc;
 		int AmOfTokens = (int)AuxStrings.size();
-		if(AmOfTokens > 0) Opt1 = (AuxStrings[0]).c_str();
-		if(AmOfTokens > 1) Opt2 = (AuxStrings[1]).c_str();
+		if(AmOfTokens > 0) 
+		{
+			sOpt1 = (AuxStrings[0]).c_str();
+			if(AmOfTokens > 1) 
+			{
+				sOpt2 = (AuxStrings[1]).c_str();
+			}
+		}
 	}
 
 	double AuxSbdPar[6];
@@ -512,7 +567,8 @@ int CALL RadObjDivMagPln(int* n, int Obj, double* pSbdPar, int nSbdPar, double* 
 	char TypeExtraSpec = 2; //pln; = 1;//cyl
 	int LenExtraSpec = 9;
 
-	SubdivideElementG3DOpt(Obj, AuxSbdPar, TypeExtraSpec, pFlatNormals, LenExtraSpec, Opt1, Opt2, "\0");
+	SubdivideElementG3DOpt(Obj, AuxSbdPar, TypeExtraSpec, pFlatNormals, LenExtraSpec, sOpt1, sOpt2, "\0");
+	//SubdivideElementG3DOpt(Obj, AuxSbdPar, TypeExtraSpec, pFlatNormals, LenExtraSpec, Opt1, Opt2, "\0");
 	*n = ioBuffer.OutInt();
 	return ioBuffer.OutErrorStatus();
 }
@@ -578,6 +634,16 @@ int CALL RadObjGeoLim(double* Lim, int Obj)
 	int NumDims;
 	ioBuffer.OutMultiDimArrayOfDouble(Lim, Dims, NumDims);
 	return ErrStat;
+}
+
+//-------------------------------------------------------------------------
+
+int CALL RadObjDegFre(int* Num, int Obj)
+{//03102018
+	NumberOfDegOfFreedom(Obj);
+
+	*Num = ioBuffer.OutInt();
+	return ioBuffer.OutErrorStatus();
 }
 
 //-------------------------------------------------------------------------
@@ -711,7 +777,22 @@ int CALL RadMatMvsH(double* pM, int* pNm, int Obj, char* id, double* pH)
 
 int CALL RadMatSatIsoFrm(int* n, double* pKsiMs1, double* pKsiMs2, double* pKsiMs3)
 {
-	NonlinearIsotropMaterial2(pKsiMs1[0],pKsiMs1[1], pKsiMs2[0],pKsiMs2[1], pKsiMs3[0],pKsiMs3[1]);
+	//NonlinearIsotropMaterial2(pKsiMs1[0],pKsiMs1[1], pKsiMs2[0],pKsiMs2[1], pKsiMs3[0],pKsiMs3[1]);
+	//OC03102018
+	double KsiMs1_0=0, KsiMs1_1=0, KsiMs2_0=0, KsiMs2_1=0, KsiMs3_0=0, KsiMs3_1=0;
+	if(pKsiMs1 != 0)
+	{
+		KsiMs1_0 = *pKsiMs1; KsiMs1_1 = *(pKsiMs1+1);
+	}
+	if(pKsiMs2 != 0)
+	{
+		KsiMs2_0 = *pKsiMs2; KsiMs2_1 = *(pKsiMs2+1);
+	}
+	if(pKsiMs3 != 0)
+	{
+		KsiMs3_0 = *pKsiMs3; KsiMs3_1 = *(pKsiMs3+1);
+	}
+	NonlinearIsotropMaterial2(KsiMs1_0,KsiMs1_1, KsiMs2_0,KsiMs2_1, KsiMs3_0,KsiMs3_1);
 
 	*n = ioBuffer.OutInt();
 	return ioBuffer.OutErrorStatus();
@@ -1169,7 +1250,8 @@ int CALL RadFldUnits(char* OutStr)
 	int ErrStat = ioBuffer.OutErrorStatus();
 	if(ErrStat > 0) return ErrStat;
 
-	strcpy(OutStr, ioBuffer.OutString());
+	strcpy(OutStr, ioBuffer.OutStringPtr()); //OC27092018
+	//strcpy(OutStr, ioBuffer.OutString());
 	ioBuffer.EraseStringBuffer();
 	return ErrStat;
 }
@@ -1183,7 +1265,8 @@ int CALL RadFldUnitsSize(int* OutSize)
 	int ErrStat = ioBuffer.OutErrorStatus();
 	if(ErrStat > 0) return ErrStat;
 
-	*OutSize = (int)strlen(ioBuffer.OutString());
+	*OutSize = (int)strlen(ioBuffer.OutStringPtr()); //27092018
+	//*OutSize = (int)strlen(ioBuffer.OutString());
 	ioBuffer.EraseStringBuffer();
 	return ErrStat;
 }
@@ -1251,9 +1334,15 @@ int CALL RadObjDrwOpenGL(int Obj, char* Opt)
 		char *SepStrArr[] = {(char*)";", (char*)","};
 		CAuxParse::StringSplit(Opt, SepStrArr, 2, (char*)" ", AuxStrings);
 		int AmOfTokens = (int)AuxStrings.size();
-		if(AmOfTokens > 0) Opt1 = (AuxStrings[0]).c_str();
-		if(AmOfTokens > 1) Opt2 = (AuxStrings[1]).c_str();
-		if(AmOfTokens > 2) Opt3 = (AuxStrings[2]).c_str();
+		if(AmOfTokens > 0) 
+		{
+			Opt1 = (AuxStrings[0]).c_str();
+			if(AmOfTokens > 1) 
+			{
+				Opt2 = (AuxStrings[1]).c_str();
+				if(AmOfTokens > 2) Opt3 = (AuxStrings[2]).c_str();
+			}
+		}
 	}
 
 	OpenGL_3D_ViewerOpt(Obj, Opt1, Opt2, Opt3);
@@ -1292,53 +1381,9 @@ int CALL RadUtiDelAll(int* n)
 
 //-------------------------------------------------------------------------
 
+int CALL RadUtiDmp(char* OutStr, int* pSize, int* arElem, int nElem, char* AscOrBin) //OC27092018
+//int CALL RadUtiDmp(char* OutStr, int* arElem, int nElem, char* AscOrBin)
 //int CALL RadUtiDmp(char* OutStr, int Elem)
-int CALL RadUtiDmp(char* OutStr, int* arElem, int nElem, char* AscOrBin)
-{
-	//DumpElem(Elem);
-	DumpElemOpt(arElem, nElem, AscOrBin); //OC230713
-	int ErrStat = ioBuffer.OutErrorStatus();
-	if(ErrStat > 0) return ErrStat;
-
-	if((strcmp(AscOrBin, "asc\0") == 0) || (strcmp(AscOrBin, "Asc\0") == 0) || (strcmp(AscOrBin, "ASC\0") == 0))
-		strcpy(OutStr, ioBuffer.OutString());
-	else
-	{
-		long sizeData = ioBuffer.OutByteStringSize();
-		const char *tData = ioBuffer.OutByteString();
-		char *tOutStr = OutStr;
-		for(long i=0; i<sizeData; i++) *(tOutStr++) = *(tData++);
-	}
-
-	ioBuffer.EraseStringBuffer(); //in any case
-	return ErrStat;
-}
-
-//-------------------------------------------------------------------------
-
-int CALL RadUtiDmpRead(char* OutStr, char* AscOrBin)
-{
-	int ErrStat = ioBuffer.OutErrorStatus();
-	if(ErrStat > 0) return ErrStat;
-
-	if((strcmp(AscOrBin, "asc\0") == 0) || (strcmp(AscOrBin, "Asc\0") == 0) || (strcmp(AscOrBin, "ASC\0") == 0))
-		strcpy(OutStr, ioBuffer.OutString());
-	else
-	{
-		long sizeData = ioBuffer.OutByteStringSize();
-		const char *tData = ioBuffer.OutByteString();
-		char *tOutStr = OutStr;
-		for(long i=0; i<sizeData; i++) *(tOutStr++) = *(tData++);
-	}
-
-	ioBuffer.EraseStringBuffer(); //in any case
-	return ErrStat;
-}
-
-//-------------------------------------------------------------------------
-
-//int CALL RadUtiDmpSize(int* OutSize, int Elem)
-int CALL RadUtiDmpSize(int* OutSize, int* arElem, int nElem, char* AscOrBin, bool doEraseBuf)
 {
 	//DumpElem(Elem);
 	DumpElemOpt(arElem, nElem, AscOrBin); //OC230713
@@ -1346,12 +1391,113 @@ int CALL RadUtiDmpSize(int* OutSize, int* arElem, int nElem, char* AscOrBin, boo
 	int ErrStat = ioBuffer.OutErrorStatus();
 	if(ErrStat > 0) return ErrStat;
 
-	if((strcmp(AscOrBin, "asc\0") == 0) || (strcmp(AscOrBin, "Asc\0") == 0) || (strcmp(AscOrBin, "ASC\0") == 0))
-		*OutSize = (int)strlen(ioBuffer.OutString());
-	else *OutSize = (int)ioBuffer.OutByteStringSize();
 
-	if(doEraseBuf) ioBuffer.EraseStringBuffer();
-	//leaving buffer not erased may be interesting if immediately after this RadUtiDmp will be called (then the DumpElemOpt(..) call won't need to be repeated)
+	if((strcmp(AscOrBin, "asc\0") == 0) || (strcmp(AscOrBin, "Asc\0") == 0) || (strcmp(AscOrBin, "ASC\0") == 0)) 
+	{
+		if(pSize != 0) *pSize = (int)strlen(ioBuffer.OutStringPtr()) + 1; //to include terminating '\0' (?)
+		//if(pSize != 0) *pSize = (int)strlen(ioBuffer.OutStringPtr()); //OC27092018
+		if(OutStr != 0) ioBuffer.OutStringClean(OutStr); 
+		//strcpy(OutStr, ioBuffer.OutString());
+	}
+	else 
+	{
+		if(pSize != 0) *pSize = (int)ioBuffer.OutByteStringSize(); //27092018
+		if(OutStr != 0) ioBuffer.OutByteStringClean(OutStr); //27092018
+	}
+	//{
+	//	long sizeData = ioBuffer.OutByteStringSize();
+	//	const char *tData = ioBuffer.OutByteStringPtr(); //27092018
+	//	//const char *tData = ioBuffer.OutByteString();
+	//	char *tOutStr = OutStr;
+	//	for(long i=0; i<sizeData; i++) *(tOutStr++) = *(tData++);
+	//}
+
+	//ioBuffer.EraseStringBuffer(); //in any case
+	return ErrStat;
+}
+
+//-------------------------------------------------------------------------
+
+//int CALL RadUtiDmpRead(char* OutStr, char* AscOrBin)
+//{
+//	int ErrStat = ioBuffer.OutErrorStatus();
+//	if(ErrStat > 0) return ErrStat;
+//
+//	if((strcmp(AscOrBin, "asc\0") == 0) || (strcmp(AscOrBin, "Asc\0") == 0) || (strcmp(AscOrBin, "ASC\0") == 0))
+//		strcpy(OutStr, ioBuffer.OutStringPtr()); //27092018
+//		//strcpy(OutStr, ioBuffer.OutString());
+//	else
+//	{
+//		long sizeData = ioBuffer.OutByteStringSize();
+//		const char *tData = ioBuffer.OutByteStringPtr(); //27092018
+//		//const char *tData = ioBuffer.OutByteString();
+//		char *tOutStr = OutStr;
+//		for(long i=0; i<sizeData; i++) *(tOutStr++) = *(tData++);
+//	}
+//
+//	ioBuffer.EraseStringBuffer(); //in any case
+//	return ErrStat;
+//}
+
+//-------------------------------------------------------------------------
+
+////int CALL RadUtiDmpSize(int* OutSize, int Elem)
+//int CALL RadUtiDmpSize(int* OutSize, int* arElem, int nElem, char* AscOrBin, bool doEraseBuf)
+//{
+//	//DumpElem(Elem);
+//	DumpElemOpt(arElem, nElem, AscOrBin); //OC230713
+//
+//	int ErrStat = ioBuffer.OutErrorStatus();
+//	if(ErrStat > 0) return ErrStat;
+//
+//	if((strcmp(AscOrBin, "asc\0") == 0) || (strcmp(AscOrBin, "Asc\0") == 0) || (strcmp(AscOrBin, "ASC\0") == 0))
+//		*OutSize = (int)strlen(ioBuffer.OutStringPtr()); //OC27092018
+//		//*OutSize = (int)strlen(ioBuffer.OutString());
+//	else *OutSize = (int)ioBuffer.OutByteStringSize();
+//
+//	if(doEraseBuf) ioBuffer.EraseStringBuffer();
+//	//leaving buffer not erased may be interesting if immediately after this RadUtiDmp will be called (then the DumpElemOpt(..) call won't need to be repeated)
+//	return ErrStat;
+//}
+
+//-------------------------------------------------------------------------
+
+int CALL RadUtiDmpPrs(int* arElem, int* pnElem, unsigned char* sBytes, int nBytes)
+{//OC01102018
+	DumpElemParseOpt(sBytes, nBytes);
+
+	int ErrStat = ioBuffer.OutErrorStatus();
+	if(ErrStat > 0) return ErrStat;
+
+	bool resIsList = (bool)sBytes[0];
+	if(pnElem != 0)
+	{
+		*pnElem = 0;
+		if(resIsList) 
+		{
+			int arDims[20], nDims=0;
+			if(arElem == 0) ioBuffer.OutMultiDimArrayOfIntDims(arDims, nDims);
+			else ioBuffer.OutMultiDimArrayOfInt(arElem, arDims, nDims);
+			*pnElem = arDims[0]; //output can only be 1D array in this case
+		}
+		else 
+		{
+			*pnElem = 1;
+			if(arElem != 0)
+			{
+				*arElem = ioBuffer.OutInt();
+			}
+		}
+	}
+	else if(arElem != 0)
+	{
+		if(resIsList) 
+		{
+			int arDims[20], nDims=0;
+			ioBuffer.OutMultiDimArrayOfInt(arElem, arDims, nDims);
+		}
+		else *arElem = ioBuffer.OutInt();
+	}
 	return ErrStat;
 }
 
@@ -1463,6 +1609,18 @@ int CALL RadObjFullMag(int* n, double* pP, double* pL, double* pM, double* SbdPa
 	}
 
 	return OutRes;
+}
+
+//-------------------------------------------------------------------------
+
+int CALL RadUtiDataGet(char* pcData, const char typeData[3], long key) //OC04102018
+//int CALL RadUtiDataGet(char* pcData, char typeData[3], long key) //OC27092018
+//int CALL RadUtiDataGet(double* pData, long key) //OC15092018
+{
+	ioBuffer.OutDataClean(pcData, typeData, key);
+
+	int ErrStat = ioBuffer.OutErrorStatus();
+	return ErrStat;
 }
 
 //-------------------------------------------------------------------------

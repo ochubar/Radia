@@ -4,8 +4,10 @@
 # v 0.01
 #############################################################################
 
-from __future__ import print_function #Python 2.7 compatibility
+from __future__ import absolute_import, division, print_function #Py 2.*/3.* compatibility
 import radia as rad
+import sys
+import time
 
 print('RADIA Python Test Script 01')
 print('')
@@ -38,9 +40,81 @@ mag11 = rad.ObjFlmCur([[-10,-30,-10],[30,-30,-10],[30,25,25],[-30,25,25],[-30,-3
 
 mag = rad.ObjCnt([mag00, mag01, mag02, mag03, mag04, mag05, mag06, mag07, mag08, mag09])
 rad.ObjAddToCnt(mag, [mag10, mag11])
+cnt02 = rad.ObjCnt([mag00, mag])
 
-rad.ObjDrwOpenGL(mag)
+mat = rad.MatStd('NdFeB', 1.2)
+rad.MatApl(mag01, mat)
+print('Magn. Material index:', mat, ' appled to object:', mag01)
 
-B = rad.Fld(mag, "b", [1,1,1])
+magDpl = rad.ObjDpl(mag, 'FreeSym->False')
 
-print(B)
+print('Number of objects in the container:', rad.ObjCntSize(mag))
+print('Number of objects in 2nd container:', rad.ObjCntSize(cnt02))
+print('Number of objects in fake container:', rad.ObjCntSize(mag04))
+
+print('Indices of elements in the container:', rad.ObjCntStuf(mag))
+print('Indices of elements in the duplicated container:', rad.ObjCntStuf(magDpl))
+
+#rad.ObjDrwOpenGL(mag)
+#rad.ObjDrwOpenGL(magDpl)
+
+mag01sbd = rad.ObjDivMag(mag01, [[2,0.5],[3,0.2],[4,0.1]], 'pln', [[1,0.4,0.1],[0.4,1,0.2],[0,0,1]], 'Frame->Lab')
+#mag01sbd = rad.ObjDivMagPln(mag01, [[2,0.5],[3,0.2],[4,0.1]], [1,0.4,0.1], [0.4,1,0.2], [0,0,1], 'Frame->Lab')
+
+#mag00sbd = rad.ObjDivMag(mag00, [[2,0.5],[3,0.2],[4,0.1]], 'cyl', [[2.5,4,0],[0,0,1],[8,0,0],3], 'Frame->Lab')
+#mag00sbd = rad.ObjDivMagCyl(mag00, [[2,0.5],[3,0.2],[4,0.1]], [2.5,4,0], [0,0,1], [8,0,0], 3, 'Frame->Lab')
+
+print('Volume of 3D object:', rad.ObjGeoVol(mag01sbd))
+print('Geom. Limits of 3D object:', rad.ObjGeoLim(mag01sbd))
+
+#rad.ObjDrwOpenGL(mag01)
+
+trf01 = rad.TrfPlSym([0,10,0], [0,1,0])
+trf02 = rad.TrfRot([0,10,0], [0,0,1], 1.)
+trf03 = rad.TrfTrsl([30,10,0])
+trf04 = rad.TrfInv()
+trf05 = rad.TrfCmbL(trf01, trf04)
+trf06 = rad.TrfCmbR(trf01, trf04)
+
+#rad.TrfMlt(mag01, trf03, 3)
+rad.TrfOrnt(mag01, trf06)
+
+#rad.ObjDrwOpenGL(mag01)
+
+dmp = rad.UtiDmp([mag01, trf02], 'bin')
+#print(dmp)
+
+elemsRest = rad.UtiDmpPrs(dmp)
+print('Indexes of restored elements:', elemsRest)
+rad.ObjDrwOpenGL(elemsRest[0])
+
+print(rad.UtiDmp(elemsRest[0], 'asc'))
+print(rad.UtiDmp(elemsRest[1], 'asc'))
+
+#rad.UtiDel(elemsRest[0])
+#print(rad.UtiDmp(elemsRest[0], 'asc'))
+
+print(rad.UtiDmp(trf03, 'asc'))
+rad.UtiDelAll()
+print(rad.UtiDmp(trf03, 'asc'))
+
+
+#cutMag = rad.ObjCutMag(mag, [0,0,50], [0,0,1], "Frame->Lab")
+#print('Obj. indexes after magnet cut:', cutMag)
+
+#rad.ObjDrwOpenGL(cutMag[0])
+
+#time.sleep(0.1)
+#rad.ObjDrwOpenGL(cutMag[1])
+
+#rad.ObjSetM(mag00, [1,2,3])
+#M = rad.ObjM(mag00)
+#print(M)
+
+#H = rad.ObjCenFld(mag, 'A')
+#print(H)
+
+#B = rad.Fld(mag, "bha", [[0,0,0],[1,1,1]])
+#print(B)
+
+#print(rad.Fld(magDpl, "b", [1,1,1]))

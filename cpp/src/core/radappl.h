@@ -140,6 +140,7 @@ public:
 	int SetGroup(int* ArrayOfKeys, long lenArrayOfKeys);
 	int AddToGroup(int GroupKey, int* ArrayOfKeys, long lenArrayOfKeys);
 	int OutGroupSize(int ElemKey);
+	//int OutGroupSize(int ElemKey, char deep=0);
 	int OutGroupSubObjectKeys(int ElemKey);
 
 	int SetRaceTrack(double* CPoi, long lenCPoi, double* Radii, long lenRadii, double* StrPartDims, long lenStrPartDims, double InHeight, double InJ_azim, int NumberOfSegm, char* ManOrAuto, char* Orient);

@@ -14,6 +14,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RadiaLib", "RadiaLib.vcxproj", "{C66E3422-C0DD-475D-B16B-0D596F188465}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RadiaPython", "RadiaPython.vcxproj", "{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C66E3422-C0DD-475D-B16B-0D596F188465} = {C66E3422-C0DD-475D-B16B-0D596F188465}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,8 +77,8 @@ Global
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|Mixed Platforms.Build.0 = Debug_Py3_6|Win32
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|Win32.ActiveCfg = Debug_Py3_6|Win32
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|Win32.Build.0 = Debug_Py3_6|Win32
-		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|x64.ActiveCfg = Debug_Py3_6|x64
-		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|x64.Build.0 = Debug_Py3_6|x64
+		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|x64.ActiveCfg = Debug_Py2_7|x64
+		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|x64.Build.0 = Debug_Py2_7|x64
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Release|Mixed Platforms.ActiveCfg = Release_Py3_6|Win32
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Release|Mixed Platforms.Build.0 = Release_Py3_6|Win32
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Release|Win32.ActiveCfg = Release_Py3_6|Win32

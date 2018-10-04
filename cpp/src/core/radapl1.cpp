@@ -1809,6 +1809,7 @@ int radTApplication::AddToGroup(int GroupKey, int* ArrayOfKeys, long lenArrayOfK
 //-------------------------------------------------------------------------
 
 int radTApplication::OutGroupSize(int ElemKey)
+//int radTApplication::OutGroupSize(int ElemKey, char deep)
 {
 	try
 	{

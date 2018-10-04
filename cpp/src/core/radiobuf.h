@@ -25,7 +25,9 @@
 
 //-------------------------------------------------------------------------
 
-class radTIOBuffer /*: public ErrorWarning*/ {
+class radTIOBuffer /*: public ErrorWarning*/ { 
+//OC15092018 note: this thing may not be thread-safe. Perhaps storing data in some maps / hashtables would help?
+//E.g. main object index (+ extral information) could be used as Key for stored data
 
 	vector<int> ErrNoBuffer;
 	vector<int> WarNoBuffer;
@@ -143,7 +145,8 @@ public:
 	void StoreByteString(const char* cByteString, long len)
 	{
 		string byteStr;
-		byteStr.append(cByteString, 0, len); //to test: make sure that it doesn't at \0 (as for C string)!
+		//byteStr.append(cByteString, 0, len); //to test: make sure that it doesn't at \0 (as for C string)!
+		byteStr.insert(0, cByteString, len); //to test: make sure that it doesn't at \0 (as for C string)!
 		StringBuffer.push_back(byteStr);
 	}
 
@@ -189,6 +192,22 @@ public:
 			EraseIntBufferMulti();
 		}
 	}
+	void OutMultiDimArrayOfIntDims(int* Dims, int& NumDims) //OC01102018
+	{
+		if(DimsIntBufferMulti != 0)
+		{
+			long TotLen = 1;
+			for(int i=0; i<NumDimsIntBufferMulti; i++)
+			{
+				int aDim = DimsIntBufferMulti[i];
+				TotLen *= aDim;
+				Dims[i] = aDim;
+			}
+			NumDims = NumDimsIntBufferMulti;
+		}
+		//No Erase here!
+	}
+
 	double OutDouble()
 	{
 		if(DoubleBuffer.empty()) return 0;
@@ -208,19 +227,25 @@ public:
 				Dims[i] = aDim;
 			}
 			NumDims = NumDimsDoubleBufferMulti;
-			double *tDoubleBufferMulti = DoubleBufferMulti;
-			double *tArray = Array;
-			for(int k=0; k<TotLen; k++) *(tArray++) = *(tDoubleBufferMulti++);
 
-			EraseDoubleBufferMulti();
+			if(Array != 0) //OC15092018 (added to allow only reading of mesh data)
+			{
+				double *tDoubleBufferMulti = DoubleBufferMulti;
+				double *tArray = Array;
+				for(int k=0; k<TotLen; k++) *(tArray++) = *(tDoubleBufferMulti++);
+
+				EraseDoubleBufferMulti();
+			}
 		}
 	}
-	const char* OutString()
+	const char* OutStringPtr() //OC27092018
+	//const char* OutString()
 	{
 		if(StringBuffer.empty()) return "\0";
 		return (StringBuffer.end() - 1)->c_str();
 	}
-	const char* OutByteString()
+	const char* OutByteStringPtr() //OC27092018
+	//const char* OutByteString()
 	{
 		if(StringBuffer.empty()) return "\0";
 		return (StringBuffer.end() - 1)->data();
@@ -229,17 +254,69 @@ public:
 	{
 		if(StringBuffer.empty()) return 0;
 		return (long)((StringBuffer.end() - 1)->size());
-
 	}
 
 	void EraseStringBuffer()
 	{
 		if(!StringBuffer.empty()) StringBuffer.erase(StringBuffer.begin(), StringBuffer.end());
 	}
+
 	void OutStringClean(char* OutStrCont)
 	{
-        strcpy(OutStrCont, OutString());
+        strcpy(OutStrCont, OutStringPtr()); //OC27092018
+        //strcpy(OutStrCont, OutString());
         EraseStringBuffer();
+	}
+	void OutByteStringClean(char* OutStr) //OC27092018
+	{
+		long sizeData = OutByteStringSize();
+		const char *tData = OutByteStringPtr();
+		char *tOutStr = OutStr;
+		for(long i=0; i<sizeData; i++) *(tOutStr++) = *(tData++);
+		EraseStringBuffer();
+	}
+
+	void OutDataClean(char* pcData, const char typeData[3], long key=0) //OC04102018
+	//void OutDataClean(char* pcData, char typeData[3], long key=0) //OC27092018
+	{//To implement key to ensure thread safety!
+
+		if((strcmp(typeData, "mad") == 0) || (strcmp(typeData, "MAD") == 0))
+		{//Multi-dim. array of double
+			int Dims[20];
+			int NumDims;
+			OutMultiDimArrayOfDouble((double*)pcData, Dims, NumDims);
+		}
+		else if((strcmp(typeData, "mai") == 0) || (strcmp(typeData, "MAI") == 0))
+		{//Multi-dim. array of double
+			int Dims[20];
+			int NumDims;
+			OutMultiDimArrayOfInt((int*)pcData, Dims, NumDims);
+		}
+		else if((strcmp(typeData, "asc") == 0) || (strcmp(typeData, "ASC") == 0))
+		{//Character string
+			OutStringClean(pcData); 
+		}
+		else if((strcmp(typeData, "bin") == 0) || (strcmp(typeData, "BIN") == 0))
+		{//Byte string
+			OutByteStringClean(pcData); 
+		}
+		else if((strcmp(typeData, "d") == 0) || (strcmp(typeData, "D") == 0))
+		{
+			double res = OutDouble();
+			char *tRes = (char*)(&res);
+			int nChar = sizeof(res);
+			char *tcData = pcData;
+			for(int i=0; i<nChar; i++) *(tcData++) = *(tRes++);
+		}
+		else if((strcmp(typeData, "i") == 0) || (strcmp(typeData, "I") == 0))
+		{
+			int res = OutInt();
+			char *tRes = (char*)(&res);
+			int nChar = sizeof(res);
+			char *tcData = pcData;
+			for(int i=0; i<nChar; i++) *(tcData++) = *(tRes++);
+		}
+		//(to continue)
 	}
 
 	const char* DecodeErrorText(const char* ErrorTitle)

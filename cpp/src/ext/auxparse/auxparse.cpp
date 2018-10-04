@@ -134,11 +134,15 @@ void CAuxParse::StringSplit(char* TotStr, char** SepStrArr, int AmOfSepStr, char
 //-------------------------------------------------------------------------
 void CAuxParse::StringSymbolsRemove(const char* OrigStr, char* SymbToCut, char* FinStr)
 {
+	if(FinStr == 0) return;
+
 	if(OrigStr == 0) return;
 	long LenOrigStr = (long)strlen(OrigStr);
-	if(LenOrigStr == 0) return;
-
-	if(FinStr == 0) return;
+	if(LenOrigStr == 0) 
+	{//OC22092018
+		*FinStr = '\0';
+		return;
+	}
 
 	if(SymbToCut == 0) { strcpy(FinStr, OrigStr); return;}
 	long LenSymbToCut = (long)strlen(SymbToCut);

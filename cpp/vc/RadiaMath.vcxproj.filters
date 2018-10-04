@@ -55,9 +55,6 @@
     <ClCompile Include="..\src\clients\mathlink\radia_tm_win.c">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\core\radinter.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\core\radintrc.cpp">
       <Filter>core</Filter>
     </ClCompile>
@@ -104,6 +101,9 @@
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ext\triangle\triangle.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\core\radinter.cpp">
       <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>

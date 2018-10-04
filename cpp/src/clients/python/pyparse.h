@@ -34,7 +34,7 @@ static const char strEr_BadArray[] = "Incorrect or no Python Array structure";
 static const char strEr_BadList[] = "Incorrect or no Python List structure";
 static const char strEr_BadListArray[] = "Incorrect or no Python List or Array structure";
 static const char strEr_BadNum[] = "Incorrect or no Python number";
-static const char strEr_BadStr[] = "Error at parsing / converting Python string";
+static const char strEr_BadStr[] = "Error at parsing / converting Python string or byte array";
 static const char strEr_BadClassName[] = "Error at retrieving Python class name";
 static const char strEr_FailedCreateList[] = "Failed to create resulting data list";
 
@@ -585,6 +585,29 @@ public:
 	}
 
 	/************************************************************************//**
+	 * Copies elements of Py byte array a C string (assumed to be allocated outside)
+	 ***************************************************************************/
+//	static void CopyPyByteArrToC(PyObject* pObj, char*& arBytes, int& nBytes)
+//	{
+//		if(pObj == 0) throw strEr_BadStr;
+//
+//		Py_ssize_t len = 0;
+//
+//#if PY_MAJOR_VERSION < 3
+//		//if(PyString_AsStringAndSize(pObj, &arBytes, &len) == -1) throw strEr_BadStr;
+//		if(PyBytes_AsStringAndSize(pObj, &arBytes, &len) == -1) throw strEr_BadStr;
+//#else
+//		//nBytes = (int)PyBytes_Size(pObj);
+//		//if(nBytes <= 0) throw strEr_BadStr;
+//		////arBytes = new char[nBytes];
+//		//arBytes = PyBytes_AsString(pObj);
+//
+//		if(PyBytes_AsStringAndSize(pObj, &arBytes, &len) == -1) throw strEr_BadStr;
+//#endif
+//		nBytes = (int)len;
+//	}
+
+	/************************************************************************//**
 	 * Copies char from C to Py
 	 ***************************************************************************/
 	static PyObject* Py_BuildValueChar(char inC)
@@ -593,6 +616,19 @@ public:
 		return Py_BuildValue("C", inC); //doesn't work with Py2.7
 #else
 		return Py_BuildValue("c", inC);
+#endif
+	}
+
+	/************************************************************************//**
+	 * Copies char from C to Py
+	 ***************************************************************************/
+	static PyObject* Py_BuildValueByteStr(char* inStr, int len)
+	{
+#if PY_MAJOR_VERSION >= 3
+		return Py_BuildValue("y#", inStr, len);
+#else
+		//return Py_BuildValue("c#", inStr, len);
+		return Py_BuildValue("s#", inStr, len); //OC04102018
 #endif
 	}
 
@@ -654,10 +690,11 @@ public:
 	/************************************************************************//**
 	* Sets up output list (eventually of lists) data from an array
 	***************************************************************************/
-	static PyObject* SetDataListOfLists(double* arB, int nB, int nP)
+	template<class T> static PyObject* SetDataListOfLists(T* arB, int nB, int nP, const char* cType="d") //OC13092018
+	//static PyObject* SetDataListOfLists(double* arB, int nB, int nP)
 	{
 		if((arB == 0) || (nB <= 0) || (nP <= 0)) return 0;
-
+		
 		int nElem = 0, nSubElem = 0;
 		if(nP == 1)
 		{
@@ -670,7 +707,8 @@ public:
 		}
 
 		PyObject *oResB = PyList_New(nElem);
-		double *t_arB = arB;
+		T *t_arB = arB; //OC13092018
+		//double *t_arB = arB;
 		for(int i=0; i<nElem; i++)
 		{
 			PyObject *oElem = 0;
@@ -679,17 +717,71 @@ public:
 				oElem = PyList_New(nSubElem);
 				for(int j=0; j<nSubElem; j++)
 				{
-					PyObject *oNum = Py_BuildValue("d", *(t_arB++));
+					PyObject *oNum = Py_BuildValue(cType, *(t_arB++)); //OC13092018
+					//PyObject *oNum = Py_BuildValue("d", *(t_arB++));
 					if(PyList_SetItem(oElem, (Py_ssize_t)j, oNum)) throw strEr_FailedCreateList;
 				}
 			}
 			else
 			{
-				oElem = Py_BuildValue("d", *(t_arB++));
+				oElem = Py_BuildValue(cType, *(t_arB++)); //OC13092018
+				//oElem = Py_BuildValue("d", *(t_arB++));
 			}
 			if(PyList_SetItem(oResB, (Py_ssize_t)i, oElem)) throw strEr_FailedCreateList;
 		}
 		return oResB;
+	}
+
+	/************************************************************************//**
+	* Sets up output list (eventually of lists) data from an array
+	***************************************************************************/
+	template<class T> static PyObject* SetDataListsNested(T*& ar, int* arDims, char* cType="d") //OC16092018
+	//static PyObject* SetDataListOfLists(double* arB, int nB, int nP)
+	{//More testing may be required!
+		//arDims[0] has to define number of dimensions
+		//arDims[1] is number of points in the in-most dimenstion
+		//...
+		//arDims[arDims[0] - 1] is number of points in the out-most dimenstion
+
+		if((ar == 0) || (arDims == 0)) return 0;
+		int nDims = arDims[0];
+		
+		int indNumElem = 1;
+		for(int ii=nDims; ii>0; ii--)
+		{
+			if(arDims[ii] > 1)
+			{
+				indNumElem = ii; break;
+			}
+		}
+
+		//int nElem = arDims[nDims_mi_1];
+		int nElem = arDims[indNumElem];
+		PyObject *oRes = PyList_New(nElem);
+
+		//PyObject *oRes = 0; 
+		//if(nElem > 1) oRes = PyList_New(nElem);
+		//else return 0;
+		//arDims[0] = nDims_mi_1;
+
+		arDims[0] = indNumElem - 1;
+		PyObject *oElem = 0;
+
+		for(int i=0; i<nElem; i++)
+		{
+			if(indNumElem > 1) oElem = SetDataListsNested(ar, arDims, cType);
+			else oElem = Py_BuildValue(cType, *(ar++));
+
+			//if((oElem == 0) && (nDims == 1) && (arDims[nDims] == 1)) oElem = Py_BuildValue(cType, *(ar++));
+			//if((oElem == 0) && (nDims_mi_2 >= 0) && (arDims[nDims_mi_2] == 1)) oElem = Py_BuildValue(cType, *(ar++));
+
+			if(oElem != 0)
+			{
+				if(PyList_SetItem(oRes, (Py_ssize_t)i, oElem)) throw strEr_FailedCreateList;
+			}
+		}
+		arDims[0] = nDims;
+		return oRes;
 	}
 };
 

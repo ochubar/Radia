@@ -196,6 +196,7 @@ void RadiaVersion();
 void DumpElem();
 void DumpElemOpt( int*, int, const char* );
 void DumpElemParse();
+void DumpElemParseOpt( const unsigned char*, int );
 void GenDump();
 void DeleteAllElements2();
 
@@ -2178,8 +2179,10 @@ void AddToGroup(int GroupKey, int* ArrayOfKeys, long lenArrayOfKeys)
 //-------------------------------------------------------------------------
 
 void OutGroupSize(int ElemKey)
+//void OutGroupSize(int ElemKey, char deep=0)
 {
 	rad.OutGroupSize(ElemKey);
+	//rad.OutGroupSize(ElemKey, deep);
 }
 
 //-------------------------------------------------------------------------
@@ -3961,6 +3964,13 @@ void DumpElemParse()
 	
 	if((bstr != 0) && (bstrLen > 0)) MLReleaseByteString(stdlink, bstr, bstrLen);
 #endif
+}
+
+//-------------------------------------------------------------------------
+
+void DumpElemParseOpt(const unsigned char* sBytes, int nBytes)
+{
+	rad.DumpElemParse(sBytes, nBytes); //?
 }
 
 //-------------------------------------------------------------------------

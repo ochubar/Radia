@@ -102,7 +102,6 @@ static PyObject* radia_ObjRecMag(PyObject *self, PyObject *args)
 {//The parallelepiped block is defined through its center point P[3], dimensions L[3], and magnetization M[3].
 
 	PyObject *oP=0, *oL=0, *oM=0, *oResInd=0;
-
 	try
 	{
 		if(!PyArg_ParseTuple(args, "OO|O:ObjRecMag", &oP, &oL, &oM)) throw CombErStr(strEr_BadFuncArg, ": ObjRecMag");
@@ -376,7 +375,6 @@ static PyObject* radia_ObjMltExtRtg(PyObject *self, PyObject *args)
 {
 	PyObject *oSlices=0, *oM=0, *oResInd=0;
 	double *arDims=0, *arCrd=0;
-
 	try
 	{
 		if(!PyArg_ParseTuple(args, "O|O:ObjMltExtRtg", &oSlices, &oM)) throw CombErStr(strEr_BadFuncArg, ": ObjMltExtRtg");
@@ -466,7 +464,7 @@ static PyObject* radia_ObjMltExtTri(PyObject *self, PyObject *args)
 		ParseM(arM, oM, "ObjMltExtTri");
 
 		char sOpt[1024]; *sOpt = '\0';
-		CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
 
 		int ind = 0;
 		g_pyParse.ProcRes(RadObjMltExtTri(&ind, xc, lx, arCrd, arSbd, nv, a, arM, sOpt));
@@ -489,7 +487,6 @@ static PyObject* radia_ObjMltExtTri(PyObject *self, PyObject *args)
 static PyObject* radia_ObjCylMag(PyObject *self, PyObject *args)
 {
 	PyObject *oP=0, *oOrnt=0, *oM=0, *oResInd=0;
-
 	try
 	{	
 		double r = 0, h = 0;
@@ -566,7 +563,6 @@ static PyObject* radia_ObjFullMag(PyObject *self, PyObject *args)
 static PyObject* radia_ObjRecCur(PyObject *self, PyObject *args)
 {
 	PyObject *oP=0, *oL=0, *oJ=0, *oResInd=0;
-
 	try
 	{	
 		if(!PyArg_ParseTuple(args, "OOO:ObjRecCur", &oP, &oL, &oJ)) throw CombErStr(strEr_BadFuncArg, ": ObjRecCur");
@@ -596,7 +592,6 @@ static PyObject* radia_ObjRecCur(PyObject *self, PyObject *args)
 static PyObject* radia_ObjArcCur(PyObject *self, PyObject *args)
 {
 	PyObject *oP=0, *oR=0, *oPhi=0, *oManAuto=0, *oOrnt=0, *oResInd=0;
-
 	try
 	{
 		double h = 0, j = 0;
@@ -639,7 +634,6 @@ static PyObject* radia_ObjRaceTrk(PyObject *self, PyObject *args)
 {//The coil consists of four 90-degree bents connected by four straight parts parallel to the XY plane.
 
 	PyObject *oP=0, *oR=0, *oL=0, *oManAuto=0, *oOrnt=0, *oResInd=0;
-
 	try
 	{
 		double h=0, curDens=0;
@@ -683,7 +677,6 @@ static PyObject* radia_ObjFlmCur(PyObject *self, PyObject *args)
 {
 	PyObject *oPts=0, *oResInd=0;
 	double *arCrd=0;
-
 	try
 	{
 		double I = 0;
@@ -715,7 +708,6 @@ static PyObject* radia_ObjFlmCur(PyObject *self, PyObject *args)
 static PyObject* radia_ObjScaleCur(PyObject *self, PyObject *args)
 {
 	PyObject *oResInd=0;
-
 	try
 	{
 		int ind = 0;
@@ -741,7 +733,6 @@ static PyObject* radia_ObjScaleCur(PyObject *self, PyObject *args)
 static PyObject* radia_ObjBckg(PyObject *self, PyObject *args)
 {
 	PyObject *oB=0, *oResInd=0;
-
 	try
 	{
 		if(!PyArg_ParseTuple(args, "O:ObjBckg", &oB)) throw CombErStr(strEr_BadFuncArg, ": ObjBckg");
@@ -770,7 +761,6 @@ static PyObject* radia_ObjCnt(PyObject *self, PyObject *args)
 {
 	PyObject *oInds=0, *oResInd=0;
 	int *arInds=0;
-
 	try
 	{
 		if(!PyArg_ParseTuple(args, "O:ObjCnt", &oInds)) throw CombErStr(strEr_BadFuncArg, ": ObjCnt");
@@ -801,7 +791,6 @@ static PyObject* radia_ObjAddToCnt(PyObject *self, PyObject *args)
 {
 	PyObject *oInds=0, *oResInd=0;
 	int *arInds=0;
-
 	try
 	{
 		int indCnt = 0;
@@ -826,422 +815,496 @@ static PyObject* radia_ObjAddToCnt(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
- * Calculates the number of objects in the container cnt.
+ * Calculates the number of objects in the container.
  ***************************************************************************/
-//static PyObject* radia_ObjCntSize(PyObject *self, PyObject *args)
-//{
-//	PyObject *oResInd=0;
-//
-//	try
-//	{
-//		int cnt = 0;
-//
-//		if(!PyArg_ParseTuple(args, "i:ObjCntSize" , &cnt)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjCntSize");
-//		if(cnt == 0) throw CombErStr(strEr_BadFuncArg, ": ObjCntSize");
-//
-//		int ind = 0;
-//		g_pyParse.ProcRes(RadObjCntSize(&ind, cnt));
-//
-//		oResInd = Py_BuildValue("i", ind);
-//		Py_XINCREF(oResInd); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return oResInd;
-//}
+static PyObject* radia_ObjCntSize(PyObject *self, PyObject *args)
+{
+	PyObject *oRes=0;
+	//PyObject *oOpt=0, *oRes=0;
+	try
+	{
+		int indCnt = 0;
+		if(!PyArg_ParseTuple(args, "i|O:ObjCntSize" , &indCnt)) throw CombErStr(strEr_BadFuncArg, ": ObjCntSize");
+		if(indCnt == 0) throw CombErStr(strEr_BadFuncArg, ": ObjCntSize");
+
+		//char sOpt[1024]; *sOpt = '\0';
+		//if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+		int sizeCnt = 0;
+		g_pyParse.ProcRes(RadObjCntSize(&sizeCnt, indCnt));
+		//g_pyParse.ProcRes(RadObjCntSize(&sizeCnt, indCnt, sOpt));
+
+		oRes = Py_BuildValue("i", sizeCnt);
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oRes;
+}
 
 /************************************************************************//**
- * Fills-in an array with the reference numbers of objects present in the container cnt
+ * Returns list with the reference numbers of objects present in the container.
  ***************************************************************************/
-//static PyObject* radia_ObjCntStuf(PyObject *self, PyObject *args)
-//{
-//	PyObject *oResInd=0;
-//
-//	try
-//	{
-//		int cnt = 0;
-//
-//		if(!PyArg_ParseTuple(args, "i:ObjCntStuf" ,&cnt)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjCntStuf");
-//		if(cnt == 0) throw CombErStr(strEr_BadFuncArg, ": ObjCntStuf");
-//
-//		int ind = 0;
-//		g_pyParse.ProcRes(RadObjCntStuf(&ind, cnt));
-//
-//		oResInd = Py_BuildValue("i", ind);
-//		Py_XINCREF(oResInd); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return oResInd;
-//}
+static PyObject* radia_ObjCntStuf(PyObject *self, PyObject *args)
+{
+	PyObject *oRes=0;
+	int *arInds=0;
+	try
+	{
+		int indCnt = 0;
+		if(!PyArg_ParseTuple(args, "i:ObjCntStuf" ,&indCnt)) throw CombErStr(strEr_BadFuncArg, ": ObjCntStuf");
+		if(indCnt == 0) throw CombErStr(strEr_BadFuncArg, ": ObjCntStuf");
+
+		int sizeCnt = 0;
+		g_pyParse.ProcRes(RadObjCntSize(&sizeCnt, indCnt));
+
+		if(sizeCnt <= 0)
+		{
+			oRes = PyList_New(0);
+		}
+		else
+		{
+			arInds = new int[sizeCnt];
+			g_pyParse.ProcRes(RadObjCntStuf(arInds, indCnt));
+			oRes = CPyParse::SetDataListOfLists(arInds, sizeCnt, 1, (char*)"i");
+		}
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	if(arInds != 0) delete[] arInds;
+	return oRes;
+}
 
 /************************************************************************//**
  * Duplicates the object obj
  ***************************************************************************/
-//static PyObject* radia_ObjDpl(PyObject *self, PyObject *args)
-//{
-//	PyObject *object_opt=0, *oResInd=0;
-//
-//	try
-//	{
-//		int obj = 0;
-//
-//		if(!PyArg_ParseTuple(args, "iO:ObjDpl" ,&obj ,&object_opt)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjDpl");
-//
-//		char option[256];
-//		CPyParse::CopyPyStringToC(object_opt, option, 256);
-//
-//		int ind = 0;
-//		g_pyParse.ProcRes(RadObjDpl(&ind, obj, option));
-//
-//		oResInd = Py_BuildValue("i", ind);
-//		Py_XINCREF(oResInd); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return oResInd;
-//}
+static PyObject* radia_ObjDpl(PyObject *self, PyObject *args)
+{
+	PyObject *oOpt=0, *oResInd=0;
+	try
+	{
+		int ind = 0;
+		if(!PyArg_ParseTuple(args, "i|O:ObjDpl", &ind, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": ObjDpl");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": ObjDpl");
+
+		char sOpt[1024]; *sOpt = '\0';
+		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+		int indDpl = 0;
+		g_pyParse.ProcRes(RadObjDpl(&indDpl, ind, sOpt));
+
+		oResInd = Py_BuildValue("i", indDpl);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
 
 /************************************************************************//**
  * Provides coordinates of geometrical center point and magnetization of the object obj
  ***************************************************************************/
-//static PyObject* radia_ObjM(PyObject *self, PyObject *args)
-//{
-//	PyObject *oResInd=0;
-//
-//	try
-//	{
-//		int obj = 0;
-//
-//		if(!PyArg_ParseTuple(args, "i:ObjM", &obj)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjM");
-//		if(obj == 0) throw CombErStr(strEr_BadFuncArg, ": ObjM");
-//
-//		double M = 0;
-//		//double *M_ptr = 0;
-//		g_pyParse.ProcRes(RadObjM(&M, obj));
-//
-//		oResInd = Py_BuildValue("d", M);
-//		Py_XINCREF(oResInd); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return oResInd;
-//}
+static PyObject* radia_ObjM(PyObject *self, PyObject *args)
+{
+	PyObject *oResM=0;
+	double *arPM=0;
+	try
+	{
+		int ind = 0;
+		if(!PyArg_ParseTuple(args, "i:ObjM", &ind)) throw CombErStr(strEr_BadFuncArg, ": ObjM");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": ObjM");
+
+		int arMesh[21];
+		g_pyParse.ProcRes(RadObjM(0, arMesh, ind)); //OC27092018
+		//g_pyParse.ProcRes(RadObjM(arMesh, ind));
+		
+		long nDim = *arMesh;
+		if(nDim > 0)
+		{
+			long long nTot = 1;
+			for(int i=1; i<=nDim; i++) nTot *= arMesh[i];
+			arPM = new double[nTot];
+
+			g_pyParse.ProcRes(RadUtiDataGet((char*)arPM, (char*)"mad", ind)); //OC27092018
+			//g_pyParse.ProcRes(RadUtiDataGet(arPM, ind));
+
+			double *arPMorig = arPM;
+			oResM = CPyParse::SetDataListsNested(arPM, arMesh, (char*)"d");
+			arPM = arPMorig;
+		}
+		if(oResM) Py_XINCREF(oResM);
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	if(arPM != 0) delete[] arPM;
+	return oResM;
+}
 
 /************************************************************************//**
- * Provides coordinates of geometrical center point and magnetization of the object obj.
+ * Provides coordinates of geometrical center point and magnetic field at that point.
  ***************************************************************************/
-//static PyObject* radia_ObjCenFld(PyObject *self, PyObject *args)
-//{
-//	PyObject *oResInd=0;
-//
-//	try
-//	{
-//		int obj = 0;
-//		char type;
-//
-//		if(!PyArg_ParseTuple(args, "ic:ObjCenFld" ,&obj ,&type)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjCenFld");
-//		if(obj == 0) throw CombErStr(strEr_BadFuncArg, ": ObjCenFld");
-//
-//		double B = 0;
-//		//double *B_ptr = 0;
-//
-//		g_pyParse.ProcRes(RadObjCenFld(&B, obj, type));
-//
-//		oResInd = Py_BuildValue("d", B);
-//		Py_XINCREF(oResInd); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return oResInd;
-//}
+static PyObject* radia_ObjCenFld(PyObject *self, PyObject *args)
+{
+	PyObject *oCmpnId=0, *oRes=0;
+	double *arPB=0;
+	try
+	{
+		int ind = 0;
+		if(!PyArg_ParseTuple(args, "iO:ObjCenFld", &ind, &oCmpnId)) throw CombErStr(strEr_BadFuncArg, ": ObjCenFld");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": ObjCenFld");
+
+		char sCmpnId[256];
+		CPyParse::CopyPyStringToC(oCmpnId, sCmpnId, 256);
+
+		int arMesh[21];
+		g_pyParse.ProcRes(RadObjCenFld(0, arMesh, ind, *sCmpnId)); //OC27092018
+		//g_pyParse.ProcRes(RadObjCenFld(arMesh, ind, *sCmpnId));
+
+		long nDim = *arMesh;
+		if(nDim > 0)
+		{
+			long long nTot = 1;
+			for(int i=1; i<=nDim; i++) nTot *= arMesh[i];
+			arPB = new double[nTot];
+
+			g_pyParse.ProcRes(RadUtiDataGet((char*)arPB, (char*)"mad", ind)); //OC27092018
+			//g_pyParse.ProcRes(RadUtiDataGet(arPB, ind));
+			double *arPBorig = arPB;
+			oRes = CPyParse::SetDataListsNested(arPB, arMesh, (char*)"d");
+			arPB = arPBorig;
+		}
+		if(oRes) Py_XINCREF(oRes);
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	if(arPB != 0) delete[] arPB;
+	return oRes;
+}
 
 /************************************************************************//**
- * Provides coordinates of geometrical center point and magnetization of the object obj.
+ * Sets magnetization of the object obj.
  ***************************************************************************/
-//static PyObject* radia_ObjSetM(PyObject *self, PyObject *args)
-//{
-//	PyObject *oResInd=0;
-//
-//	try
-//	{
-//		int obj = 0;
-//		if(!PyArg_ParseTuple(args, "i:ObjSetM" ,&obj )) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjSetM");
-//
-//		double M = 0;
-//		g_pyParse.ProcRes(RadObjSetM(obj, &M));
-//
-//		oResInd = Py_BuildValue("d", M);
-//		Py_XINCREF(oResInd); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return oResInd;
-//}
+static PyObject* radia_ObjSetM(PyObject *self, PyObject *args)
+{
+	PyObject *oM=0, *oResInd=0;
+	try
+	{
+		int ind = 0;
+		if(!PyArg_ParseTuple(args, "iO:ObjSetM", &ind, &oM)) throw CombErStr(strEr_BadFuncArg, ": ObjSetM");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": ObjSetM");
+
+		double arM[] = {0.,0.,0.};
+		ParseM(arM, oM, "ObjSetM");
+
+		g_pyParse.ProcRes(RadObjSetM(ind, arM));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
 
 /************************************************************************//**
- * Cuts the object obj by a plane passing through a given point normally to a given vector.
+ * Cuts the object obj by a plane passing through a given point perpendicularly to a given vector.
  ***************************************************************************/
-//static PyObject* radia_ObjCutMag(PyObject *self, PyObject *args)
-//{
-//	PyObject *objectResult_nobj=0, *objectResult_Objs=0;
-//	PyObject *object_P=0, *object_N=0, *object_opt=0;
-//
-//	try
-//	{
-//		int obj = 0;
-//
-//		if(!PyArg_ParseTuple(args, "iOOO:ObjCutMag" ,&obj ,&object_P
-//			,&object_N ,&object_opt)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjCutMag");
-//		if(obj == 0) throw CombErStr(strEr_BadFuncArg, ": ObjCutMag");
-//
-//		int n_pts = 3;
-//		double array_P[n_pts];
-//		double array_N[n_pts];
-//
-//		double *array_P_ptr = array_P;
-//		double *array_N_ptr = array_N;
-//
-//		CPyParse::CopyPyListElemsToNumArray(object_P, 'd', array_P_ptr, n_pts);
-//		CPyParse::CopyPyListElemsToNumArray(object_N, 'd', array_N_ptr, n_pts);
-//
-//		char option[256];
-//		CPyParse::CopyPyStringToC(object_opt, option, 256);
-//
-//		int n_obj = 0;
-//		int Objs = 0;
-//
-//		g_pyParse.ProcRes(RadObjCutMag(&Objs, &n_obj, obj, array_P, array_N, option));
-//
-//		objectResult_nobj = Py_BuildValue("i", n_obj);
-//		objectResult_Objs = Py_BuildValue("i", Objs);
-//
-//		Py_XINCREF(objectResult_nobj);
-//		Py_XINCREF(objectResult_Objs); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return objectResult_Objs; //, objectResult_nobj;
-//}
+static PyObject* radia_ObjCutMag(PyObject *self, PyObject *args)
+{
+	PyObject *oP=0, *oN=0, *oOpt=0, *oRes=0;
+	try
+	{
+		int ind = 0;
+		if(!PyArg_ParseTuple(args, "iOO|O:ObjCutMag", &ind, &oP, &oN, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": ObjCutMag");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": ObjCutMag");
+
+		double arP[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP, 'd', arP, 3, CombErStr(strEr_BadFuncArg, ": ObjCutMag, incorrect definition of point in the cutting plane"));
+		double arN[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oN, 'd', arN, 3, CombErStr(strEr_BadFuncArg, ": ObjCutMag, incorrect definition of cutting plane normal"));
+
+		char sOpt[1024]; *sOpt = '\0';
+		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+		int arInds[10];
+		int nObj = 0;
+		g_pyParse.ProcRes(RadObjCutMag(arInds, &nObj, ind, arP, arN, sOpt));
+
+		oRes = CPyParse::SetDataListOfLists(arInds, nObj, 1, (char*)"i");
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oRes;
+}
 
 /************************************************************************//**
  * Subdivides (segments) the object obj by 3 sets of parallel planes.
  ***************************************************************************/
-//static PyObject* radia_ObjDivMagPln(PyObject *self, PyObject *args)
-//{
-//	PyObject *object_SbdPar=0, *object_FlatNorm=0;
-//	PyObject *object_option=0, *objectResult_n=0;
-//
-//	try
-//	{
-//		int obj = 0;
-//		int nSbdPar = 0;
-//
-//		if(!PyArg_ParseTuple(args, "iOiOO:ObjDivMagPln", &obj, &object_SbdPar,
-//			&nSbdPar, &object_FlatNorm, &object_option)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjDivMagPln");
-//
-//		int n_flatnorm = 9;
-//		double array_SbdPar[nSbdPar];
-//		double array_FlatNorm[n_flatnorm];
-//
-//		double *array_SbdPar_ptr = 0;
-//		double *array_FlatNorm_ptr = 0;
-//
-//		CPyParse::CopyPyListElemsToNumArray(object_SbdPar, 'd', array_SbdPar_ptr, nSbdPar);
-//		CPyParse::CopyPyListElemsToNumArray(object_FlatNorm, 'd', array_FlatNorm_ptr, n_flatnorm);
-//		
-//		char option[256];
-//		CPyParse::CopyPyStringToC(object_option, option, 256);
-//
-//		int n = 0;
-//		g_pyParse.ProcRes(RadObjDivMagPln(&n, obj, array_SbdPar,
-//			nSbdPar, array_FlatNorm, option));
-//
-//		objectResult_n = Py_BuildValue("i", n);
-//		Py_XINCREF(objectResult_n); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return objectResult_n;
-//}
+static PyObject* radia_ObjDivMagPln(PyObject *self, PyObject *args)
+{
+	PyObject *oSbdPar=0, *oN1=0, *oN2=0, *oN3=0, *oOpt=0, *oResInd=0;
+	try
+	{
+		int ind = 0;
+		if(!PyArg_ParseTuple(args, "iO|OOOO:ObjDivMagPln", &ind, &oSbdPar, &oN1, &oN2, &oN3, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": ObjDivMagPln");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": ObjDivMagPln");
+
+		if((oN1 != 0) && (oN2 == 0) && (oN3 == 0) && (oOpt == 0))
+		{//To suport call like: rad.ObjDivMagPln(mag01, [[2,0.5],[3,0.2],[4,0.1]], 'Frame->Lab')
+			oOpt = oN1; oN1 = 0;
+		}
+
+		double arSbdPar[6];
+		double *pSbdPar = arSbdPar;
+		int nSbdPar = 6;
+		char resP = CPyParse::CopyPyNestedListElemsToNumAr(oSbdPar, 'd', pSbdPar, nSbdPar);
+		if(resP == 0) throw CombErStr(strEr_BadFuncArg, ": ObjDivMagPln, incorrect definition of cutting plane normal vectors");
+
+		double arN1N2N3[] = {1,0,0, 0,1,0, 0,0,1};
+		if(oN1 != 0)
+		{
+			CPyParse::CopyPyListElemsToNumArrayKnownLen(oN1, 'd', arN1N2N3, 3, CombErStr(strEr_BadFuncArg, ": ObjDivMagPln, incorrect definition of first cutting plane normal vector"));
+		}
+		if(oN2 != 0)
+		{
+			CPyParse::CopyPyListElemsToNumArrayKnownLen(oN2, 'd', arN1N2N3 + 3, 3, CombErStr(strEr_BadFuncArg, ": ObjDivMagPln, incorrect definition of second cutting plane normal vector"));
+		}
+		if(oN3 != 0)
+		{
+			CPyParse::CopyPyListElemsToNumArrayKnownLen(oN3, 'd', arN1N2N3 + 6, 3, CombErStr(strEr_BadFuncArg, ": ObjDivMagPln, incorrect definition of third cutting plane normal vector"));
+		}
+
+		char sOpt[1024]; *sOpt = '\0';
+		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+		int indNew = 0;
+		g_pyParse.ProcRes(RadObjDivMagPln(&indNew, ind, arSbdPar, nSbdPar, arN1N2N3, sOpt));
+
+		oResInd = Py_BuildValue("i", indNew);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
 
 /************************************************************************//**
  * Subdivides (segments) the object obj by a set of coaxial elliptic cylinders. 
  ***************************************************************************/
-//static PyObject* radia_ObjDivMagCyl(PyObject *self, PyObject *args)
-//{
-//	PyObject *objectResult_index=0;
-//	PyObject *object_SbdPar=0, *object_FlatCylPar=0, *object_option=0;
-//
-//	try
-//	{
-//		int obj = 0;
-//		int nSbdPar = 0;
-//		int rat = 0;
-//
-//		if(!PyArg_ParseTuple(args, "iOiOdO:ObjDivMagCyl", &obj, &object_SbdPar,
-//			&nSbdPar, &object_FlatCylPar, &rat, &object_option)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjDivMagCyl");
-//
-//		int n_flatcyl = 9;
-//		double array_SbdPar[nSbdPar];
-//		double array_FlatCylPar[n_flatcyl];
-//
-//		double *ptr_SbdPar = 0;
-//		double *ptr_FlatCylPar = 0;
-//
-//		CPyParse::CopyPyListElemsToNumArray(object_SbdPar, 'd', ptr_SbdPar, nSbdPar);
-//		CPyParse::CopyPyListElemsToNumArray(object_FlatCylPar, 'd', ptr_FlatCylPar, n_flatcyl);
-//
-//		char option[256];
-//		CPyParse::CopyPyStringToC(object_option, option, 256);
-//
-//		int n = 0;
-//		g_pyParse.ProcRes(RadObjDivMagCyl(&n, obj, array_SbdPar, nSbdPar,
-//			array_FlatCylPar, rat, option));
-//
-//		objectResult_index = Py_BuildValue("i", n);
-//		Py_XINCREF(objectResult_index); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return objectResult_index;
-//}
+static PyObject* radia_ObjDivMagCyl(PyObject *self, PyObject *args)
+{
+	PyObject *oSbdPar=0, *oA=0, *oV=0, *oP=0, *oOpt=0, *oResInd=0;
+	try
+	{
+		int ind = 0;
+		double rat = 0;
+		if(!PyArg_ParseTuple(args, "iOOOOd|O:ObjDivMagCyl", &ind, &oSbdPar, &oA, &oV, &oP, &rat, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": ObjDivMagCyl");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": ObjDivMagCyl");
+
+		double arSbdPar[6];
+		double *pSbdPar = arSbdPar;
+		int nSbdPar = 6;
+		char resP = CPyParse::CopyPyNestedListElemsToNumAr(oSbdPar, 'd', pSbdPar, nSbdPar);
+		if(resP == 0) throw CombErStr(strEr_BadFuncArg, ": ObjDivMagCyl");
+
+		double arAVP[] = {0,0,0, 0,0,0, 0,0,0};
+		if(oA != 0)
+		{
+			CPyParse::CopyPyListElemsToNumArrayKnownLen(oA, 'd', arAVP, 3, CombErStr(strEr_BadFuncArg, ": ObjDivMagCyl, incorrect definition of point on cylinder axis"));
+		}
+		if(oV != 0)
+		{
+			CPyParse::CopyPyListElemsToNumArrayKnownLen(oV, 'd', arAVP + 3, 3, CombErStr(strEr_BadFuncArg, ": ObjDivMagCyl, incorrect definition of vector of cylinder axis"));
+		}
+		if(oP != 0)
+		{
+			CPyParse::CopyPyListElemsToNumArrayKnownLen(oP, 'd', arAVP + 6, 3, CombErStr(strEr_BadFuncArg, ": ObjDivMagCyl, incorrect definition of point in elliptical cylinder base"));
+		}
+
+		char sOpt[1024]; *sOpt = '\0';
+		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+		int indNew = 0;
+		g_pyParse.ProcRes(RadObjDivMagCyl(&indNew, ind, arSbdPar, nSbdPar, arAVP, rat, sOpt));
+
+		oResInd = Py_BuildValue("i", indNew);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Subdivides (segments) the object obj by a set of coaxial elliptic cylinders. 
+ ***************************************************************************/
+static PyObject* radia_ObjDivMag(PyObject *self, PyObject *args)
+{
+	PyObject *oSbdPar=0, *oType=0, *oDir=0, *oOpt=0, *oResInd=0;
+	try
+	{
+		int ind = 0;
+		if(!PyArg_ParseTuple(args, "iO|OOO:ObjDivMag", &ind, &oSbdPar, &oType, &oDir, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": ObjDivMag");
+		//if(!PyArg_ParseTuple(args, "iOOO|O:ObjDivMag", &ind, &oSbdPar, &oType, &oDir, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": ObjDivMag");
+		if((ind == 0) || (oSbdPar == 0)) throw CombErStr(strEr_BadFuncArg, ": ObjDivMag");
+
+		double arSbdPar[6];
+		double *pSbdPar = arSbdPar;
+		int nSbdPar = 6;
+		char resP = CPyParse::CopyPyNestedListElemsToNumAr(oSbdPar, 'd', pSbdPar, nSbdPar);
+		if(resP == 0) throw CombErStr(strEr_BadFuncArg, ": ObjDivMag");
+
+		char sOpt[1024]; *sOpt = '\0';
+		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+		//char sType[32]; *sType = '\0';
+		char sType[] = "pln";
+		if(oType != 0) CPyParse::CopyPyStringToC(oType, sType, 32);
+
+		int indNew = 0;
+		if((strcmp(sType, "pln") == 0) || (strcmp(sType, "Pln") == 0) || (strcmp(sType, "PLN") == 0))
+		{
+			double arN1N2N3[] = {1,0,0, 0,1,0, 0,0,1};
+			if(oDir != 0)
+			{
+				double *pN1N2N3 = arN1N2N3;
+				int nCrd = 6;
+				char resDir = CPyParse::CopyPyNestedListElemsToNumAr(oDir, 'd', pN1N2N3, nCrd);
+				if((resDir == 0) || (nCrd != 6)) throw CombErStr(strEr_BadFuncArg, ": ObjDivMag, incorrect definition of cutting plane normal vectors");
+			}
+			g_pyParse.ProcRes(RadObjDivMagPln(&indNew, ind, arSbdPar, nSbdPar, arN1N2N3, sOpt));
+		}
+		else if((strcmp(sType, "cyl") == 0) || (strcmp(sType, "Cyl") == 0) || (strcmp(sType, "CYL") == 0))
+		{
+			if(oDir == 0) throw CombErStr(strEr_BadFuncArg, ": ObjDivMag, incorrect definition of parameters for subdivision by elliptical cylinders");
+
+			double arAVPr[] = {0,0,0, 0,0,0, 0,0,0, 0};
+			double *pAVPr = arAVPr;
+			int nCrdAVPr = 10;
+			char resDir = CPyParse::CopyPyNestedListElemsToNumAr(oDir, 'd', pAVPr, nCrdAVPr);
+			if((resDir == 0) || (nCrdAVPr != 10)) throw CombErStr(strEr_BadFuncArg, ": ObjDivMag, incorrect definition of parameters for subdivision by elliptical cylinders");
+
+			g_pyParse.ProcRes(RadObjDivMagCyl(&indNew, ind, arSbdPar, nSbdPar, arAVPr, arAVPr[9], sOpt));
+		}
+		else throw CombErStr(strEr_BadFuncArg, ": ObjDivMag, incorrect definition of subdivision (segmentation) type");
+
+		oResInd = Py_BuildValue("i", indNew);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
 
 /************************************************************************//**
  * Computes geometrical volume of a 3D object.
  ***************************************************************************/
-//static PyObject* radia_ObjGeoVol(PyObject *self, PyObject *args)
-//{
-//	PyObject *objectResult=0;
-//
-//	try
-//	{
-//		int obj = 0;
-//
-//		if(!PyArg_ParseTuple(args, "i:ObjGeoVol", &obj)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjGeoVol");
-//
-//
-//		double v = 0;
-//		g_pyParse.ProcRes(RadObjGeoVol(&v, obj));
-//
-//		objectResult = Py_BuildValue("d", v);
-//		Py_XINCREF(objectResult); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return objectResult;
-//}
+static PyObject* radia_ObjGeoVol(PyObject *self, PyObject *args)
+{
+	PyObject *oRes=0;
+	try
+	{
+		int ind = 0;
+		if(!PyArg_ParseTuple(args, "i:ObjGeoVol", &ind)) throw CombErStr(strEr_BadFuncArg, ": ObjGeoVol");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": ObjGeoVol");
+
+		double v = 0;
+		g_pyParse.ProcRes(RadObjGeoVol(&v, ind));
+
+		oRes = Py_BuildValue("d", v);
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oRes;
+}
 
 /************************************************************************//**
  *  Computes coordinates of object extrimities in laboratory frame.
  ***************************************************************************/
-//static PyObject* radia_ObjGeoLim(PyObject *self, PyObject *args)
-//{
-//	PyObject *objectResult_L=0;
-//
-//	try
-//	{
-//		int obj = 0;
-//
-//		if(!PyArg_ParseTuple(args, "i:ObjGeoLim", &obj)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjGeoLim");
-//
-//		double array_L[6];
-//
-//		g_pyParse.ProcRes(RadObjGeoLim(array_L, obj));
-//
-//		objectResult_L = Py_BuildValue("d", array_L);
-//		Py_XINCREF(objectResult_L); //?
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return objectResult_L;
-//}
+static PyObject* radia_ObjGeoLim(PyObject *self, PyObject *args)
+{
+	PyObject *oRes=0;
+	try
+	{
+		int ind = 0;
+		if(!PyArg_ParseTuple(args, "i:ObjGeoLim", &ind)) throw CombErStr(strEr_BadFuncArg, ": ObjGeoLim");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": ObjGeoVol");
+
+		double arLim[6];
+		g_pyParse.ProcRes(RadObjGeoLim(arLim, ind));
+
+		oRes = CPyParse::SetDataListOfLists(arLim, 6, 1, (char*)"d");
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oRes;
+}
 
 /************************************************************************//**
- * Starts an application for viewing of 3D geometry of the object obj
+ *  Computes coordinates of object extrimities in laboratory frame.
  ***************************************************************************/
-//static PyObject* radia_ObjDrwQD3D(PyObject *self, PyObject *args)
-//{
-//	PyObject *obj_option=0;
-//	PyObject *objectError=0;
-//	try
-//	{
-//		int obj = 0;
-//
-//		if(!PyArg_ParseTuple(args, "iO:ObjDrwQD3D", &obj, &obj_option)) 
-//			throw CombErStr(strEr_BadFuncArg, ": ObjDrwQD3D");
-//
-//		char option[256];
-//		CPyParse::CopyPyStringToC(obj_option, option, 256);
-//
-//		g_pyParse.ProcRes(RadObjDrwQD3D(obj, option));
-//		objectError = Py_BuildValue("i", 0);
-//
-//	}
-//	catch(const char* erText) 
-//	{
-//		PyErr_SetString(PyExc_RuntimeError, erText);
-//		objectError = Py_BuildValue("i", 1);
-//		//PyErr_PrintEx(1);
-//	}
-//
-//	return objectError;
-//}
+static PyObject* radia_ObjDegFre(PyObject *self, PyObject *args)
+{
+	PyObject *oRes=0;
+	try
+	{
+		int ind = 0;
+		if(!PyArg_ParseTuple(args, "i:ObjDegFre", &ind)) throw CombErStr(strEr_BadFuncArg, ": ObjDegFre");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": ObjDegFre");
+
+		int numDegFre = 0;
+		g_pyParse.ProcRes(RadObjDegFre(&numDegFre, ind));
+
+		oRes = Py_BuildValue("i", numDegFre);
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oRes;
+}
 
 /************************************************************************//**
  * Magnetic Field Sources: Assigns drawing attributes - RGB color (r,g,b) and line thickness thcn - to a Magnetic Field Source object
@@ -1249,7 +1312,6 @@ static PyObject* radia_ObjAddToCnt(PyObject *self, PyObject *args)
 static PyObject* radia_ObjDrwAtr(PyObject *self, PyObject *args)
 {
 	PyObject *oInd=0, *oRGB=0;
-
 	try
 	{
 		double thcn=0.001;
@@ -1263,6 +1325,7 @@ static PyObject* radia_ObjDrwAtr(PyObject *self, PyObject *args)
 		CPyParse::CopyPyListElemsToNumArrayKnownLen(oRGB, 'd', arRGB, 3, CombErStr(strEr_BadFuncArg, ": ObjDrwAtr, incorrect definition of RGB color"));
 
 		g_pyParse.ProcRes(RadObjDrwAtr(ind, arRGB, thcn));
+		Py_XINCREF(oInd); //?
 	}
 	catch(const char* erText)
 	{
@@ -1278,7 +1341,6 @@ static PyObject* radia_ObjDrwAtr(PyObject *self, PyObject *args)
 static PyObject* radia_ObjDrwOpenGL(PyObject *self, PyObject *args)
 {
 	PyObject *oInd=0, *oOpt=0;
-
 	try
 	{
 		if(!PyArg_ParseTuple(args, "O|O:ObjDrwOpenGL", &oInd, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": ObjDrwOpenGL");
@@ -1291,13 +1353,233 @@ static PyObject* radia_ObjDrwOpenGL(PyObject *self, PyObject *args)
 		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
 
 		g_pyParse.ProcRes(RadObjDrwOpenGL(ind, sOpt));
+		Py_XINCREF(oInd); //?
 	}
 	catch(const char* erText)
 	{
 		PyErr_SetString(PyExc_RuntimeError, erText);
-		//PyErr_PrintEx(1);
+		PyErr_PrintEx(1); //OC04102018 Need to clear the error in this case, to let Py script runing further if ObjDrwOpenGL is not implemented
 	}
 	return oInd;
+}
+
+/************************************************************************//**
+ * Space Transformations: Creates a symmetry with respect to plane defined by a point and a normal vector.
+ ***************************************************************************/
+static PyObject* radia_TrfPlSym(PyObject *self, PyObject *args)
+{
+	PyObject *oP=0, *oN=0, *oResInd=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "OO:TrfPlSym", &oP, &oN)) throw CombErStr(strEr_BadFuncArg, ": TrfPlSym");
+		if((oP == 0) || (oN == 0)) throw CombErStr(strEr_BadFuncArg, ": TrfPlSym");
+
+		double arP[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP, 'd', arP, 3, CombErStr(strEr_BadFuncArg, ": TrfPlSym, incorrect definition of point in the symmetry plane"));
+
+		double arN[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oN, 'd', arN, 3, CombErStr(strEr_BadFuncArg, ": TrfPlSym, incorrect definition of vector normal to the symmetry plane"));
+
+		int ind = 0;
+		g_pyParse.ProcRes(RadTrfPlSym(&ind, arP, arN));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Space Transformations: Creates a rotation about an axis.
+ ***************************************************************************/
+static PyObject* radia_TrfRot(PyObject *self, PyObject *args)
+{
+	PyObject *oP=0, *oV=0, *oResInd=0;
+	try
+	{
+		double phi = 0;
+		if(!PyArg_ParseTuple(args, "OOd:TrfRot", &oP, &oV, &phi)) throw CombErStr(strEr_BadFuncArg, ": TrfRot");
+		if((oP == 0) || (oV == 0)) throw CombErStr(strEr_BadFuncArg, ": TrfRot");
+
+		double arP[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP, 'd', arP, 3, CombErStr(strEr_BadFuncArg, ": TrfRot, incorrect definition of point on axis of rotation"));
+
+		double arV[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oV, 'd', arV, 3, CombErStr(strEr_BadFuncArg, ": TrfRot, incorrect definition of rotation axis vector"));
+
+		int ind = 0;
+		g_pyParse.ProcRes(RadTrfRot(&ind, arP, arV, phi));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Space Transformations: Creates a translation.
+ ***************************************************************************/
+static PyObject* radia_TrfTrsl(PyObject *self, PyObject *args)
+{
+	PyObject *oV=0, *oResInd=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "O:TrfTrsl", &oV)) throw CombErStr(strEr_BadFuncArg, ": TrfTrsl");
+		if(oV == 0) throw CombErStr(strEr_BadFuncArg, ": TrfTrsl");
+
+		double arV[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oV, 'd', arV, 3, CombErStr(strEr_BadFuncArg, ": TrfTrsl, incorrect definition of translation vector"));
+
+		int ind = 0;
+		g_pyParse.ProcRes(RadTrfTrsl(&ind, arV));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Space Transformations: Creates a field inversion.
+ ***************************************************************************/
+static PyObject* radia_TrfInv(PyObject *self, PyObject *args)
+{
+	PyObject *oResInd=0;
+	try
+	{
+		int ind = 0;
+		g_pyParse.ProcRes(RadTrfInv(&ind));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Space Transformations: Multiplies original space transformation by another transformation from left.
+ ***************************************************************************/
+static PyObject* radia_TrfCmbL(PyObject *self, PyObject *args)
+{
+	PyObject *oResInd=0;
+	try
+	{
+		int indTrfOrig = 0, indTrf = 0;
+		if(!PyArg_ParseTuple(args, "ii:TrfCmbL", &indTrfOrig, &indTrf)) throw CombErStr(strEr_BadFuncArg, ": TrfCmbL");
+		if((indTrfOrig == 0) || (indTrf == 0)) throw CombErStr(strEr_BadFuncArg, ": TrfCmbL");
+
+		int ind = 0;
+		g_pyParse.ProcRes(RadTrfCmbL(&ind, indTrfOrig, indTrf));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Space Transformations: Multiplies original space transformation by another transformation from right.
+ ***************************************************************************/
+static PyObject* radia_TrfCmbR(PyObject *self, PyObject *args)
+{
+	PyObject *oResInd=0;
+	try
+	{
+		int indTrfOrig = 0, indTrf = 0;
+		if(!PyArg_ParseTuple(args, "ii:TrfCmbR", &indTrfOrig, &indTrf)) throw CombErStr(strEr_BadFuncArg, ": TrfCmbR");
+		if((indTrfOrig == 0) || (indTrf == 0)) throw CombErStr(strEr_BadFuncArg, ": TrfCmbR");
+
+		int ind = 0;
+		g_pyParse.ProcRes(RadTrfCmbR(&ind, indTrfOrig, indTrf));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Space Transformations: Creates mlt-1 symmetry objects of the object obj. 
+ * Each symmetry object is derived from the previous one by applying the transformation trf to it. 
+ * Following this, the object obj becomes equivalent to mlt different objects.
+ ***************************************************************************/
+static PyObject* radia_TrfMlt(PyObject *self, PyObject *args)
+{
+	PyObject *oResInd=0;
+	try
+	{
+		int indObj = 0, indTrf = 0, mlt = 0;
+		if(!PyArg_ParseTuple(args, "iii:TrfMlt", &indObj, &indTrf, &mlt)) throw CombErStr(strEr_BadFuncArg, ": TrfMlt");
+		if((indObj == 0) || (indTrf == 0) || (mlt == 0)) throw CombErStr(strEr_BadFuncArg, ": TrfMlt");
+
+		int ind = 0;
+		g_pyParse.ProcRes(RadTrfMlt(&ind, indObj, indTrf, mlt));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Space Transformations: Orients object obj by applying a space transformation to it once. 
+ ***************************************************************************/
+static PyObject* radia_TrfOrnt(PyObject *self, PyObject *args)
+{
+	PyObject *oResInd=0;
+	try
+	{
+		int indObj = 0, indTrf = 0;
+		if(!PyArg_ParseTuple(args, "ii:TrfOrnt", &indObj, &indTrf)) throw CombErStr(strEr_BadFuncArg, ": TrfOrnt");
+		if((indObj == 0) || (indTrf == 0)) throw CombErStr(strEr_BadFuncArg, ": TrfOrnt");
+
+		int ind = 0;
+		g_pyParse.ProcRes(RadTrfOrnt(&ind, indObj, indTrf));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
 }
 
 /************************************************************************//**
@@ -1309,7 +1591,6 @@ static PyObject* radia_ObjDrwOpenGL(PyObject *self, PyObject *args)
 static PyObject* radia_TrfZerPara(PyObject *self, PyObject *args)
 {
 	PyObject *oP=0, *oN=0, *oResInd=0;
-
 	try
 	{
 		int ind=0;
@@ -1342,7 +1623,6 @@ static PyObject* radia_TrfZerPara(PyObject *self, PyObject *args)
 static PyObject* radia_TrfZerPerp(PyObject *self, PyObject *args)
 {
 	PyObject *oP=0, *oN=0, *oResInd=0;
-
 	try
 	{
 		int ind=0;
@@ -1368,12 +1648,37 @@ static PyObject* radia_TrfZerPerp(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
+ * Applies magnetic material to a 3D object.
+ ***************************************************************************/
+static PyObject* radia_MatApl(PyObject *self, PyObject *args)
+{
+	PyObject *oResInd=0;
+	try
+	{
+		int indObj = 0, indMat = 0;
+		if(!PyArg_ParseTuple(args, "ii:MatApl", &indObj, &indMat)) throw CombErStr(strEr_BadFuncArg, ": MatApl");
+		if((indObj == 0) || (indMat == 0)) throw CombErStr(strEr_BadFuncArg, ": MatApl");
+
+		int indRes = 0;
+		g_pyParse.ProcRes(RadMatApl(&indRes, indObj, indMat));
+
+		oResInd = Py_BuildValue("i", indRes);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
  * Magnetic Materials: a pre-defined magnetic material (the material is identified by its name/formula, e.g. \"NdFeB\").
  ***************************************************************************/
 static PyObject* radia_MatStd(PyObject *self, PyObject *args)
 {
 	PyObject *oMatId=0, *oResInd=0;
-
 	try
 	{
 		double absM = 0;
@@ -1398,13 +1703,53 @@ static PyObject* radia_MatStd(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
+ * Magnetic Materials: a nonlinear isotropic magnetic material with the magnetization magnitude equal M = ms1*tanh(ksi1*H/ms1) + ms2*tanh(ksi2*H/ms2) + ms3*tanh(ksi3*H/ms3), where H is the magnitude of the magnetic field strength vector (in Tesla).
+ ***************************************************************************/
+static PyObject* radia_MatSatIsoFrm(PyObject *self, PyObject *args)
+{
+	PyObject *oPair1=0, *oPair2=0, *oPair3=0, *oResInd=0;
+	double *arKsiMs1=0, *arKsiMs2=0, *arKsiMs3=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "O|OO:MatSatIsoFrm", &oPair1, &oPair2, &oPair3)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm");
+		if(oPair1 == 0) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm");
+		
+		int nElem = 0;
+		if((!CPyParse::CopyPyNestedListElemsToNumAr(oPair1, 'd', arKsiMs1, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm");
+
+		if(oPair2 != 0)
+		{
+			if((!CPyParse::CopyPyNestedListElemsToNumAr(oPair2, 'd', arKsiMs2, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm");
+		}
+		if(oPair3 != 0)
+		{
+			if((!CPyParse::CopyPyNestedListElemsToNumAr(oPair3, 'd', arKsiMs3, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm");
+		}
+
+		int indRes = 0;
+		g_pyParse.ProcRes(RadMatSatIsoFrm(&indRes, arKsiMs1, arKsiMs2, arKsiMs3));
+
+		oResInd = Py_BuildValue("i", indRes);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	if(arKsiMs1 != 0) delete[] arKsiMs1;
+	if(arKsiMs2 != 0) delete[] arKsiMs2;
+	if(arKsiMs3 != 0) delete[] arKsiMs3;
+	return oResInd;
+}
+
+/************************************************************************//**
  * Magnetic Materials: a nonlinear isotropic magnetic material with the M versus H curve defined by the list of pairs corresponding values of H and M (H1,M1,H2,M2,...)
  ***************************************************************************/
 static PyObject* radia_MatSatIsoTab(PyObject *self, PyObject *args)
 {
 	PyObject *oMatData=0, *oResInd=0;
 	double *arMatData=0;
-
 	try
 	{
 		if(!PyArg_ParseTuple(args, "O:MatSatIsoTab", &oMatData)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoTab");
@@ -1435,7 +1780,6 @@ static PyObject* radia_MatSatIsoTab(PyObject *self, PyObject *args)
 static PyObject* radia_MatMvsH(PyObject *self, PyObject *args)
 {
 	PyObject *oCmpnId=0, *oH=0, *oResM=0;
-
 	try
 	{
 		int ind=0;
@@ -1465,12 +1809,98 @@ static PyObject* radia_MatMvsH(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
- * Magnetic Field Calculation Methods: Builds an interaction matrix and performs a relaxation procedure
+ * Magnetic Field Calculation Methods: Builds interaction matrix for an object.
+ ***************************************************************************/
+static PyObject* radia_RlxPre(PyObject *self, PyObject *args)
+{
+	PyObject *oResInd=0;
+	try
+	{
+		int indObj = 0, indSrc = 0;
+		if(!PyArg_ParseTuple(args, "ii:RlxPre", &indObj, &indSrc)) throw CombErStr(strEr_BadFuncArg, ": RlxPre");
+		if(indObj == 0) throw CombErStr(strEr_BadFuncArg, ": RlxPre");
+
+		int ind = 0;
+		g_pyParse.ProcRes(RadRlxPre(&ind, indObj, indSrc));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Executes manual relaxation procedure for the interaction matrix intrc.
+ ***************************************************************************/
+static PyObject* radia_RlxMan(PyObject *self, PyObject *args)
+{
+	PyObject *oResInd=0;
+	try
+	{
+		int ind = 0, meth = 0, numIt = 0;
+		double rlxPar = 0;
+		if(!PyArg_ParseTuple(args, "iiid:RlxMan", &ind, &meth, &numIt, &rlxPar)) throw CombErStr(strEr_BadFuncArg, ": RlxMan");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": RlxMan");
+
+		double arRes[12];
+		int lenRes = 0;
+		g_pyParse.ProcRes(RadRlxMan(arRes, &lenRes, ind, meth, numIt, rlxPar));
+
+		if(lenRes == 1) oResInd = Py_BuildValue("d", *arRes);
+		else if(lenRes > 1) oResInd = CPyParse::SetDataListOfLists(arRes, lenRes, 1);
+		if(oResInd) Py_XINCREF(oResInd);
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Executes automatic relaxation procedure for the interaction matrix intrc.
+ ***************************************************************************/
+static PyObject* radia_RlxAuto(PyObject *self, PyObject *args)
+{
+	PyObject *oOpt=0, *oResInd=0;
+	try
+	{
+		int ind = 0, meth = 0, numIt = 0;
+		double prec = 0;
+		if(!PyArg_ParseTuple(args, "idii|O:RlxAuto", &ind, &prec, &numIt, &meth, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": RlxAuto");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": RlxAuto");
+
+		char sOpt[1024]; *sOpt = '\0';
+		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+		double arRes[12];
+		int lenRes = 0;
+		g_pyParse.ProcRes(RadRlxAuto(arRes, &lenRes, ind, prec, numIt, meth, sOpt));
+
+		if(lenRes == 1) oResInd = Py_BuildValue("d", *arRes);
+		else if(lenRes > 1) oResInd = CPyParse::SetDataListOfLists(arRes, lenRes, 1);
+		if(oResInd) Py_XINCREF(oResInd);
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Builds an interaction matrix and performs a relaxation procedure.
  ***************************************************************************/
 static PyObject* radia_Solve(PyObject *self, PyObject *args)
 {
 	PyObject *oRes=0;
-
 	try
 	{
 		int ind=0, numIt=1000, meth=0;
@@ -1491,7 +1921,6 @@ static PyObject* radia_Solve(PyObject *self, PyObject *args)
 		PyErr_SetString(PyExc_RuntimeError, erText);
 		//PyErr_PrintEx(1);
 	}
-	
 	return oRes;
 }
 
@@ -1502,11 +1931,11 @@ static PyObject* radia_Fld(PyObject *self, PyObject *args)
 {
 	PyObject *oCmpnId=0, *oP=0, *oResB=0;
 	double *arCoord=0, *arB=0;
-
 	try
 	{
 		int ind=0;
 		if(!PyArg_ParseTuple(args, "iOO:Fld", &ind, &oCmpnId, &oP)) throw CombErStr(strEr_BadFuncArg, ": Fld");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": Fld");
 
 		char sCmpnId[256];
 		CPyParse::CopyPyStringToC(oCmpnId, sCmpnId, 256);
@@ -1545,7 +1974,6 @@ static PyObject* radia_Fld(PyObject *self, PyObject *args)
 static PyObject* radia_FldInt(PyObject *self, PyObject *args)
 {
 	PyObject *oInfOrFin=0, *oCmpnId=0, *oP1=0, *oP2=0, *oResIB=0;
-
 	try
 	{
 		int ind=0;
@@ -1577,6 +2005,172 @@ static PyObject* radia_FldInt(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
+ * Outputs information about an object or list of objects.
+ ***************************************************************************/
+static PyObject* radia_UtiDmp(PyObject *self, PyObject *args)
+{
+	PyObject *oInds=0, *oType=0, *oRes=0;
+	int *arInds=0;
+	char *sDmp=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "OO:UtiDmp", &oInds, &oType)) throw CombErStr(strEr_BadFuncArg, ": UtiDmp");
+		if((oInds == 0) || (oType == 0)) throw CombErStr(strEr_BadFuncArg, ": UtiDmp");
+
+		char sType[256];
+		CPyParse::CopyPyStringToC(oType, sType, 256);
+
+		int nInds = 0;
+		if(PyList_Check(oInds))
+		{
+			bool lenIsSmall = false;
+			CPyParse::CopyPyListElemsToNumArray(oInds, 'i', arInds, nInds, lenIsSmall);
+			if((arInds == 0) || (nInds <= 0)) throw CombErStr(strEr_BadFuncArg, ": UtiDmp");
+		}
+		else if(PyNumber_Check(oInds))
+		{
+			int ind = PyLong_AsLong(oInds);
+			if(ind <= 0) throw CombErStr(strEr_BadFuncArg, ": UtiDmp");
+		
+			arInds = new int;
+			*arInds = ind;
+			nInds = 1;
+		}
+		else throw CombErStr(strEr_BadFuncArg, ": UtiDmp");
+
+		int nBytes = 0;
+		g_pyParse.ProcRes(RadUtiDmp(0, &nBytes, arInds, nInds, sType));
+
+		if(nBytes > 0) 
+		{
+			sDmp = new char[nBytes];
+			g_pyParse.ProcRes(RadUtiDataGet(sDmp, sType));
+
+			if((strcmp(sType, "asc") == 0) || (strcmp(sType, "ASC") == 0))
+			{
+				oRes = Py_BuildValue("s", sDmp);
+			}
+			else if((strcmp(sType, "bin") == 0) || (strcmp(sType, "BIN") == 0))
+			{
+				oRes = CPyParse::Py_BuildValueByteStr(sDmp, nBytes);
+			}
+
+			if(oRes) Py_XINCREF(oRes);
+		}
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	if(arInds != 0) delete[] arInds;
+	if(sDmp != 0) delete[] sDmp;
+	return oRes;
+}
+
+/************************************************************************//**
+ * Parses byte-string produced by UtiDmp(elem,"bin") and attempts to instantiate 
+ * elem objects(s); returns either index of one instantiated object 
+ * (if elem was an index of one object) or a list of indexes of instantiated 
+ * objects (if elem was a list of objects).
+ ***************************************************************************/
+static PyObject* radia_UtiDmpPrs(PyObject *self, PyObject *args)
+{
+	PyObject *oBytes=0, *oRes=0;
+	int *arInds=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "O:UtiDmpPrs", &oBytes)) throw CombErStr(strEr_BadFuncArg, ": UtiDmpPrs");
+		if(oBytes == 0) throw CombErStr(strEr_BadFuncArg, ": UtiDmpPrs");
+
+		char *sBytes=0;
+		Py_ssize_t nBytes=0;
+		//int nBytes=0;
+		//CPyParse::CopyPyByteArrToC(oBytes, sBytes, nBytes);
+		if(PyBytes_AsStringAndSize(oBytes, &sBytes, &nBytes) == -1) throw strEr_BadStr; //OC04102018
+		//No deallocation of sBytes is required after this!
+		if((sBytes == 0) || (nBytes <= 0)) throw CombErStr(strEr_BadFuncArg, ": UtiDmpPrs, object(s) can not be instantiated from this string/byte array");
+
+		int nElem = 0;
+		g_pyParse.ProcRes(RadUtiDmpPrs(0, &nElem, (unsigned char*)sBytes, (int)nBytes));
+		if(nElem <= 0) throw CombErStr(strEr_BadFuncArg, ": UtiDmpPrs, object(s) can not be instantiated from this string/byte array");
+
+		bool resIsList = (bool)sBytes[0];
+		if(resIsList)
+		{
+			arInds = new int[nElem];
+			g_pyParse.ProcRes(RadUtiDataGet((char*)arInds, "mai", 0));
+		
+			if(nElem == 1) oRes = Py_BuildValue("i", *arInds); //if list has only one element, returning this element (not list)
+			else oRes = CPyParse::SetDataListOfLists(arInds, nElem, 1, "i");
+			delete[] arInds;
+		}
+		else
+		{
+			int auxInd = 0; 
+			g_pyParse.ProcRes(RadUtiDataGet((char*)(&auxInd), "i", 0));
+
+			oRes = Py_BuildValue("i", auxInd);
+		}
+
+		if(oRes!= 0) Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oRes;
+}
+
+/************************************************************************//**
+ * Deletes an object.
+ ***************************************************************************/
+static PyObject* radia_UtiDel(PyObject *self, PyObject *args)
+{
+	PyObject *oRes=0;
+	try
+	{
+		int ind=0;
+		if(!PyArg_ParseTuple(args, "i:UtiDel", &ind)) throw CombErStr(strEr_BadFuncArg, ": UtiDel");
+
+		int nDummy = 0;
+		g_pyParse.ProcRes(RadUtiDel(&nDummy, ind));
+
+		oRes = Py_BuildValue("i", nDummy);
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oRes;
+}
+
+/************************************************************************//**
+ * Deletes all previously created objects.
+ ***************************************************************************/
+static PyObject* radia_UtiDelAll(PyObject *self, PyObject *args)
+{
+	PyObject *oRes=0;
+	try
+	{
+		int nDummy = 0;
+		g_pyParse.ProcRes(RadUtiDelAll(&nDummy));
+
+		oRes = Py_BuildValue("i", nDummy);
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oRes;
+}
+
+/************************************************************************//**
  * Python C API stuff: module & method definition2, etc.
  ***************************************************************************/
 
@@ -1599,35 +2193,55 @@ static PyMethodDef radia_methods[] = {
 	{"ObjScaleCur", radia_ObjScaleCur, METH_VARARGS, "ObjScaleCur() scales current (density) in a 3D object by multiplying it by a constant"},
 	{"ObjBckg", radia_ObjBckg, METH_VARARGS, "ObjBckg() creates a source of uniform background magnetic field"},
 	{"ObjCnt", radia_ObjCnt, METH_VARARGS, "ObjCnt() instantiates Container of Magnetic Field Sources"},
-	{"ObjAddToCnt", radia_ObjAddToCnt, METH_VARARGS, "ObjAddToCnt() adds objects to the container object cnt"},
-	//{"ObjCntSize", radia_ObjCntSize, METH_VARARGS, "ObjCntSize() Calculates the number of objects in the container cnt"},
-	//{"ObjCntStuf", radia_ObjCntStuf, METH_VARARGS, "ObjCntStuf() Fills-in an array with the reference numbers of objects present in the container cnt"}, 
-	//{"ObjDpl", radia_ObjDpl, METH_VARARGS, "ObjDpl() Duplicates the object obj"},
-	//{"ObjM", radia_ObjM, METH_VARARGS, "ObjM() Provides coordinates of geometrical center point and magnetization of the object obj"},
-	//{"ObjCenFld", radia_ObjCenFld, METH_VARARGS, "ObjCenFld() Provides coordinates of geometrical center point and magnetization of the object obj"},
-	//{"ObjSetM", radia_ObjSetM, METH_VARARGS, "ObjSetM() Provides coordinates of geometrical center point and magnetization of the object obj."},
+	{"ObjAddToCnt", radia_ObjAddToCnt, METH_VARARGS, "ObjAddToCnt() adds objects to the container object"},
+	{"ObjCntSize", radia_ObjCntSize, METH_VARARGS, "ObjCntSize() calculates the number of objects in the container"},
+	{"ObjCntStuf", radia_ObjCntStuf, METH_VARARGS, "ObjCntStuf() returns list with the reference numbers of objects present in container"}, 
+	{"ObjDpl", radia_ObjDpl, METH_VARARGS, "ObjDpl() duplicates 3D object"},
+	{"ObjM", radia_ObjM, METH_VARARGS, "ObjM() provides coordinates of geometrical center point(s) and magnetization(s) of an object"},
+	{"ObjCenFld", radia_ObjCenFld, METH_VARARGS, "ObjCenFld() provides coordinates of geometrical center point and field at that point"},
+	{"ObjSetM", radia_ObjSetM, METH_VARARGS, "ObjSetM() sets magnetization of an object"},
 
-	//{"ObjCutMag", radia_ObjCutMag, METH_VARARGS, "ObjCutMag() Cuts the object obj by a plane passing through a given point normally to a given vector."},
-	//{"ObjDivMagPln", radia_ObjDivMagPln, METH_VARARGS, "ObjDivMagPln() Subdivides (segments) the object obj by 3 sets of parallel planes. "},
-	//{"ObjDivMagCyl", radia_ObjDivMagCyl, METH_VARARGS, "ObjDivMagCyl() Subdivides (segments) the object obj by a set of coaxial elliptic cylinders. "},
-	//{"ObjGeoVol", radia_ObjGeoVol, METH_VARARGS, "ObjGeoVol() Computes geometrical volume of a 3D object."},
-	//{"ObjGeoLim", radia_ObjGeoLim, METH_VARARGS, "ObjGeoLim() Computes coordinates of object extrimities in laboratory frame"},
+	{"ObjCutMag", radia_ObjCutMag, METH_VARARGS, "ObjCutMag() cuts 3D object by a plane passing through a given point normally to a given vector"},
+	{"ObjDivMagPln", radia_ObjDivMagPln, METH_VARARGS, "ObjDivMagPln() subdivides (segments) a 3D object by 3 sets of parallel planes"},
+	{"ObjDivMagCyl", radia_ObjDivMagCyl, METH_VARARGS, "ObjDivMagCyl() subdivides (segments) a 3D object obj by a set of coaxial elliptical cylinders"},
+	{"ObjDivMag", radia_ObjDivMag, METH_VARARGS, "ObjDivMag() subdivides (segments) a 3D object obj by sets of parallel planes or coaxial elliptical cylinders"},
+	{"ObjGeoVol", radia_ObjGeoVol, METH_VARARGS, "ObjGeoVol() computes geometrical volume of a 3D object"},
+	{"ObjGeoLim", radia_ObjGeoLim, METH_VARARGS, "ObjGeoLim() computes coordinates of object extrimities in laboratory frame"},
+	{"ObjDegFre", radia_ObjDegFre, METH_VARARGS, "ObjDegFre() gives number of degrees of freedom for the relaxation of an object"},
 	
 	{"ObjDrwAtr", radia_ObjDrwAtr, METH_VARARGS, "ObjDrwAtr() assigns drawing attributes - RGB color (r,g,b) and line thickness thcn - to a Magnetic Field Source object"},
 	{"ObjDrwOpenGL", radia_ObjDrwOpenGL, METH_VARARGS, "ObjDrwOpenGL() assigns drawing attributes - RGB color (r,g,b) and line thickness thcn - to a Magnetic Field Source object"},
-	//{"ObjDrwQD3D", radia_ObjDrwQD3D, METH_VARARGS, "ObjDrwQD3D() Starts an application for viewing of 3D geometry of the object obj"},
 
+	{"TrfPlSym", radia_TrfPlSym, METH_VARARGS, "TrfPlSym() creates a symmetry with respect to plane defined by a point and a normal vector"},
+	{"TrfRot", radia_TrfRot, METH_VARARGS, "TrfRot() creates a rotation about an axis"},
+	{"TrfTrsl", radia_TrfTrsl, METH_VARARGS, "TrfTrsl() creates a translation"},
+	{"TrfInv", radia_TrfInv, METH_VARARGS, "TrfInv() creates a field inversion"},
+	{"TrfCmbL", radia_TrfCmbL, METH_VARARGS, "TrfCmbL() multiplies original space transformation by another transformation from left"},
+	{"TrfCmbR", radia_TrfCmbR, METH_VARARGS, "TrfCmbR() multiplies original space transformation by another transformation from right"},
+	{"TrfMlt", radia_TrfMlt, METH_VARARGS, "TrfMlt() creates mlt-1 symmetry objects of a 3D object"},
+	{"TrfOrnt", radia_TrfOrnt, METH_VARARGS, "TrfOrnt() orients 3D object by applying a space transformation to it once"},
 	{"TrfZerPara", radia_TrfZerPara, METH_VARARGS, "TrfZerPara() creates an object mirror with respect to a plane. The object mirror possesses the same geometry as obj, but its magnetization and/or current densities are modified in such a way that the magnetic field produced by the obj and its mirror in the plane of mirroring is perpendicular to this plane"},
 	{"TrfZerPerp", radia_TrfZerPerp, METH_VARARGS, "TrfZerPerp() creates an object mirror with respect to a plane. The object mirror possesses the same geometry as obj, but its magnetization and/or current densities are modified in such a way that the magnetic field produced by the obj and its mirror in the plane of mirroring is parallel to this plane"},
 
+	{"MatApl", radia_MatApl, METH_VARARGS, "MatApl() applies magnetic material to a 3D object"},
 	{"MatStd", radia_MatStd, METH_VARARGS, "MatStd() creates a pre-defined magnetic material (the material is identified by its name/formula, e.g. \"NdFeB\")"},
+	{"MatSatIsoFrm", radia_MatSatIsoFrm, METH_VARARGS, "MatSatIsoFrm() creates a nonlinear isotropic magnetic material with the M versus H curve defined by the formula M = ms1*tanh(ksi1*H/ms1) + ms2*tanh(ksi2*H/ms2) + ms3*tanh(ksi3*H/ms3), where H is the magnitude of the magnetic field strength vector (in Tesla)"},
 	{"MatSatIsoTab", radia_MatSatIsoTab, METH_VARARGS, "MatSatIsoTab() creates a nonlinear isotropic magnetic material with the M versus H curve defined by the list of pairs corresponding values of H and M [[H1,M1],[H2,M2],...]"},
 	{"MatMvsH", radia_MatMvsH, METH_VARARGS, "MatMvsH() computes magnetization from magnetic field strength vector for a given material"},
+
+	{"RlxPre", radia_RlxPre, METH_VARARGS, "RlxPre() builds interaction matrix for an object"},
+	{"RlxMan", radia_RlxMan, METH_VARARGS, "RlxMan() executes manual relaxation procedure on a given interaction matrix"},
+	{"RlxAuto", radia_RlxAuto, METH_VARARGS, "RlxAuto() executes automatic relaxation procedure on a given interaction matrix"},
 
 	{"Solve", radia_Solve, METH_VARARGS, "Solve() solves a magnetostatic problem, i.e. builds an interaction matrix and performs a relaxation procedure"},
 
 	{"Fld", radia_Fld, METH_VARARGS,  "Fld() computes field created by the object obj at one or many points"},
 	{"FldInt", radia_FldInt, METH_VARARGS, "FldInt() computes magnetic field integral produced by magnetic field source object along a straight line"},
+
+	{"UtiDmp", radia_UtiDmp, METH_VARARGS, "UtiDmp() outputs information (in bnary or in ASCII format) about an object or list of objects"},
+	{"UtiDmpPrs", radia_UtiDmpPrs, METH_VARARGS, "UtiDmpPrs() parses byte-string produced previously by UtiDmp(elem,\"bin\") and attempts to instantiate objects(s) identical to elem"},
+	{"UtiDel", radia_UtiDel, METH_VARARGS, "UtiDel() deletes an object"},
+	{"UtiDelAll", radia_UtiDelAll, METH_VARARGS, "UtiDelAll() deletes all previously created objects"},
 
 	{NULL, NULL}
 };

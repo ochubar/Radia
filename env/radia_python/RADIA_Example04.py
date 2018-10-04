@@ -4,10 +4,10 @@
 # A uniformly magnetized polyhedron is created with a magnetization of 1 Tesla.
 # The field produced by this polyhedron is computed and shown to be uniform inside the volume
 # of the polyhedron and equal to 2/3 Tesla as expected from an analytical integration.
-# v 0.01
+# v 0.02
 #############################################################################
 
-from __future__ import print_function #Python 2.7 compatibility
+from __future__ import absolute_import, division, print_function #Py 2.*/3.* compatibility
 import radia as rad
 from math import *
 from uti_plot import *
