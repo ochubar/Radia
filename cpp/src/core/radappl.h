@@ -26,6 +26,7 @@
 #include "radcnvrg.h"
 #include "radapl1.h"
 #include "radauxst.h"
+#include "radgeometry.h"
 
 #include <sstream> // Porting
 
@@ -244,6 +245,7 @@ public:
 
 	int GoQuickDraw3D_Viewer(int ElemKey, const char** OptionNames, const char** OptionValues, int OptionCount);
 	int GoOpenGL_3D_Viewer(int ElemKey, const char** OptionNames, const char** OptionValues, int OptionCount);
+    int GoObjGeometry(int ElemKey, int* arrayCounts, const char** OptionNames, const char** OptionValues, int OptionCount, radGeometry &result);
 	int DecodeViewingOptions(const char** OptionNames, const char** OptionValues, int OptionCount, char* OptBits);
 	void PrepareGeomPolygDataForViewing(radTVectGeomPolygon& GeomPolygons, double*& VertCoord, int& Nv, int*& VertInd, int*& PgLen, float*& PgColors, int& Npg);
 	void DeallocateAuxPgnViewData(double** dArr, int** iArr1, int** iArr2, float** fArr);

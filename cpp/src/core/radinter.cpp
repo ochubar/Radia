@@ -187,6 +187,7 @@ void QuickDraw3D_ViewerOpt1( int, const char* );
 void QuickDraw3D_ViewerOpt0( int );
 void OpenGL_3D_Viewer();
 void OpenGL_3D_ViewerOpt( int, const char*, const char*, const char* );
+void ObjGeometry(int ElemKey, int* arrayCounts, const char* Opt1, const char* Opt2, const char* Opt3, radGeometry &result);
 
 void DeleteElement( int );
 void DeleteAllElements1();
@@ -4201,6 +4202,23 @@ void OpenGL_3D_ViewerOpt(int ElemKey, const char* Opt1, const char* Opt2, const 
 	AuxParseOptionNamesAndValues(NonParsedOpts, OptionNames, OptionValues, OptionCount);
 
 	rad.GoOpenGL_3D_Viewer(ElemKey, OptionNames, OptionValues, OptionCount);
+}
+
+//-------------------------------------------------------------------------
+
+void ObjGeometry(int ElemKey, int* arrayCounts, const char* Opt1, const char* Opt2, const char* Opt3, radGeometry &result)
+{
+	char CharBuf1[200], CharBuf2[200], CharBuf3[200];
+	const char* OptionNames[] = {CharBuf1, CharBuf2, CharBuf3};
+	const char* OptionValues[] = {0,0,0};
+	const char* NonParsedOpts[] = {Opt1, Opt2, Opt3};
+	int OptionCount = 3;
+	//AuxParseOptionNamesAndValues(3, NonParsedOpts, OptionNames, OptionValues, OptionCount);
+	AuxParseOptionNamesAndValues(NonParsedOpts, OptionNames, OptionValues, OptionCount);
+	if (!rad.GoObjGeometry(ElemKey, arrayCounts, OptionNames, OptionValues, OptionCount, result)) {
+      	rad.Send.ErrorMessage("Radia::Error900");
+        return;
+    }
 }
 
 //-------------------------------------------------------------------------

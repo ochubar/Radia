@@ -166,6 +166,43 @@ int radTApplication::GoOpenGL_3D_Viewer(int ElemKey, const char** OptionNames, c
 #include "radappl.h"
 #endif
 
+void printDoubleValues(const char* name, int size, const double* arr)
+{
+  cout << name << ": " << size << endl;
+  for (int i = 0; i < size; i++) {
+    cout << ' ' << arr[i];
+  }
+  cout << endl;
+}
+
+void printIntValues(const char* name, int size, const int* arr)
+{
+  cout << name << ": " << size << endl;
+  for (int i = 0; i < size; i++) {
+    cout << ' ' << arr[i];
+  }
+  cout << endl;
+}
+
+void printFloatValues(const char* name, int size, const float* arr)
+{
+  cout << name << ": " << size << endl;
+  for (int i = 0; i < size; i++) {
+    cout << ' ' << arr[i];
+  }
+  cout << endl;
+}
+
+
+double* floatToDouble(const float *arr, int size)
+{
+  double* res = new double[size];
+  for (int i = 0; i < size; i++) {
+    res[i] = arr[i];
+  }
+  return res;
+}
+
 //-------------------------------------------------------------------------
 
 int radTApplication::GoOpenGL_3D_Viewer(int ElemKey, const char** OptionNames, const char** OptionValues, int OptionCount)
@@ -178,3 +215,91 @@ int radTApplication::GoOpenGL_3D_Viewer(int ElemKey, const char** OptionNames, c
 
 #endif //_WITH_GLUT
 
+int radTApplication::GoObjGeometry(int ElemKey, int *arrayCounts, const char** OptionNames, const char** OptionValues, int OptionCount, radGeometry &result)
+{
+    try
+    {
+        radThg hg;
+        if(!ValidateElemKey(ElemKey, hg)) {
+          cout <<"invalid element key: " << ElemKey << endl;
+          return 0;
+        }
+
+        radTCast Cast;
+        radTg3d* g3dPtr = Cast.g3dCast(hg.rep); if(g3dPtr==0) { Send.ErrorMessage("Radia::Error003"); return 0;}
+
+        char OptBits[4];
+        char& DoShowLines = OptBits[0];
+        char& DoShowFaces = OptBits[1];
+        char& DoShowFrameAxes = OptBits[2];
+        char& DoShowSymChilds = OptBits[3];
+        if(!DecodeViewingOptions(OptionNames, OptionValues, OptionCount, OptBits)) {
+          cout << "failed DecodeViewingOptions" << endl;
+          return 0;
+        }
+
+        char ShowSymmetryChilds = DoShowSymChilds;
+
+        radGraphPresOptions InGraphPresOptions(ShowSymmetryChilds);
+        radTg3dGraphPresent* g3dGraphPresentPtr = g3dPtr->CreateGraphPresent();
+
+        char DrawFacilityInd = 2; // OpenGL Draw facility index
+        g3dGraphPresentPtr->DrawFacilityInd = DrawFacilityInd;
+
+        radTg3dGraphPresent::Send = Send;
+        g3dGraphPresentPtr->SetGraphPresOptionsExt(InGraphPresOptions, DoShowLines, DoShowFaces);
+        g3dGraphPresentPtr->MapOfDrawAttrPtr = &MapOfDrawAttr;
+        g3dGraphPresentPtr->RetrieveDrawAttr(ElemKey);
+
+        g3dGraphPresentPtr->GenDraw();
+        if(DoShowFrameAxes) g3dGraphPresentPtr->DrawFrameLines();
+
+        int AmOfPolygons = (int)((radTg3dGraphPresent::Send).GeomPolygons.size());
+        int AmOfLines = (int)((radTg3dGraphPresent::Send).GeomLines.size());
+
+        if((AmOfPolygons > 0) || (AmOfLines > 0))
+        {
+            int *ignore = 0;
+
+            if(AmOfPolygons > 0)
+            {
+                PrepareGeomPolygDataForViewing(
+                    (radTg3dGraphPresent::Send).GeomPolygons,
+                    result.Polygons.Vertices,
+                    result.Polygons.VerticesCount,
+                    ignore,
+                    result.Polygons.Lengths,
+                    result.Polygons.Colors,
+                    result.Polygons.Count
+                );
+                delete[] ignore;
+            }
+            if(AmOfLines > 0)
+            {
+                PrepareGeomPolygDataForViewing(
+                    (radTg3dGraphPresent::Send).GeomLines,
+                    result.Lines.Vertices,
+                    result.Lines.VerticesCount,
+                    ignore,
+                    result.Lines.Lengths,
+                    result.Lines.Colors,
+                    result.Lines.Count
+                );
+                delete[] ignore;
+            }
+            (radTg3dGraphPresent::Send).DeallocateGeomPolygonData();
+        }
+
+        delete g3dGraphPresentPtr;
+
+        return 1;
+    }
+    catch(...)
+    {
+      //Initialize(); return 0;
+      radGeometry res = {};
+      cout << "FAILED" << endl;
+      return 0;
+    }
+
+}

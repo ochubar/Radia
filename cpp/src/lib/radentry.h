@@ -6,6 +6,8 @@
 // Modified:    30.05.04
 /////////////////////////////////////////////////////////////////////////////
 
+#include "radgeometry.h"
+
 //-------------------------------------------------------------------------
 // Platform- and compiler-dependent macro definitions
 //-------------------------------------------------------------------------
@@ -461,6 +463,15 @@ EXP int CALL RadObjDrwQD3D(int obj, char* opt);
 @author O.C.
 */
 EXP int CALL RadObjDrwOpenGL(int obj, char* opt);
+
+/**
+The actual output data array can be obtained by calling RadUtiDataGet function for "mad" and "mai" data types.
+@param arrayCounts [out] polygon and line array sizes, first entry is the size of arrayCounts
+@param obj [in] reference number of the object to be viewed
+@param opt [in] See RadObjDrwOpenGL.opt
+@return integer error code (0 : no error, >0 : error number, <0 : warning number)
+*/
+EXP int CALL RadObjGeometry(int* arrayCounts, int obj, char* opt, radGeometry &result);
 
 /** Applies drawing attributes - RGB color (r,g,b) and line thickness thcn - to object obj.
 @param obj [in] reference number of the object to which drawing attributes should be applied

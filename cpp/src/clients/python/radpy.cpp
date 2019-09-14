@@ -8,6 +8,7 @@
  * @version 0.02
  ***************************************************************************/
 
+#include "radgeometry.h"
 #include "radentry.h"
 #include "pyparse.h"
 #include "auxparse.h"
@@ -1364,6 +1365,75 @@ static PyObject* radia_ObjDrwOpenGL(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
+ * Magnetic Field Sources: Returns the OpenGL 3D geometry data
+ ***************************************************************************/
+static PyObject* radia_ObjGeometry_helper(const radGeometryFlattened &rgf) {
+    PyObject *lengths = PyList_New(rgf.Count);
+    PyObject *colors = PyList_New(rgf.Count);
+    PyObject *vertices = PyList_New(rgf.VerticesCount);
+    if (!vertices || !lengths || !colors) {
+        throw "Memory Allocation Failure";
+    }
+    for (Py_ssize_t i = rgf.Count; --i >= 0;) {
+        PyObject *l = PyInt_FromLong(rgf.Lengths[i]);
+        PyObject *c = PyFloat_FromDouble(rgf.Colors[i]);
+        if (l == NULL || c == NULL
+            || PyList_SetItem(lengths, i, l) < 0
+            ||PyList_SetItem(colors, i, c) < 0
+        ) {
+            throw "Memory Allocation Failure";
+        }
+    }
+    for (Py_ssize_t i = rgf.VerticesCount; --i >= 0;) {
+        PyObject *v = PyFloat_FromDouble(rgf.Vertices[i]);
+        if (v == NULL || PyList_SetItem(vertices, i, v) < 0) {
+            throw "Memory Allocation Failure";
+        }
+    }
+    return Py_BuildValue(
+        "{s:N,s:N,s:N}",
+        "colors",
+        colors,
+        "lengths",
+        lengths,
+        "vertices",
+        vertices
+    );
+}
+
+static PyObject* radia_ObjGeometry(PyObject *self, PyObject *args)
+{
+	PyObject *oInd=0, *oOpt=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "O|O:ObjGeometry", &oInd, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": ObjGeometry");
+		if(oInd == 0) throw CombErStr(strEr_BadFuncArg, ": ObjGeometry");
+
+		if(!PyNumber_Check(oInd)) throw CombErStr(strEr_BadFuncArg, ": ObjGeometry");
+		int ind = (int)PyLong_AsLong(oInd);
+
+		char sOpt[1024]; *sOpt = '\0';
+		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+        int sizes[10];
+        radGeometry rg = {};
+		g_pyParse.ProcRes(RadObjGeometry(sizes, ind, sOpt, rg));
+        return Py_BuildValue(
+            "{s:N,s:N}",
+            "polygons",
+            radia_ObjGeometry_helper(rg.Polygons),
+            "lines",
+            radia_ObjGeometry_helper(rg.Lines)
+        );
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return 0;
+}
+
+/************************************************************************//**
  * Space Transformations: Creates a symmetry with respect to plane defined by a point and a normal vector.
  ***************************************************************************/
 static PyObject* radia_TrfPlSym(PyObject *self, PyObject *args)
@@ -1492,6 +1562,8 @@ static PyObject* radia_TrfCmbL(PyObject *self, PyObject *args)
 		g_pyParse.ProcRes(RadTrfCmbL(&ind, indTrfOrig, indTrf));
 
 		oResInd = Py_BuildValue("i", ind);
+        //TODO(robnagler) Py_XINCREF is incorrect. Will lead to garbage collection issues.
+        //See https://mail.python.org/pipermail/python-list/2005-January/340319.html
 		Py_XINCREF(oResInd); //?
 	}
 	catch(const char* erText) 
@@ -2211,6 +2283,7 @@ static PyMethodDef radia_methods[] = {
 	
 	{"ObjDrwAtr", radia_ObjDrwAtr, METH_VARARGS, "ObjDrwAtr() assigns drawing attributes - RGB color (r,g,b) and line thickness thcn - to a Magnetic Field Source object"},
 	{"ObjDrwOpenGL", radia_ObjDrwOpenGL, METH_VARARGS, "ObjDrwOpenGL() assigns drawing attributes - RGB color (r,g,b) and line thickness thcn - to a Magnetic Field Source object"},
+	{"ObjGeometry", radia_ObjGeometry, METH_VARARGS, "ObjGeometry() returns geometry data for a 3D object"},
 
 	{"TrfPlSym", radia_TrfPlSym, METH_VARARGS, "TrfPlSym() creates a symmetry with respect to plane defined by a point and a normal vector"},
 	{"TrfRot", radia_TrfRot, METH_VARARGS, "TrfRot() creates a rotation about an axis"},
