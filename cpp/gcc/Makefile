@@ -53,7 +53,7 @@ PRG_LIB=		libradia.a
 lib:	$(OBJ_LIB)
 	ar crv $(PRG_LIB) *.o
 	#cp $(PRG_LIB) $(LIB_DIR)/
-	###########################################################rm -f *.o
+	############################################################rm -f *.o
 
 %.o: $(RAD_SRC_LIB_DIR)/%.cpp
 	$(CC) $(LIBCFLAGS) -c $<  
@@ -77,7 +77,7 @@ triangle.o:	$(RAD_SRC_TRI_DIR)/triangle.c
 #		gcc $(CFLAGS) -c $(SH_SRC_GEN_MATH_DIR)/gmfft.cpp -O3 $(RAD_SRC_DEF) 
 
 clean:
-	###########################################################rm -f# *.o *.so *.a
+	############################################################rm -f# *.o *.so *.a
 
 #pgm:	$(OBJ_MATH)
 #	g++ $(ML_INCLUDE) $(OBJ_MATH) $(LIB_MATH) -o $(PRG_MATH)

@@ -1390,7 +1390,7 @@ static PyObject* radia_ObjGeometry_helper(const radGeometryFlattened &rgf) {
             throw "Memory Allocation Failure";
         }
     }
-    return Py_BuildValue(
+    PyObject *res = Py_BuildValue(
         "{s:N,s:N,s:N}",
         "colors",
         colors,
@@ -1399,6 +1399,10 @@ static PyObject* radia_ObjGeometry_helper(const radGeometryFlattened &rgf) {
         "vertices",
         vertices
     );
+    if (res == NULL) {
+        throw "Memory Allocation Failure";
+    }
+    return res;
 }
 
 static PyObject* radia_ObjGeometry(PyObject *self, PyObject *args)
@@ -1418,13 +1422,19 @@ static PyObject* radia_ObjGeometry(PyObject *self, PyObject *args)
         int sizes[10];
         radGeometry rg = {};
 		g_pyParse.ProcRes(RadObjGeometry(sizes, ind, sOpt, rg));
-        return Py_BuildValue(
+        PyObject *res = Py_BuildValue(
             "{s:N,s:N}",
             "polygons",
             radia_ObjGeometry_helper(rg.Polygons),
             "lines",
             radia_ObjGeometry_helper(rg.Lines)
         );
+        if (res == NULL) {
+            //TODO(robnagler) ref counts are invalid at this point,
+            //  but then this is a malloc error...
+            throw "Memory Allocation Failure";
+        }
+        return res;
 	}
 	catch(const char* erText)
 	{
