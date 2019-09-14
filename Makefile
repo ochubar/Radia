@@ -40,12 +40,12 @@ fftw:
 	cd $(fftw_dir); \
 	./configure --enable-float --with-pic; \
 	sed 's/^CFLAGS = /CFLAGS = -fPIC /' -i Makefile; \
-	make -j4 && cp fftw/.libs/libfftw.a $(ext_dir); \
+	make -j8 && cp fftw/.libs/libfftw.a $(ext_dir); \
 	cd $(root_dir); \
 	rm -rf $(ext_dir)/$(fftw_dir);
 
 core: 
-	#cd $(gcc_dir); make -j4 clean lib
+	#cd $(gcc_dir); make -j8 clean lib
 	cd $(gcc_dir); make clean lib
 
 pylib:
