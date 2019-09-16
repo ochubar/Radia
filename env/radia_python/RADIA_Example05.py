@@ -144,8 +144,7 @@ if __name__=="__main__":
     size=rad.ObjDegFre(t)
 
     #Display the geometry
-    from pykern import pkjson
-    pkjson.dump_pretty(rad.ObjGeometry(t), filename='1.json')
+    rad.ObjDrwOpenGL(t)
 
     #Solve the geometry
     t1=time()
@@ -185,7 +184,7 @@ if __name__=="__main__":
 
     #Creating the Model and Solving with Rectangular Segmentation in the Corners
     t = Geom(0)
-    pkjson.dump_pretty(rad.ObjGeometry(t), filename='2.json')
+    rad.ObjDrwOpenGL(t)
 
     t1=time()
     res=rad.Solve(t,0.0001,1500)
