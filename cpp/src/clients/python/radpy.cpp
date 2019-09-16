@@ -1375,7 +1375,7 @@ static PyObject* radia_ObjGeometry_helper(const radGeometryFlattened &rgf) {
         throw "Memory Allocation Failure";
     }
     for (Py_ssize_t i = rgf.Count; --i >= 0;) {
-        PyObject *l = PyInt_FromLong(rgf.Lengths[i]);
+        PyObject *l = PyLong_FromLong(rgf.Lengths[i]);
         PyObject *c = PyFloat_FromDouble(rgf.Colors[i]);
         if (l == NULL || c == NULL
             || PyList_SetItem(lengths, i, l) < 0
