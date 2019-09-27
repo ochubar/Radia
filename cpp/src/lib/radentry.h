@@ -471,7 +471,7 @@ The actual output data array can be obtained by calling RadUtiDataGet function f
 @param opt [in] See RadObjDrwOpenGL.opt
 @return integer error code (0 : no error, >0 : error number, <0 : warning number)
 */
-EXP int CALL RadObjGeometry(int* arrayCounts, int obj, char* opt, radGeometry &result);
+EXP int CALL RadObjGeometry(int obj, char* opt, radGeometry &result);
 
 /** Applies drawing attributes - RGB color (r,g,b) and line thickness thcn - to object obj.
 @param obj [in] reference number of the object to which drawing attributes should be applied

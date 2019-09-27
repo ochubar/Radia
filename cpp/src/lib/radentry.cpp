@@ -105,7 +105,7 @@ void ShimSignature( int, char*, double,double,double, double,double,double, doub
 
 void QuickDraw3D_ViewerOpt( int, const char*, const char*, const char* );
 void OpenGL_3D_ViewerOpt( int, const char*, const char*, const char* );
-void ObjGeometry( int, int*, const char*, const char*, const char*, radGeometry &res );
+void ObjGeometry( int, const char*, const char*, const char*, radGeometry &res );
 
 void ApplyDrawAttrToElem( int, double,double,double, double );
 
@@ -1354,7 +1354,7 @@ int CALL RadObjDrwOpenGL(int Obj, char* Opt)
 
 //-------------------------------------------------------------------------
 
-int CALL RadObjGeometry(int* arrayCounts, int Obj, char* Opt, radGeometry &result)
+int CALL RadObjGeometry(int Obj, char* Opt, radGeometry &result)
 {
 	const char *Opt1=0, *Opt2=0, *Opt3=0;
 	vector<string> AuxStrings;
@@ -1373,7 +1373,7 @@ int CALL RadObjGeometry(int* arrayCounts, int Obj, char* Opt, radGeometry &resul
 			}
 		}
 	}
-	ObjGeometry(Obj, arrayCounts, Opt1, Opt2, Opt3, result);
+	ObjGeometry(Obj, Opt1, Opt2, Opt3, result);
 	ioBuffer.OutInt(); // to clear buffer
 	return ioBuffer.OutErrorStatus();
 }

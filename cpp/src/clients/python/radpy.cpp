@@ -1369,24 +1369,26 @@ static PyObject* radia_ObjDrwOpenGL(PyObject *self, PyObject *args)
  ***************************************************************************/
 static PyObject* radia_ObjGeometry_helper(const radGeometryFlattened &rgf) {
     PyObject *lengths = PyList_New(rgf.Count);
-    PyObject *colors = PyList_New(rgf.Count);
-    PyObject *vertices = PyList_New(rgf.VerticesCount);
+    PyObject *colors = PyList_New(rgf.Count * 3);
+    PyObject *vertices = PyList_New(rgf.VerticesCount * 3);
     if (!vertices || !lengths || !colors) {
         throw "Memory Allocation Failure";
     }
-    for (Py_ssize_t i = rgf.Count; --i >= 0;) {
-        PyObject *l = PyLong_FromLong(rgf.Lengths[i]);
-        PyObject *c = PyFloat_FromDouble(rgf.Colors[i]);
-        if (l == NULL || c == NULL
-            || PyList_SetItem(lengths, i, l) < 0
-            ||PyList_SetItem(colors, i, c) < 0
-        ) {
+    for (Py_ssize_t i = PyList_Size(lengths); --i >= 0;) {
+        PyObject *o = PyLong_FromLong(rgf.Lengths[i]);
+        if (o == NULL || PyList_SetItem(lengths, i, o) < 0) {
             throw "Memory Allocation Failure";
         }
     }
-    for (Py_ssize_t i = rgf.VerticesCount; --i >= 0;) {
-        PyObject *v = PyFloat_FromDouble(rgf.Vertices[i]);
-        if (v == NULL || PyList_SetItem(vertices, i, v) < 0) {
+    for (Py_ssize_t i = PyList_Size(colors); --i >= 0;) {
+        PyObject *o = PyLong_FromDouble(rgf.Colors[i]);
+        if (o == NULL || PyList_SetItem(colors, i, o) < 0) {
+            throw "Memory Allocation Failure";
+        }
+    }
+    for (Py_ssize_t i = PyList_Size(vertices); --i >= 0;) {
+        PyObject *o = PyFloat_FromDouble(rgf.Vertices[i]);
+        if (o == NULL || PyList_SetItem(vertices, i, o) < 0) {
             throw "Memory Allocation Failure";
         }
     }
@@ -1419,9 +1421,8 @@ static PyObject* radia_ObjGeometry(PyObject *self, PyObject *args)
 		char sOpt[1024]; *sOpt = '\0';
 		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
 
-        int sizes[10];
         radGeometry rg = {};
-		g_pyParse.ProcRes(RadObjGeometry(sizes, ind, sOpt, rg));
+		g_pyParse.ProcRes(RadObjGeometry(ind, sOpt, rg));
         PyObject *res = Py_BuildValue(
             "{s:N,s:N}",
             "polygons",

@@ -215,7 +215,7 @@ int radTApplication::GoOpenGL_3D_Viewer(int ElemKey, const char** OptionNames, c
 
 #endif //_WITH_GLUT
 
-int radTApplication::GoObjGeometry(int ElemKey, int *arrayCounts, const char** OptionNames, const char** OptionValues, int OptionCount, radGeometry &result)
+int radTApplication::GoObjGeometry(int ElemKey, const char** OptionNames, const char** OptionValues, int OptionCount, radGeometry &result)
 {
     try
     {
