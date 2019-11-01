@@ -166,45 +166,6 @@ int radTApplication::GoOpenGL_3D_Viewer(int ElemKey, const char** OptionNames, c
 #include "radappl.h"
 #endif
 
-void printDoubleValues(const char* name, int size, const double* arr)
-{
-  cout << name << ": " << size << endl;
-  for (int i = 0; i < size; i++) {
-    cout << ' ' << arr[i];
-  }
-  cout << endl;
-}
-
-void printIntValues(const char* name, int size, const int* arr)
-{
-  cout << name << ": " << size << endl;
-  for (int i = 0; i < size; i++) {
-    cout << ' ' << arr[i];
-  }
-  cout << endl;
-}
-
-void printFloatValues(const char* name, int size, const float* arr)
-{
-  cout << name << ": " << size << endl;
-  for (int i = 0; i < size; i++) {
-    cout << ' ' << arr[i];
-  }
-  cout << endl;
-}
-
-
-double* floatToDouble(const float *arr, int size)
-{
-  double* res = new double[size];
-  for (int i = 0; i < size; i++) {
-    res[i] = arr[i];
-  }
-  return res;
-}
-
-//-------------------------------------------------------------------------
-
 int radTApplication::GoOpenGL_3D_Viewer(int ElemKey, const char** OptionNames, const char** OptionValues, int OptionCount)
 {
 	Send.ErrorMessage("Radia::Error114"); return 0;
