@@ -6,6 +6,7 @@
 
 from __future__ import print_function #Python 2.7 compatibility
 import radia as rad
+print('RADIA Library Version:', rad.UtiVer(), '\n')
 
 print('RADIA Python Example #1:')
 print('This is the simplest example. A magnetized cube is placed at position [0,0,0].')

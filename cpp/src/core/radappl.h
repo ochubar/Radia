@@ -239,6 +239,7 @@ public:
 	int ApplyDrawAttrToElem_g3d(int ElemKey, double* RGB_col, long lenRGB_col, double LineThickness =-1.);
 	int RemoveDrawAttrFromElem_g3d(int ElemKey);
 	int GraphicsForElem_g3d(int ElemKey, int InShowSymmetryChilds, const char** arOptionNames =0, const char** arOptionValues =0, int numOptions =0);
+	int GraphicsForElem_g3d_VTK(int ElemKey, const char** OptionNames =0, const char** OptionValues =0, int OptionCount =0); //OC04112019
 
 	void GraphicsForAll_g3d(int InShowSymmetryChilds);
 

@@ -106,6 +106,7 @@ public:
 	void Color(const radRGB&, char =0);
 	void Polygon(const TVector3d*, int, char =0);
 	void Line(const TVector3d*, int, char =0);
+	int GeomDataToBuffer(); //OC04112019
 
 	//void FrameLines(char);
 	void InitLimits3D()

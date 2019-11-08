@@ -90,7 +90,8 @@ void FieldForce( int, int );
 void FieldForceThroughEnergy( int, int, char*, int,int,int );
 void FieldTorqueThroughEnergy( int, int, char*, double,double,double, int,int,int );
 void FocusingPotential( int, double,double,double, double,double,double, int );
-void FocusingKickPer( int, double,double,double, double,double,double, double,int, double,double,double, double,int,double,int, const char*, int,int,double,double );
+//void FocusingKickPer( int, double,double,double, double,double,double, double,int, double,double,double, double,int,double,int, const char*, int,int,double,double );
+void FocusingKickPer( int, double,double,double, double,double,double, double,double, double,double,double, double,int,double,int, const char*, int,int,double,double, const char*, double, const char* ); //OC03112019
 void FocusingKickPerFormStrRep( double*,double*,double*,double*,double*, int,int, double, int, const char* );
 
 void ParticleTrajectory( int, double, double,double,double,double, double,double, int );
@@ -102,6 +103,7 @@ void RandomizationOnOrOff( char* );
 void TolForConvergence( double, double, double );
 void ShimSignature( int, char*, double,double,double, double,double,double, double,double,double, int, double,double,double );
 
+int GraphicsForElemVTK( int, const char*, const char*, const char* );
 void QuickDraw3D_ViewerOpt( int, const char*, const char*, const char* );
 void OpenGL_3D_ViewerOpt( int, const char*, const char*, const char* );
 
@@ -1074,9 +1076,11 @@ int CALL RadFldFocPot(double* d, int Obj, double* P1, double* P2, int np)
 
 //-------------------------------------------------------------------------
 
-int CALL RadFldFocKickPer(double* pMatr1, double* pMatr2, double* pIntBtrE2, double* pArg1, double* pArg2, int* psize, int obj, double* P1, double* Ns, double per, int nper, int nps, double* Ntr, double r1, int np1, double d1, double r2, int np2, double d2, int nh, char* com)
+int CALL RadFldFocKickPer(double* pMatr1, double* pMatr2, double* pIntBtrE2, double* pArg1, double* pArg2, int* psize, int obj, double* P1, double* Ns, double per, int nper, int nps, double* Ntr, double r1, int np1, double d1, double r2, int np2, double d2, int nh, char* com, char* unit, double en, char* frm) //OC03112019
+//int CALL RadFldFocKickPer(double* pMatr1, double* pMatr2, double* pIntBtrE2, double* pArg1, double* pArg2, int* psize, int obj, double* P1, double* Ns, double per, int nper, int nps, double* Ntr, double r1, int np1, double d1, double r2, int np2, double d2, int nh, char* com)
 {
-    FocusingKickPer(obj, P1[0], P1[1], P1[2], Ns[0], Ns[1], Ns[2], per, nper, Ntr[0], Ntr[1], Ntr[2], r1, np1, r2, np2, com, nh, nps, d1, d2);
+    FocusingKickPer(obj, P1[0], P1[1], P1[2], Ns[0], Ns[1], Ns[2], per, nper, Ntr[0], Ntr[1], Ntr[2], r1, np1, r2, np2, com, nh, nps, d1, d2, unit, en, frm); //OC03112019
+    //FocusingKickPer(obj, P1[0], P1[1], P1[2], Ns[0], Ns[1], Ns[2], per, nper, Ntr[0], Ntr[1], Ntr[2], r1, np1, r2, np2, com, nh, nps, d1, d2);
 
 	int ErrStat = ioBuffer.OutErrorStatus();
 	if(ErrStat > 0) return ErrStat;
@@ -1348,6 +1352,48 @@ int CALL RadObjDrwOpenGL(int Obj, char* Opt)
 	OpenGL_3D_ViewerOpt(Obj, Opt1, Opt2, Opt3);
 	ioBuffer.OutInt(); // to clear buffer
 	return ioBuffer.OutErrorStatus();
+}
+
+//-------------------------------------------------------------------------
+
+int CALL RadObjDrwVTK(int* pNvp, int* pNp, int* pNvl, int* pNl, int* pKey, int obj, char* opt)
+{
+	const char *Opt1=0, *Opt2=0, *Opt3=0;
+	vector<string> AuxStrings;
+	if(opt != 0)
+	{
+		char *SepStrArr[] = {(char*)";", (char*)","};
+		CAuxParse::StringSplit(opt, SepStrArr, 2, (char*)" ", AuxStrings);
+		int AmOfTokens = (int)AuxStrings.size();
+		if(AmOfTokens > 0) 
+		{
+			Opt1 = (AuxStrings[0]).c_str();
+			if(AmOfTokens > 1) 
+			{
+				Opt2 = (AuxStrings[1]).c_str();
+				if(AmOfTokens > 2) Opt3 = (AuxStrings[2]).c_str();
+			}
+		}
+	}
+
+	*pNvp = 0; *pNp = 0; *pNvl = 0; *pNl = 0;
+	*pKey = GraphicsForElemVTK(obj, Opt1, Opt2, Opt3);
+	if(*pKey != 0)
+	{
+		ioBuffer.OutGeomPolygLen(*pKey, pNvp, pNp);
+		ioBuffer.OutGeomPolygLen(*pKey + 1, pNvl, pNl);
+	}
+
+	return ioBuffer.OutErrorStatus();
+}
+
+//-------------------------------------------------------------------------
+
+int CALL RadObjDrwDataGetVTK(double* arCrdVP, int* arLenP, float* arColP, double* arCrdVL, int* arLenL, float* arColL, int key)
+{
+	ioBuffer.OutGeomPolygData(key, arCrdVP, arLenP, arColP);
+	ioBuffer.OutGeomPolygData(key+1, arCrdVL, arLenL, arColL);
+	return 0;
 }
 
 //-------------------------------------------------------------------------

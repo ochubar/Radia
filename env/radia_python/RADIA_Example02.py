@@ -73,7 +73,7 @@ def CalcField(g):
     
     return BzVsY, [yMin, yMax, ny], IBzVsX, [xMin, xMax, nx]
 
-#*********************************Entry point
+#*********************************Entry Point
 if __name__=="__main__":
 
     #Build the Geometry

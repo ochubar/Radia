@@ -1037,6 +1037,51 @@ int radTApplication::GraphicsForElem_g3d(int ElemKey, int InShowSymmetryChilds, 
 
 //-------------------------------------------------------------------------
 
+int radTApplication::GraphicsForElem_g3d_VTK(int ElemKey, const char** OptionNames, const char** OptionValues, int OptionCount) //OC04112019 (from R. Nagler's radTApplication::GoObjGeometry)
+{
+	try
+	{
+		radThg hg;
+		if(!ValidateElemKey(ElemKey, hg)) return 0;
+		radTg3d* g3dPtr = Cast.g3dCast(hg.rep); if(g3dPtr==0) { Send.ErrorMessage("Radia::Error003"); return 0;}
+
+		//bool SendingWasAlreadyDone = false;
+
+		char OptBits[4];
+		char& DoShowLines = OptBits[0];
+		char& DoShowFaces = OptBits[1];
+		char& DoShowFrameAxes = OptBits[2];
+		char& DoShowSymChilds = OptBits[3];
+		if(!DecodeViewingOptions(OptionNames, OptionValues, OptionCount, OptBits)) return 0;
+
+		radGraphPresOptions InGraphPresOptions(DoShowSymChilds);
+		radTg3dGraphPresent* g3dGraphPresentPtr = g3dPtr->CreateGraphPresent();
+
+		char DrawFacilityInd = 2; // OpenGL Draw facility index
+		g3dGraphPresentPtr->DrawFacilityInd = DrawFacilityInd;
+
+		radTg3dGraphPresent::Send = Send;
+
+		g3dGraphPresentPtr->SetGraphPresOptionsExt(InGraphPresOptions, DoShowLines, DoShowFaces);
+		g3dGraphPresentPtr->MapOfDrawAttrPtr = &MapOfDrawAttr;
+		g3dGraphPresentPtr->RetrieveDrawAttr(ElemKey);
+
+		g3dGraphPresentPtr->GenDraw();
+		if(DoShowFrameAxes) g3dGraphPresentPtr->DrawFrameLines();
+
+		int keyGeomData = (radTg3dGraphPresent::Send).GeomDataToBuffer();
+
+		delete g3dGraphPresentPtr;
+		return keyGeomData;
+	}
+	catch(...)
+	{
+		Initialize(); return 0;
+	}
+}
+
+//-------------------------------------------------------------------------
+
 void radTApplication::GraphicsForAll_g3d(int InShowSymmetryChilds)
 {
 	try

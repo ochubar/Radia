@@ -116,7 +116,7 @@ def Geom(circ):
     rad.TrfZerPara(g,[0,0,0],[0,0,1])
     return t
 
-#*********************************Entry point
+#*********************************Entry Point
 if __name__=="__main__":
 
     #Geometry Parameters
@@ -129,6 +129,7 @@ if __name__=="__main__":
     #Segmentation Parameters
     nx=2
     nbp=2; nbr=2 #for corners
+    
     n1=[nx,3,2] #pole faces
     n2=[nx,2,2] #small vertical arm
     n3=[nx,2,2]
@@ -136,22 +137,22 @@ if __name__=="__main__":
     n5=[nx,2,2]
     n6=[nx,2,2] #inside the coil
 
-    #Build the geometry
+    #Build the Geometry
     t0=time()
     rad.UtiDelAll()
     ironmat=rad.MatSatIsoFrm([20000,2],[0.1,2],[0.1,2])
     t = Geom(1)
     size=rad.ObjDegFre(t)
 
-    #Display the geometry
+    #Display the Geometry
     rad.ObjDrwOpenGL(t)
 
-    #Solve the geometry
+    #Solve the Geometry
     t1=time()
     res=rad.Solve(t,0.0001,1500)
     t2=time()
 
-    #Print the results
+    #Print the Results
     b0=rad.Fld(t,'Bz',[0,0,0])
     bampere=(-4*pi*current/gap)/10000
     r=b0/bampere

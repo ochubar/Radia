@@ -176,6 +176,8 @@ void GraphicsForElemWithoutSymChilds(int);
 void GraphicsForElemWithSymChildsExt();
 void GraphicsForAllWithoutSymChilds();
 void GraphicsForAllWithSymChilds();
+int GraphicsForElemVTK( int, const char*, const char*, const char* );
+
 void ApplyDrawAttrToElem( int, double,double,double, double );
 void ApplyColorToElem( int, double,double,double );
 void RemoveDrawAttrFromElem(int);
@@ -4018,6 +4020,20 @@ void GraphicsForElemWithSymChildsExt()
 		if(arOptionValues[k] != 0) MLWrapDeleteSymbol(stdlink, arOptionValues[k]); //OC240612
 	}
 #endif
+}
+
+//-------------------------------------------------------------------------
+
+int GraphicsForElemVTK(int ElemKey, const char* Opt1, const char* Opt2, const char* Opt3) //OC04112019 (requested by R.Nagler)
+{
+	char CharBuf1[200], CharBuf2[200], CharBuf3[200];
+	const char* OptionNames[] ={ CharBuf1, CharBuf2, CharBuf3 };
+	const char* OptionValues[] ={ 0, 0, 0 };
+	const char* NonParsedOpts[] ={ Opt1, Opt2, Opt3 };
+	int OptionCount = 3;
+	AuxParseOptionNamesAndValues(NonParsedOpts, OptionNames, OptionValues, OptionCount);
+
+	return rad.GraphicsForElem_g3d_VTK(ElemKey, OptionNames, OptionValues, OptionCount); //rad.GoObjGeometry in Rob's version
 }
 
 //-------------------------------------------------------------------------

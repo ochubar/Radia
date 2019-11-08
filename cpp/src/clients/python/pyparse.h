@@ -29,7 +29,8 @@ using namespace std;
 #endif
 
 //-------------------------------------------------------------------------
-	
+
+static const char strEr_MAF[] = "Memory Allocation Failure";
 static const char strEr_BadArray[] = "Incorrect or no Python Array structure";
 static const char strEr_BadList[] = "Incorrect or no Python List structure";
 static const char strEr_BadListArray[] = "Incorrect or no Python List or Array structure";

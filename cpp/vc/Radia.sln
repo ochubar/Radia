@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2043
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29201.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RadiaMath", "RadiaMath.vcxproj", "{0FD06408-7423-4BBA-8445-A3A9A9DC2CA8}"
 EndProject
@@ -77,8 +77,8 @@ Global
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|Mixed Platforms.Build.0 = Debug_Py3_6|Win32
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|Win32.ActiveCfg = Debug_Py3_6|Win32
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|Win32.Build.0 = Debug_Py3_6|Win32
-		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|x64.ActiveCfg = Debug_Py2_7|x64
-		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|x64.Build.0 = Debug_Py2_7|x64
+		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|x64.ActiveCfg = Debug_Py3_6|x64
+		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Debug|x64.Build.0 = Debug_Py3_6|x64
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Release|Mixed Platforms.ActiveCfg = Release_Py3_6|Win32
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Release|Mixed Platforms.Build.0 = Release_Py3_6|Win32
 		{398ED7FE-2BC9-4CA2-B226-3856D49E6C1B}.Release|Win32.ActiveCfg = Release_Py3_6|Win32

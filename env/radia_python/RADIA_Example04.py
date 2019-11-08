@@ -39,7 +39,7 @@ def SphericalVolume(_r, _n_phi, _nz, _M):
     allSlicePgns.append([[[0.,0.]], _r])
     return rad.ObjMltExtPgn(allSlicePgns, _M)
 
-#*********************************Entry point
+#*********************************Entry Point
 if __name__=="__main__":
 
     #Build the Geometry 

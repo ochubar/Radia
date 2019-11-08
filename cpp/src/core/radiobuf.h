@@ -23,11 +23,17 @@
 #include <stdlib.h> //OC01052013
 #include <string.h> //OC01052013
 
+#include "radauxst.h"
+
+//-------------------------------------------------------------------------
+
+//class radTVectGeomPolygon;
+
 //-------------------------------------------------------------------------
 
 class radTIOBuffer /*: public ErrorWarning*/ { 
 //OC15092018 note: this thing may not be thread-safe. Perhaps storing data in some maps / hashtables would help?
-//E.g. main object index (+ extral information) could be used as Key for stored data
+//E.g. main object index (+ extra information) could be used as Key for stored data
 
 	vector<int> ErrNoBuffer;
 	vector<int> WarNoBuffer;
@@ -41,6 +47,17 @@ class radTIOBuffer /*: public ErrorWarning*/ {
 
 	int *IntBufferMulti;
 	int *DimsIntBufferMulti, NumDimsIntBufferMulti;
+
+	map<int, double*, less<int> > m_DoubleBufferMulti; //OC04112019
+	map<int, vector<int>, less<int> > m_DimsDoubleBufferMulti; //OC04112019
+
+	map<int, float*, less<int> > m_FloatBufferMulti; //OC04112019
+	map<int, vector<int>, less<int> > m_DimsFloatBufferMulti; //OC04112019
+
+	map<int, int*, less<int> > m_IntBufferMulti; //OC04112019
+	map<int, vector<int>, less<int> > m_DimsIntBufferMulti; //OC04112019
+
+	map<int, vector<int>, less<int> > m_IntBuffer; //OC04112019
 
 	static string err_ar[];
 	static int AmOfErrors;
@@ -148,6 +165,64 @@ public:
 		//byteStr.append(cByteString, 0, len); //to test: make sure that it doesn't at \0 (as for C string)!
 		byteStr.insert(0, cByteString, len); //to test: make sure that it doesn't at \0 (as for C string)!
 		StringBuffer.push_back(byteStr);
+	}
+
+	void StoreGeomPolygData(radTVectGeomPolygon& GeomPolygons, int key) //OC04112019 (similar to radTApplication::PrepareGeomPolygDataForViewing)
+	{
+		int Nv = 0;
+		int Npg = (int)(GeomPolygons.size());
+		if(Npg <= 0) return;
+
+		for(int i=0; i<Npg; i++) Nv += GeomPolygons[i].Nv;
+		if(Nv <= 0) return;
+
+		double *arVertCoord = new double[3*Nv];
+		//VertInd = new int[Nv];
+		int *arPgLen = new int[Npg];
+		float *arPgColors = new float[3*Npg];
+
+		double *tVertCoord = arVertCoord;
+		//int *tVertInd = VertInd;
+		int *tPgLen = arPgLen;
+		float *tPgColors = arPgColors;
+
+		//int AbsPointCount = 0; //1; //OC240804
+		for(int j=0; j<Npg; j++)
+		{
+			radTGeomPolygon& CurPolygon = GeomPolygons[j];
+			double *tCurVert = CurPolygon.VertCoords;
+			int CurNv = CurPolygon.Nv;
+
+			*(tPgLen++) = CurNv;
+
+			float *tColor = CurPolygon.ColRGB;
+			*(tPgColors++) = *(tColor++);
+			*(tPgColors++) = *(tColor++);
+			*(tPgColors++) = *(tColor++);
+
+			for(int k=0; k<CurNv; k++)
+			{
+				*(tVertCoord++) = *(tCurVert++);
+				*(tVertCoord++) = *(tCurVert++);
+				*(tVertCoord++) = *(tCurVert++);
+				//*(tVertInd++) = (AbsPointCount++); //correct if necessary
+			}
+		}
+
+		m_DoubleBufferMulti[key] = arVertCoord;
+		vector<int> vNumVertCoord; vNumVertCoord.push_back(3*Nv);
+		m_DimsDoubleBufferMulti[key] = vNumVertCoord;
+
+		m_IntBufferMulti[key] = arPgLen;
+		vector<int> vNumPg; vNumPg.push_back(Npg);
+		m_DimsIntBufferMulti[key] = vNumPg;
+
+		m_FloatBufferMulti[key] = arPgColors;
+		vector<int> vNumPgCol; vNumPgCol.push_back(3*Npg);
+		m_DimsFloatBufferMulti[key] = vNumPgCol;
+		
+		vector<int> vInt; vInt.push_back(Npg); vInt.push_back(Nv); //Perhaps not necessarfy
+		m_IntBuffer[key] = vInt;
 	}
 
 	int OutErrorStatus()
@@ -317,6 +392,43 @@ public:
 			for(int i=0; i<nChar; i++) *(tcData++) = *(tRes++);
 		}
 		//(to continue)
+	}
+
+	void OutGeomPolygLen(int key, int* pNvp, int* pNp) //OC04112019
+	{
+		*pNvp = 0; *pNp = 0;
+		if(m_IntBuffer.find(key) == m_IntBuffer.end()) return;
+
+		vector<int> vLenP = m_IntBuffer[key];
+		*pNp = vLenP[0]; *pNvp = vLenP[1];
+		m_IntBuffer.erase(key);
+	}
+
+	template<class T> static void OutBufferMulti(int key, map<int, T*, less<int> >& Buffer, map<int, vector<int>, less<int> >& DimsBuffer, T* arOut) //OC04112019
+	{
+		if(Buffer.find(key) == Buffer.end()) return;
+		T *arStored = Buffer[key];
+		T *t_arStored = arStored, *t_arOut = arOut;
+		
+		if(DimsBuffer.find(key) == DimsBuffer.end()) return;
+		vector<int> vDims = DimsBuffer[key];
+
+		for(int iDim=0; iDim<(int)(vDims.size()); iDim++)
+		{
+			int curDim = vDims[iDim];
+			for(int i=0; i<curDim; i++) *(t_arOut++) = *(t_arStored++);
+		}
+
+		delete[] arStored;
+		Buffer.erase(key);
+		DimsBuffer.erase(key);
+	}
+
+	void OutGeomPolygData(int key, double* arCrdVP, int* arLenP, float* arColP) //OC04112019
+	{
+		OutBufferMulti(key, m_DoubleBufferMulti, m_DimsDoubleBufferMulti, arCrdVP);
+		OutBufferMulti(key, m_IntBufferMulti, m_DimsIntBufferMulti, arLenP);
+		OutBufferMulti(key, m_FloatBufferMulti, m_DimsFloatBufferMulti, arColP);
 	}
 
 	const char* DecodeErrorText(const char* ErrorTitle)

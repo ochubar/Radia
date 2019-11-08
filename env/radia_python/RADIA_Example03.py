@@ -20,35 +20,25 @@ def Und(lp, mp, np, cp, lm, mm, nm, cm, gap, gapOffset, numPer):
     Grp = rad.ObjCnt([])
 
     #Principal Poles and Magnets
-    #y = lp[1]/4;
     y = 0.25*lp[1];
 
-    #Pole = rad.ObjFullMag([lp[0]/4,y,-lp[2]/2-gap/2], [lp[0]/2,lp[1]/2,lp[2]], zer, np, Grp, mp, cp)
     Pole = rad.ObjFullMag([0.25*lp[0],y,-0.5*(lp[2]+gap)], [0.5*lp[0],0.5*lp[1],lp[2]], zer, np, Grp, mp, cp)
-    #y += lp[1]/4;
     y += 0.25*lp[1];
 
     mDir = -1
     for i in range(0, numPer):
         initM = [0, mDir, 0]; mDir *= -1
-        #y += lm[1]/2
         y += 0.5*lm[1]
         
-        #Magnet = rad.ObjFullMag([lm[0]/4,y,-lm[2]/2-gap/2-gapOffset], [lm[0]/2,lm[1],lm[2]], initM, nm, Grp, mm, cm)
         Magnet = rad.ObjFullMag([0.25*lm[0],y,-0.5*(lm[2]+gap)-gapOffset], [0.5*lm[0],lm[1],lm[2]], initM, nm, Grp, mm, cm)
-        #y += (lm[1] + lp[1])/2
         y += 0.5*(lm[1] + lp[1])
 
-        #Pole = rad.ObjFullMag([lp[0]/4,y,-lp[2]/2-gap/2], [lp[0]/2,lp[1],lp[2]], zer, np, Grp, mp, cp)
         Pole = rad.ObjFullMag([0.25*lp[0],y,-0.5*(lp[2]+gap)], [0.5*lp[0],lp[1],lp[2]], zer, np, Grp, mp, cp)
-        #y += lp[1]/2
         y += 0.5*lp[1]
 
     initM = [0, mDir, 0]
-    #y += lm[1]/4;
     y += 0.25*lm[1];
     
-    #Magnet = rad.ObjFullMag([lm[0]/4,y,-lm[2]/2-gap/2-gapOffset], [lm[0]/2,lm[1]/2,lm[2]], initM, nm, Grp, mm, cm)
     Magnet = rad.ObjFullMag([0.25*lm[0],y,-0.5*(lm[2]+gap)-gapOffset], [0.5*lm[0],0.5*lm[1],lm[2]], initM, nm, Grp, mm, cm)
 
     #Mirrors
@@ -114,7 +104,7 @@ def CalcField(g, per, numPer):
     BzVsY = rad.Fld(g, 'bz', [[xc,yMin+iy*yStep,zc] for iy in range(ny)])
     return BzVsY, [yMin, yMax, ny]
 
-#*********************************Entry point
+#*********************************Entry Point
 if __name__=="__main__":
 
     #General Undulator Parameters

@@ -721,7 +721,8 @@ radTHMatDBVect radTMaterial::SetupMaterDB()
 	radTHMatDB h004(new radTLinearAnisotropMaterialDB("Ferrite", 0.07, 0.2, 0.35)); LocDB.push_back(h004);
 
 	radTHMatDB h101(new radTNonlinearIsotropMaterialDB("Xc06", 1.362,0.2605,0.4917, 2118.,63.06,17.138)); LocDB.push_back(h101);
-	radTHMatDB h102(new radTNonlinearIsotropMaterialDB("XcO6", 1.362,0.2605,0.4917, 2118.,63.06,17.138)); LocDB.push_back(h102);
+	//radTHMatDB h102(new radTNonlinearIsotropMaterialDB("XcO6", 1.362,0.2605,0.4917, 2118.,63.06,17.138)); LocDB.push_back(h102);
+	//OC02112019 (commented-out the above)
 	radTHMatDB h103(new radTNonlinearIsotropMaterialDB("Steel37", 1.1488,0.4268,0.4759, 1596.3,133.11,18.713)); LocDB.push_back(h103);
 	radTHMatDB h104(new radTNonlinearIsotropMaterialDB("Steel42", 1.441,0.2912,0.3316, 968.66,24.65,8.3)); LocDB.push_back(h104);
 	radTHMatDB h105(new radTNonlinearIsotropMaterialDB("AFK502", 1.788,0.437,0.115, 10485.,241.5,7.43)); LocDB.push_back(h105);

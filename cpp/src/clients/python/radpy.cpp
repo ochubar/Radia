@@ -4,7 +4,7 @@
  * Project: Radia
  * First release: June 2018
  *
- * @authors O.Chubar (BNL), J.Edelen (RadiaSoft)
+ * @authors O. Chubar (BNL), J. Edelen (RadiaSoft), G. Le Bec (ESRF)
  * @version 0.02
  ***************************************************************************/
 
@@ -1364,6 +1364,116 @@ static PyObject* radia_ObjDrwOpenGL(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
+ * Magnetic Field Sources: outputs data for viewing of 3D geometry of an object using the VTK software system
+ ***************************************************************************/
+static PyObject* ParseGeomDataDrwVTK(double* arCrdV, int nV, int* arLenP, float* arColP, int nP) //OC05112019 (from by R. Nagler's static PyObject* radia_ObjGeometry_helper)
+{
+	PyObject *lengths = PyList_New(nP);
+	PyObject *colors = PyList_New(nP*3);
+	PyObject *vertices = PyList_New(nV*3);
+	if(!vertices || !lengths || !colors) throw strEr_MAF;
+
+	for(Py_ssize_t i = PyList_Size(lengths); --i >= 0;) 
+	{
+		PyObject *o = PyLong_FromLong(arLenP[i]);
+		if(o == NULL || PyList_SetItem(lengths, i, o) < 0) throw strEr_MAF;
+	}
+
+	for(Py_ssize_t i = PyList_Size(colors); --i >= 0;) 
+	{
+		PyObject *o = PyLong_FromDouble(arColP[i]); //why colors are float at input if they are casted to long here?
+		if(o == NULL || PyList_SetItem(colors, i, o) < 0) throw strEr_MAF;
+	}
+
+	for(Py_ssize_t i = PyList_Size(vertices); --i >= 0;) 
+	{
+		PyObject *o = PyFloat_FromDouble(arCrdV[i]);
+		if(o == NULL || PyList_SetItem(vertices, i, o) < 0) throw strEr_MAF;
+	}
+
+	PyObject *oRes = Py_BuildValue(
+		"{s:N,s:N,s:N}",
+		"colors",
+		colors,
+		"lengths",
+		lengths,
+		"vertices",
+		vertices
+	);
+	if(oRes == NULL) throw strEr_MAF;
+	return oRes;
+}
+
+/************************************************************************//**
+ * Magnetic Field Sources: outputs data for viewing of 3D geometry of an object using the VTK software system
+ ***************************************************************************/
+static PyObject* radia_ObjDrwVTK(PyObject *self, PyObject *args) //OC03112019 (requested by R. Nagler)
+//static PyObject* radia_ObjGeometry(PyObject *self, PyObject *args) 
+{
+	PyObject *oInd=0, *oOpt=0, *oRes=0;
+	double *arCrdVP=0, *arCrdVL=0;
+	float *arColP=0, *arColL=0;
+	int *arLenP=0, *arLenL=0;
+
+	try
+	{
+		if(!PyArg_ParseTuple(args, "O|O:ObjDrwVTK", &oInd, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": ObjDrwVTK");
+		//if(!PyArg_ParseTuple(args, "O|O:ObjGeometry", &oInd, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": ObjGeometry");
+		if(oInd == 0) throw CombErStr(strEr_BadFuncArg, ": ObjDrwVTK");
+
+		if(!PyNumber_Check(oInd)) throw CombErStr(strEr_BadFuncArg, ": ObjDrwVTK");
+		int ind = (int)PyLong_AsLong(oInd);
+
+		char sOpt[1024]; *sOpt = '\0';
+		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+		int nVertPgns=0, nPgns=0, nVertLines=0, nLines=0, key=-1;
+		g_pyParse.ProcRes(RadObjDrwVTK(&nVertPgns, &nPgns, &nVertLines, &nLines, &key, ind, sOpt));
+
+		if(nVertPgns > 0) arCrdVP = new double[nVertPgns*3];
+		if(nPgns > 0)
+		{
+			arLenP = new int[nPgns];
+			arColP = new float[nPgns*3];
+		}
+		if(nVertLines > 0) arCrdVL = new double[nVertLines*3];
+		if(nLines > 0)
+		{
+			arLenL = new int[nLines];
+			arColL = new float[nLines*3];
+		}
+
+		g_pyParse.ProcRes(RadObjDrwDataGetVTK(arCrdVP, arLenP, arColP, arCrdVL, arLenL, arColL, key));
+
+		oRes = Py_BuildValue(
+			"{s:N,s:N}",
+			"polygons",
+			ParseGeomDataDrwVTK(arCrdVP, nVertPgns, arLenP, arColP, nPgns),
+			"lines",
+			ParseGeomDataDrwVTK(arCrdVL, nVertLines, arLenL, arColL, nLines)
+		);
+		if(oRes == NULL) throw strEr_MAF;
+		//TODO(robnagler) ref counts are invalid at this point,
+		//  but then this is a malloc error...
+
+		Py_XINCREF(oRes); //? NOTE: seem to have experienced crashes without this
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+
+	if(arCrdVP != 0) delete[] arCrdVP;
+	if(arCrdVL != 0) delete[] arCrdVL;
+	if(arColP != 0) delete[] arColP;
+	if(arColL != 0) delete[] arColL;
+	if(arLenP != 0) delete[] arLenP;
+	if(arLenL != 0) delete[] arLenL;
+
+	return oRes;
+}
+
+/************************************************************************//**
  * Space Transformations: Creates a symmetry with respect to plane defined by a point and a normal vector.
  ***************************************************************************/
 static PyObject* radia_TrfPlSym(PyObject *self, PyObject *args)
@@ -1681,8 +1791,10 @@ static PyObject* radia_MatStd(PyObject *self, PyObject *args)
 	PyObject *oMatId=0, *oResInd=0;
 	try
 	{
-		double absM = 0;
-		if(!PyArg_ParseTuple(args, "Od:MatStd", &oMatId, &absM)) throw CombErStr(strEr_BadFuncArg, ": MatStd");
+		double absM = -1; //OC02112019
+		//double absM = 0;
+		if(!PyArg_ParseTuple(args, "O|d:MatStd", &oMatId, &absM)) throw CombErStr(strEr_BadFuncArg, ": MatStd"); //OC02112019
+		//if(!PyArg_ParseTuple(args, "Od:MatStd", &oMatId, &absM)) throw CombErStr(strEr_BadFuncArg, ": MatStd");
 		if(oMatId == 0) throw CombErStr(strEr_BadFuncArg, ": MatStd");
 
 		char sMatId[256];
@@ -1703,6 +1815,47 @@ static PyObject* radia_MatStd(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
+ * Magnetic Materials: a linear anisotropic magnetic material.
+ ***************************************************************************/
+static PyObject* radia_MatLin(PyObject* self, PyObject* args)
+{
+	PyObject *oKsi=0, *oMr=0, *oResInd=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "OO:MatLin", &oKsi, &oMr)) throw CombErStr(strEr_BadFuncArg, ": MatLin");
+		if((oKsi == 0) || (oMr == 0)) throw CombErStr(strEr_BadFuncArg, ": MatLin");
+
+		double arKsi[2];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oKsi, 'd', arKsi, 2, CombErStr(strEr_BadFuncArg, ": MatLin, incorrect definition of susceptibility parameters"));
+
+		int nMr=0;
+		double arMr[3];
+		if(PyNumber_Check(oMr))
+		{
+			*arMr = PyFloat_AsDouble(oMr);
+			nMr = 1;
+		}
+		else
+		{
+			CPyParse::CopyPyListElemsToNumArrayKnownLen(oMr, 'd', arMr, 3, CombErStr(strEr_BadFuncArg, ": MatLin, incorrect definition of remanent magnetization"));
+			nMr = 3;
+		}
+
+		int indRes=0;
+		g_pyParse.ProcRes(RadMatLin(&indRes, arKsi, arMr, nMr));
+
+		oResInd = Py_BuildValue("i", indRes);
+		Py_XINCREF(oResInd); //?
+	}
+	catch (const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
  * Magnetic Materials: a nonlinear isotropic magnetic material with the magnetization magnitude equal M = ms1*tanh(ksi1*H/ms1) + ms2*tanh(ksi2*H/ms2) + ms3*tanh(ksi3*H/ms3), where H is the magnitude of the magnetic field strength vector (in Tesla).
  ***************************************************************************/
 static PyObject* radia_MatSatIsoFrm(PyObject *self, PyObject *args)
@@ -1715,15 +1868,15 @@ static PyObject* radia_MatSatIsoFrm(PyObject *self, PyObject *args)
 		if(oPair1 == 0) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm");
 		
 		int nElem = 0;
-		if((!CPyParse::CopyPyNestedListElemsToNumAr(oPair1, 'd', arKsiMs1, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm");
+		if((!CPyParse::CopyPyNestedListElemsToNumAr(oPair1, 'd', arKsiMs1, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm, pair of Ksi and Ms is expected");
 
 		if(oPair2 != 0)
 		{
-			if((!CPyParse::CopyPyNestedListElemsToNumAr(oPair2, 'd', arKsiMs2, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm");
+			if((!CPyParse::CopyPyNestedListElemsToNumAr(oPair2, 'd', arKsiMs2, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm, pair of Ksi and Ms is expected");
 		}
 		if(oPair3 != 0)
 		{
-			if((!CPyParse::CopyPyNestedListElemsToNumAr(oPair3, 'd', arKsiMs3, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm");
+			if((!CPyParse::CopyPyNestedListElemsToNumAr(oPair3, 'd', arKsiMs3, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoFrm, pair of Ksi and Ms is expected");
 		}
 
 		int indRes = 0;
@@ -1746,7 +1899,7 @@ static PyObject* radia_MatSatIsoFrm(PyObject *self, PyObject *args)
 /************************************************************************//**
  * Magnetic Materials: a nonlinear isotropic magnetic material with the M versus H curve defined by the list of pairs corresponding values of H and M (H1,M1,H2,M2,...)
  ***************************************************************************/
-static PyObject* radia_MatSatIsoTab(PyObject *self, PyObject *args)
+static PyObject* radia_MatSatIsoTab(PyObject* self, PyObject* args)
 {
 	PyObject *oMatData=0, *oResInd=0;
 	double *arMatData=0;
@@ -1758,10 +1911,176 @@ static PyObject* radia_MatSatIsoTab(PyObject *self, PyObject *args)
 		int nDataTot = 0;
 		char resP = CPyParse::CopyPyNestedListElemsToNumAr(oMatData, 'd', arMatData, nDataTot);
 		if(resP == 0) throw CombErStr(strEr_BadFuncArg, ": MatSatIsoTab");
-		int nDataP = (int)round(0.5*nDataTot);
+		int nDataP = (int)round(0.5 * nDataTot);
 
 		int indRes = 0;
 		g_pyParse.ProcRes(RadMatSatIsoTab(&indRes, arMatData, nDataP));
+
+		oResInd = Py_BuildValue("i", indRes);
+		Py_XINCREF(oResInd); //?
+	}
+	catch (const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	if(arMatData != 0) delete[] arMatData;
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Magnetic Materials: laminated nonlinear anisotropic magnetic material with packing factor p and the lamination planes perpendicular to the vector N. The magnetization magnitude vs magnetic field strength for the corresponding isotropic material is defined by the formula M = ms1*tanh(ksi1*H/ms1) + ms2*tanh(ksi2*H/ms2) + ms3*tanh(ksi3*H/ms3), where H is the magnitude of the magnetic field strength vector (in Tesla); ksi1, ms1, ksi2, ms2, ksi3, ms3 constants are given by parameters KsiMs1, KsiMs2, KsiMs3.
+ ***************************************************************************/
+static PyObject* radia_MatSatLamFrm(PyObject* self, PyObject* args)
+{
+	PyObject *oPair1=0, *o2=0, *o3=0, *o4=0, *o5=0, *oResInd=0;
+	double *arKsiMs1=0, *arKsiMs2=0, *arKsiMs3=0, *arN=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "OO|OOO:MatSatLamFrm", &oPair1, &o2, &o3, &o4, &o5)) throw CombErStr(strEr_BadFuncArg, ": MatSatLamFrm");
+		if(oPair1 == 0) throw CombErStr(strEr_BadFuncArg, ": MatSatLamFrm");
+
+		int nElem=0;
+		if((!CPyParse::CopyPyNestedListElemsToNumAr(oPair1, 'd', arKsiMs1, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatLamFrm, pair of Ksi and Ms is expected");
+
+		double p=0;
+		if(o2 != 0)
+		{//Can be another pair or staking factor 
+			if(PyNumber_Check(o2)) p = PyFloat_AsDouble(o2);
+			else
+			{
+				if((!CPyParse::CopyPyNestedListElemsToNumAr(o2, 'd', arKsiMs2, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatLamFrm, pair of Ksi and Ms is expected");
+			}
+		}
+		if(o3 != 0)
+		{
+			if(PyNumber_Check(o2)) p = PyFloat_AsDouble(o3);
+			else
+			{
+				if(p == 0)
+				{
+					if((!CPyParse::CopyPyNestedListElemsToNumAr(o3, 'd', arKsiMs2, nElem)) || (nElem != 2)) throw CombErStr(strEr_BadFuncArg, ": MatSatLamFrm, pair of Ksi and Ms is expected");
+				}
+				else
+				{
+					if((!CPyParse::CopyPyNestedListElemsToNumAr(o3, 'd', arN, nElem)) || (nElem != 3)) throw CombErStr(strEr_BadFuncArg, ": MatSatLamFrm, 3D vector coordinate list / array is expected");
+				}
+			}
+		}
+		if(o4 != 0)
+		{
+			if(p == 0)
+			{
+				if(PyNumber_Check(o2)) p = PyFloat_AsDouble(o4);
+			}
+			else
+			{
+				if((!CPyParse::CopyPyNestedListElemsToNumAr(o4, 'd', arN, nElem)) || (nElem != 3)) throw CombErStr(strEr_BadFuncArg, ": MatSatLamFrm, 3D vector coordinate list / array is expected");
+			}
+		}
+		if(o5 != 0)
+		{
+			if((!CPyParse::CopyPyNestedListElemsToNumAr(o5, 'd', arN, nElem)) || (nElem != 3)) throw CombErStr(strEr_BadFuncArg, ": MatSatLamFrm, 3D vector coordinate list / array is expected");
+		}
+
+		if(p == 0) throw CombErStr(strEr_BadFuncArg, ": MatSatLamFrm, positive lamination stacking factor is not defined");
+
+		int indRes=0;
+		g_pyParse.ProcRes(RadMatSatLamFrm(&indRes, arKsiMs1, arKsiMs2, arKsiMs3, p, arN));
+
+		oResInd = Py_BuildValue("i", indRes);
+		Py_XINCREF(oResInd); //?
+	}
+	catch (const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	if(arKsiMs1 != 0) delete[] arKsiMs1;
+	if(arKsiMs2 != 0) delete[] arKsiMs2;
+	if(arKsiMs3 != 0) delete[] arKsiMs3;
+	if(arN != 0) delete[] arN;
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Magnetic Materials: laminated nonlinear anisotropic magnetic material with packing factor p and the lamination planes perpendicular to the vector N. The magnetization magnitude vs magnetic field strength for the corresponding isotropic material is defined by pairs of values H, M in Tesla.
+ ***************************************************************************/
+static PyObject* radia_MatSatLamTab(PyObject* self, PyObject* args)
+{
+	PyObject *oMatData=0, *oN=0, *oResInd=0;
+	double *arMatData=0, *arN=0;
+	try
+	{
+		double p=0;
+		if(!PyArg_ParseTuple(args, "Od|O:MatSatLamTab", &oMatData, &p, oN)) throw CombErStr(strEr_BadFuncArg, ": MatSatLamTab");
+		if((oMatData == 0) || (p == 0)) throw CombErStr(strEr_BadFuncArg, ": MatSatLamTab");
+
+		int nDataTot=0;
+		char resP = CPyParse::CopyPyNestedListElemsToNumAr(oMatData, 'd', arMatData, nDataTot);
+		if(resP == 0) throw CombErStr(strEr_BadFuncArg, ": MatSatLamTab");
+		int nDataP = (int)round(0.5*nDataTot);
+
+		if(oN != 0)
+		{
+			int nElem=0;
+			if((!CPyParse::CopyPyNestedListElemsToNumAr(oN, 'd', arN, nElem)) || (nElem != 3)) throw CombErStr(strEr_BadFuncArg, ": MatSatLamTab, 3D vector coordinate list / array is expected");
+		}
+
+		int indRes=0;
+		g_pyParse.ProcRes(RadMatSatLamTab(&indRes, arMatData, nDataP, p, arN));
+
+		oResInd = Py_BuildValue("i", indRes);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	if(arMatData != 0) delete[] arMatData;
+	if(arN != 0) delete[] arN;
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Magnetic Materials: a nonlinear anisotropic magnetic material. The magnetization vector component parallel to the easy axis is computed either by the formula: ms1*tanh(ksi1*(hpa-hc1)/ms1) + ms2*tanh(ksi2*(hpa-hc2)/ms2) + ms3*tanh(ksi3*(hpa-hc3)/ms3) + ksi0*(hpa-hc0), where hpa is the field strength vector component parallel to the easy axis, or by ksi0*hpa. The magnetization vector component perpendicular to the easy axis is computed either by the formula: ms1*tanh(ksi1*hpe/ms1) + ms2*tanh(ksi2*hpe/ms2) + ms3*tanh(ksi3*hpe/ms3) + ksi0*hpe, where hpe is the field strength vector component perpendicular to the easy axis, or by ksi0*hpe. At least one of the magnetization components should non-linearly depend on the field strength. The direction of the easy magnetisation axis is set up by the magnetization vector in the object to which the material is later applied.
+ ***************************************************************************/
+static PyObject* radia_MatSatAniso(PyObject* self, PyObject* args)
+{
+	PyObject *oPar=0, *oPer=0, *oResInd=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "OO:MatSatAniso", &oPar, &oPer)) throw CombErStr(strEr_BadFuncArg, ": MatSatAniso");
+		if((oPar == 0) || (oPer == 0)) throw CombErStr(strEr_BadFuncArg, ": MatSatAniso");
+
+		double arPar[11], arPer[11];
+		int nPar=0, nPer=0;
+		if(PyNumber_Check(oPar))
+		{
+			*arPar = PyFloat_AsDouble(oPar);
+			nPar = 1;
+		}
+		else
+		{
+			nPar = 11;
+			double *p = arPar;
+			if(!CPyParse::CopyPyNestedListElemsToNumAr(oPar, 'd', p, nPar)) throw CombErStr(strEr_BadFuncArg, ": MatSatAniso, incorrect definition of magnetic material constants in the direction parallel to the easy axis");
+		}
+		if(PyNumber_Check(oPer))
+		{
+			*arPer = PyFloat_AsDouble(oPer);
+			nPer = 1;
+		}
+		else
+		{
+			nPer = 11;
+			double *p = arPer;
+			if(!CPyParse::CopyPyNestedListElemsToNumAr(oPer, 'd', p, nPer)) throw CombErStr(strEr_BadFuncArg, ": MatSatAniso, incorrect definition of magnetic material constants in the direction perpendicular to the easy axis");
+		}
+
+		int indRes=0;
+		g_pyParse.ProcRes(RadMatSatAniso(&indRes, arPar, nPar, arPer, nPer));
 
 		oResInd = Py_BuildValue("i", indRes);
 		Py_XINCREF(oResInd); //?
@@ -1871,7 +2190,7 @@ static PyObject* radia_RlxAuto(PyObject *self, PyObject *args)
 	PyObject *oOpt=0, *oResInd=0;
 	try
 	{
-		int ind = 0, meth = 0, numIt = 0;
+		int ind=0, meth=0, numIt=0;
 		double prec = 0;
 		if(!PyArg_ParseTuple(args, "idii|O:RlxAuto", &ind, &prec, &numIt, &meth, &oOpt)) throw CombErStr(strEr_BadFuncArg, ": RlxAuto");
 		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": RlxAuto");
@@ -1896,6 +2215,33 @@ static PyObject* radia_RlxAuto(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
+ * Magnetic Field Calculation Methods: Updates external field data for the relaxation (to take into account e.g. modification of currents in coils, if any) without rebuilding the interaction matrix.
+ ***************************************************************************/
+static PyObject* radia_RlxUpdSrc(PyObject* self, PyObject* args)
+{
+	PyObject *oResInd = 0;
+
+	try
+	{
+		int ind=0;
+		if(!PyArg_ParseTuple(args, "i:RlxUpdSrc", &ind)) throw CombErStr(strEr_BadFuncArg, ": RlxUpdSrc");
+		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": RlxUpdSrc");
+
+		g_pyParse.ProcRes(RadRlxUpdSrc(ind));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+
+	return oResInd;
+}
+
+/************************************************************************//**
  * Magnetic Field Calculation Methods: Builds an interaction matrix and performs a relaxation procedure.
  ***************************************************************************/
 static PyObject* radia_Solve(PyObject *self, PyObject *args)
@@ -1903,7 +2249,8 @@ static PyObject* radia_Solve(PyObject *self, PyObject *args)
 	PyObject *oRes=0;
 	try
 	{
-		int ind=0, numIt=1000, meth=0;
+		int ind=0, numIt=1000, meth=4; //OC02112019
+		//int ind=0, numIt=1000, meth=0;
 		double prec=0.0001;
 
 		if(!PyArg_ParseTuple(args, "idi|i:Solve", &ind, &prec, &numIt, &meth)) throw CombErStr(strEr_BadFuncArg, ": Solve");
@@ -1935,7 +2282,7 @@ static PyObject* radia_Fld(PyObject *self, PyObject *args)
 	{
 		int ind=0;
 		if(!PyArg_ParseTuple(args, "iOO:Fld", &ind, &oCmpnId, &oP)) throw CombErStr(strEr_BadFuncArg, ": Fld");
-		if(ind == 0) throw CombErStr(strEr_BadFuncArg, ": Fld");
+		if((ind == 0) || (oCmpnId == 0) || (oP == 0)) throw CombErStr(strEr_BadFuncArg, ": Fld");
 
 		char sCmpnId[256];
 		CPyParse::CopyPyStringToC(oCmpnId, sCmpnId, 256);
@@ -1963,7 +2310,50 @@ static PyObject* radia_Fld(PyObject *self, PyObject *args)
 	}
 	if(arCoord != 0) delete[] arCoord;
 	if(arB != 0) delete[] arB;
+	return oResB;
+}
 
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Computes magnetic field created by object obj in np equidistant points along a line segment from P1 to P2; the field component is specified by the id input variable.
+ ***************************************************************************/
+static PyObject* radia_FldLst(PyObject* self, PyObject* args)
+{
+	PyObject *oCmpnId=0, *oP1=0, *oP2=0, *oOpt=0, *oResB=0;
+	//PyObject *oCmpnId=0, *oP1=0, *oP2=0, *oOpt=0, *oResB=0;
+	double *arB=0;
+	try
+	{
+		int ind=0, nP=0;
+		double start=0.;
+		if(!PyArg_ParseTuple(args, "iOOOi|Od:FldLst", &ind, &oCmpnId, &oP1, &oP2, &nP, &oOpt, &start)) throw CombErStr(strEr_BadFuncArg, ": FldLst");
+		//if(!PyArg_ParseTuple(args, "iOOOO|OO:FldLst", &ind, &oCmpnId, &oP1, &oP2, nP, &oOpt, &start)) throw CombErStr(strEr_BadFuncArg, ": FldLst");
+		if((ind <= 0) || (oCmpnId == 0) || (oP1 == 0) || (oP2 == 0) || (nP <= 0)) throw CombErStr(strEr_BadFuncArg, ": FldLst");
+
+		char sCmpnId[256];
+		CPyParse::CopyPyStringToC(oCmpnId, sCmpnId, 256);
+
+		double arP1[3], arP2[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP1, 'd', arP1, 3, CombErStr(strEr_BadFuncArg, ": FldLst, incorrect definition of first point defining line segment along which field should be calculated"));
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP2, 'd', arP2, 3, CombErStr(strEr_BadFuncArg, ": FldLst, incorrect definition of second point defining line segment along which field should be calculated"));
+
+		char sOpt[1024]; *sOpt = '\0';
+		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+		const int maxNumFldCmpn = 14;
+		arB = new double[maxNumFldCmpn*nP];
+		int nB = 0;
+		g_pyParse.ProcRes(RadFldLst(arB, &nB, ind, sCmpnId, arP1, arP2, nP, sOpt, start));
+
+		if(nB == 1) oResB = Py_BuildValue("d", *arB);
+		else if(nB > 1) oResB = CPyParse::SetDataListOfLists(arB, nB, nP);
+		if(oResB) Py_XINCREF(oResB);
+	}
+	catch(const char* erText) 
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	if(arB != 0) delete[] arB;
 	return oResB;
 }
 
@@ -2004,8 +2394,486 @@ static PyObject* radia_FldInt(PyObject *self, PyObject *args)
 	return oResIB;
 }
 
+/***************************************************************************
+ * Magnetic Field Calculation Methods: Computes transverse coordinates and their derivatives (angles) of a relativistic charged trajectory in the magnetic field produced by object obj, 
+ * using a Runge-Kutta integration. The charge of the particle is that of electron. All positions are in millimeters and angles in radians.
+ ***************************************************************************/
+static PyObject* radia_FldPtcTrj(PyObject *self, PyObject *args) 
+{
+	PyObject *oInitCond=0, *oLongLim=0, *oResTrj=0;
+	double *arTrj=0; //OC
+
+	try
+	{
+		int ind=0, Np;
+		double E;
+
+		if(!PyArg_ParseTuple(args, "idOOi:FldPtcTrj", &ind, &E, &oInitCond, &oLongLim, &Np)) throw CombErStr(strEr_BadFuncArg, ": FldPtcTrj");
+		if((oInitCond == 0) || (oLongLim == 0)) throw CombErStr(strEr_BadFuncArg, ": FldPtcTrj");
+
+		double arInitCond[4], arLongLim[2];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oInitCond, 'd', arInitCond, 4, CombErStr(strEr_BadFuncArg, ": FldPtcTrj, incorrect definition of initial conditions"));
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oLongLim, 'd', arLongLim, 2, CombErStr(strEr_BadFuncArg, ": FldPtcTrj, incorrect definition of Y range"));
+
+		//double *arTrj = new double[Np*5];
+		arTrj = new double[Np*5]; //OC
+		int nTrjPts = 0;
+		g_pyParse.ProcRes(RadFldPtcTrj(arTrj, &nTrjPts, ind, E, arInitCond, arLongLim, Np));
+
+		if(nTrjPts == 1) oResTrj = Py_BuildValue("d", *arTrj);
+		else if (nTrjPts > 1) oResTrj = CPyParse::SetDataListOfLists(arTrj, nTrjPts, Np);
+		if(oResTrj) Py_XINCREF(oResTrj);
+
+		//if (arTrj != 0) delete[] arTrj; //OC (commented-out)
+	}
+	catch (const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	if(arTrj != 0) delete[] arTrj; //OC
+	return oResTrj;
+}
+
 /************************************************************************//**
- * Outputs information about an object or list of objects.
+ * Magnetic Field Calculation Methods: Computes potential energy (in Joule) of the object objdst in the field created by the object objsrc. If SbdPar = 0, the function performes the computation based on absolute accuracy value for the energy (by default 10 Joule; can be modified by the function FldCmpPrc). Otherwise, the computation is performed based on the destination object subdivision numbers (kx=SbdPar[0],ky=SbdPar[1],kz=SbdPar[2]).
+ ***************************************************************************/
+static PyObject* radia_FldEnr(PyObject* self, PyObject* args)
+{
+	PyObject *oSbdPar=0, *oResE=0;
+	try
+	{
+		int indDst=0, indSrc=0;
+		if(!PyArg_ParseTuple(args, "ii|O:FldEnr", &indDst, &indSrc, &oSbdPar)) throw CombErStr(strEr_BadFuncArg, ": FldEnr");
+		if((indDst <= 0) || (indSrc <= 0)) throw CombErStr(strEr_BadFuncArg, ": FldEnr");
+
+		int arSbdPar[] = {1,1,1};
+		if(oSbdPar != 0) CPyParse::CopyPyListElemsToNumArrayKnownLen(oSbdPar, 'i', arSbdPar, 3, CombErStr(strEr_BadFuncArg, ": FldEnr, incorrect definition of subdivision numbers"));
+
+		double resE=0;
+		g_pyParse.ProcRes(RadFldEnr(&resE, indDst, indSrc, arSbdPar));
+
+		oResE = Py_BuildValue("d", resE);
+		Py_XINCREF(oResE); //?
+	}
+	catch (const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return oResE;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Computes force (in Newton) acting on the object objdst in the field produced by the object objsrc. If SbdPar = 0, the function performes the computation based on absolute accuracy value for the force (by default 10 Newton; can be modified by the function FldCmpPrc). Otherwise, the computation is performed based on the destination object subdivision numbers {kx=SbdPar[0],ky=SbdPar[1],kz=SbdPar[2]}.
+ ***************************************************************************/
+static PyObject* radia_FldEnrFrc(PyObject* self, PyObject* args)
+{
+	PyObject *oCmpnId=0, *oSbdPar=0, *oResF=0;
+	try
+	{
+		int indDst=0, indSrc=0;
+		if(!PyArg_ParseTuple(args, "iiO|O:FldEnrFrc", &indDst, &indSrc, &oCmpnId, &oSbdPar)) throw CombErStr(strEr_BadFuncArg, ": FldEnrFrc");
+		if((indDst <= 0) || (indSrc <= 0) || (oCmpnId == 0)) throw CombErStr(strEr_BadFuncArg, ": FldEnrFrc");
+
+		char sCmpnId[256];
+		CPyParse::CopyPyStringToC(oCmpnId, sCmpnId, 256);
+
+		int arSbdPar[]={1,1,1};
+		if(oSbdPar != 0) CPyParse::CopyPyListElemsToNumArrayKnownLen(oSbdPar, 'i', arSbdPar, 3, CombErStr(strEr_BadFuncArg, ": FldEnrFrc, incorrect definition of subdivision numbers"));
+
+		double arF[9];
+		int nF=0;
+		g_pyParse.ProcRes(RadFldEnrFrc(arF, &nF, indDst, indSrc, sCmpnId, arSbdPar));
+
+		if(nF == 1) oResF = Py_BuildValue("d", *arF);
+		else if(nF > 1) oResF = CPyParse::SetDataListOfLists(arF, nF, 1);
+		if(oResF) Py_XINCREF(oResF);
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return oResF;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Computes torque (in Newton*mm) with respect to point P, acting on the object objdst in the field produced by the object objsrc. If SbdPar = 0, the function performes the computation based on absolute accuracy value for the torque (by default 10 Newton*mm; can be modified by the function FldCmpPrc). Otherwise, the computation is performed based on the destination object subdivision numbers {kx=SbdPar[0],ky=SbdPar[1],kz=SbdPar[2]}.
+ ***************************************************************************/
+static PyObject* radia_FldEnrTrq(PyObject* self, PyObject* args)
+{
+	PyObject *oCmpnId=0, *oP=0, *oSbdPar=0, *oResT=0;
+	try
+	{
+		int indDst=0, indSrc=0;
+		if(!PyArg_ParseTuple(args, "iiOO|O:FldEnrTrq", &indDst, &indSrc, &oCmpnId, &oP, &oSbdPar)) throw CombErStr(strEr_BadFuncArg, ": FldEnrTrq");
+		if((indDst <= 0) || (indSrc <= 0) || (oCmpnId == 0) || (oP)) throw CombErStr(strEr_BadFuncArg, ": FldEnrTrq");
+
+		char sCmpnId[256];
+		CPyParse::CopyPyStringToC(oCmpnId, sCmpnId, 255);
+
+		int arSbdPar[]={1,1,1};
+		if(oSbdPar != 0) CPyParse::CopyPyListElemsToNumArrayKnownLen(oSbdPar, 'i', arSbdPar, 3, CombErStr(strEr_BadFuncArg, ": FldEnrTrq, incorrect definition of subdivision numbers"));
+
+		double arP[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP, 'd', arP, 3, CombErStr(strEr_BadFuncArg, ": FldEnrTrq, incorrect definition of point the torque should be calculated with respect to"));
+
+		double arT[9];
+		int nT=0;
+		g_pyParse.ProcRes(RadFldEnrTrq(arT, &nT, indDst, indSrc, sCmpnId, arP, arSbdPar));
+
+		if(nT == 1) oResT = Py_BuildValue("d", *arT);
+		else if(nT > 1) oResT = CPyParse::SetDataListOfLists(arT, nT, 1);
+		if(oResT) Py_XINCREF(oResT);
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return oResT;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Computes force of the field produced by the object obj onto a shape defined by shape. shape can be the result of RadObjRecMag (parallelepiped) or RadFldFrcShpRtg (rectangular surface). This function uses the algorithm based on Maxwell tensor, which may not always provide high efficiency. We suggest to use the function RadFldEnrFrc instead of this function.
+ ***************************************************************************/
+static PyObject* radia_FldFrc(PyObject* self, PyObject* args)
+{
+	PyObject *oResF=0;
+	try
+	{
+		int indObj=0, indShp=0;
+		if(!PyArg_ParseTuple(args, "ii:FldFrc", &indObj, &indShp)) throw CombErStr(strEr_BadFuncArg, ": FldFrc");
+		if((indObj <= 0) || (indShp <= 0)) throw CombErStr(strEr_BadFuncArg, ": FldFrc");
+
+		double arF[9];
+		int nF=0;
+		g_pyParse.ProcRes(RadFldFrc(arF, &nF, indObj, indShp));
+
+		if(nF == 1) oResF = Py_BuildValue("d", *arF);
+		else if(nF > 1) oResF = CPyParse::SetDataListOfLists(arF, nF, 1);
+		if(oResF) Py_XINCREF(oResF);
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return oResF;
+}
+
+/************************************************************************//**
+ * Auxiliary Shape Object: Creates a rectangle with central point P and dimensions W (to be used for force computation via Maxwell tensor)
+ ***************************************************************************/
+static PyObject* radia_FldFrcShpRtg(PyObject *self, PyObject *args)
+{
+	PyObject *oP=0, *oW=0, *oResInd=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "OO:FldFrcShpRtg", &oP, &oW)) throw CombErStr(strEr_BadFuncArg, ": FldFrcShpRtg");
+		if((oP == 0) || (oW == 0)) throw CombErStr(strEr_BadFuncArg, ": FldFrcShpRtg");
+
+		double arP[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP, 'd', arP, 3, CombErStr(strEr_BadFuncArg, ": FldFrcShpRtg, incorrect definition of center point"));
+
+		double arW[2];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oW, 'd', arW, 2, CombErStr(strEr_BadFuncArg, ": FldFrcShpRtg, incorrect definition of dimensions"));
+
+		int ind=0;
+		g_pyParse.ProcRes(RadFldFrcShpRtg(&ind, arP, arW));
+
+		oResInd = Py_BuildValue("i", ind);
+		Py_XINCREF(oResInd); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oResInd;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Computes "focusing potential" for trajectory of relativistic charged particle in magnetic field produced by the object obj. The integration is made from P1 to P2 with np equidistant points.
+ ***************************************************************************/
+static PyObject* radia_FldFocPot(PyObject* self, PyObject* args)
+{
+	PyObject *oP1=0, *oP2=0, *oResFP=0;
+	try
+	{
+		int indObj=0, np=0;
+		if(!PyArg_ParseTuple(args, "iOOi:FldFocPot", &indObj, &oP1, &oP2)) throw CombErStr(strEr_BadFuncArg, ": FldFocPot");
+		if((indObj <= 0) || (np <= 0)) throw CombErStr(strEr_BadFuncArg, ": FldFocPot");
+
+		double arP1[3], arP2[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP1, 'd', arP1, 3, CombErStr(strEr_BadFuncArg, ": FldFocPot, incorrect definition of first end point"));
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP2, 'd', arP2, 3, CombErStr(strEr_BadFuncArg, ": FldFocPot, incorrect definition of second end point"));
+
+		double resFP=0;
+		g_pyParse.ProcRes(RadFldFocPot(&resFP, indObj, arP1, arP2, np));
+
+		oResFP = Py_BuildValue("d", resFP);
+		Py_XINCREF(oResFP); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return oResFP;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Computes matrices of 2nd order kicks for trajectory of relativistic charged particle in periodic magnetic field produced by the object obj. The computed kick matrices can be used in charged particle tracking codes.  The longitudinal integration along one period starts at point P1 and is done along direction pointed by vector Ns; one direction of the transverse grid is pointed by vector Ntr, the other transverse direction is given by vector product of Ntr and Ns.
+ ***************************************************************************/
+static PyObject* radia_FldFocKickPer(PyObject* self, PyObject* args)
+{
+	PyObject *oP1=0, *oNs=0, *oN1=0, *oCom=0, *oPrecPar=0, *oUnits=0, *oFrm=0, *oRes=0;
+	double *arM1=0, *arM2=0, *arIntBtrE2=0, *arArg1=0, *arArg2=0;
+	char *sOut=0;
+	try
+	{
+		int ind=0, nPer=0, np1=0, np2=0;
+		double per=0., r1=0., r2=0., E=1.;
+		if(!PyArg_ParseTuple(args, "iOOdiOdidi|OOOdO:FldFocKickPer", &ind, &oP1, &oNs, &per, &nPer, &oN1, &r1, &np1, &r2, &np2, &oCom, &oPrecPar, &oUnits, &E, &oFrm)) throw CombErStr(strEr_BadFuncArg, ": FldFocKickPer");
+		if((oP1 == 0) || (oNs == 0) || (oN1 == 0) || (np1 <= 0) || (np2 <= 0)) throw CombErStr(strEr_BadFuncArg, ": FldFocKickPer");
+
+		double arP1[3], arNs[3], arN1[3];
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP1, 'd', arP1, 3, CombErStr(strEr_BadFuncArg, ": FldFocKickPer, incorrect definition of the integration start point"));
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oNs, 'd', arNs, 3, CombErStr(strEr_BadFuncArg, ": FldFocKickPer, incorrect definition of a vector defining the longitudinal direction for the periodic magnetic field"));
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oN1, 'd', arN1, 3, CombErStr(strEr_BadFuncArg, ": FldFocKickPer, incorrect definition of a vector defining first transverse direction"));
+
+		char sCom[1025];
+		*sCom = '\0';
+		if(oCom != 0) CPyParse::CopyPyStringToC(oCom, sCom, 1024);
+
+		int nh=1, nps=8;
+		double d1=0., d2=0.;
+		if(oPrecPar != 0)
+		{
+			double arPrecPar[4];
+			CPyParse::CopyPyListElemsToNumArrayKnownLen(oPrecPar, 'd', arPrecPar, 4, CombErStr(strEr_BadFuncArg, ": FldFocKickPer, incorrect definition of the integration precision parameters"));
+			nh = (int)arPrecPar[0]; 
+			nps = (int)arPrecPar[1];
+			d1 = arPrecPar[2];
+			d2 = arPrecPar[3];
+		}
+
+		char sUnits[256];
+		strcpy(sUnits, "T2m2\0");
+		if(oUnits != 0) CPyParse::CopyPyStringToC(oUnits, sUnits, 255);
+
+		char sFrm[256];
+		strcpy(sFrm, "fix\0");
+		if(oFrm != 0) CPyParse::CopyPyStringToC(oFrm, sFrm, 255);
+
+		long np1_np2 = np1*np2;
+		arM1 = new double[np1_np2];
+		arM2 = new double[np1_np2];
+		arIntBtrE2 = new double[np1_np2];
+		arArg1 = new double[np1];
+		arArg2 = new double[np2];
+		int sLen=0;
+		g_pyParse.ProcRes(RadFldFocKickPer(arM1, arM2, arIntBtrE2, arArg1, arArg2, &sLen, ind, arP1, arNs, per, nPer, nps, arN1, r1, np1, d1, r2, np2, d2, nh, sCom, sUnits, E, sFrm)); //OC03112019
+		//g_pyParse.ProcRes(RadFldFocKickPer(arM1, arM2, arIntBtrE2, arArg1, arArg2, &sLen, ind, arP1, arNs, per, nPer, nps, arN1, r1, np1, d1, r2, np2, d2, nh, sCom));
+
+		sOut = new char[sLen];
+		g_pyParse.ProcRes(RadFldFocKickPerFormStr(sOut, arM1, arM2, arIntBtrE2, arArg1, arArg2, np1, np2, per, nPer, sCom));
+
+		oRes = PyTuple_New(6);
+		PyObject *oM1 = CPyParse::SetDataListOfLists(arM1, np1, np2); //check dims; make it a flat array?
+		PyTuple_SET_ITEM(oRes, 0, oM1);
+		PyObject *oM2 = CPyParse::SetDataListOfLists(arM2, np1, np2); //check dims; make it a flat array?
+		PyTuple_SET_ITEM(oRes, 1, oM1);
+		PyObject *oIntBtrE2 = CPyParse::SetDataListOfLists(arIntBtrE2, np1, np2); //check dims; make it a flat array?
+		PyTuple_SET_ITEM(oRes, 2, oIntBtrE2);
+		PyObject *oArg1 = CPyParse::SetDataListOfLists(arArg1, np1, 1);
+		PyTuple_SET_ITEM(oRes, 3, oArg1);
+		PyObject *oArg2 = CPyParse::SetDataListOfLists(arArg2, np2, 1);
+		PyTuple_SET_ITEM(oRes, 4, oArg2);
+		PyObject *oOutStr = Py_BuildValue("s", sOut); //to check
+		PyTuple_SET_ITEM(oRes, 5, oOutStr);
+
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+
+	if(arM1 != 0) delete[] arM1;
+	if(arM2 != 0) delete[] arM2;
+	if(arIntBtrE2 != 0) delete[] arIntBtrE2;
+	if(arArg1 != 0) delete[] arArg1;
+	if(arArg2 != 0) delete[] arArg2;
+	if(sOut != 0) delete[] sOut;
+	return oRes;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Sets general absolute accuracy levels for computation of magnetic field induction (prcB), vector potential (prcA), induction integrals along straight line (prcBint), field force (prcFrc), relativistic particle trajectory coordinates (prcTrjCrd) and angles (prcTrjAng)
+ ***************************************************************************/
+static PyObject* radia_FldCmpCrt(PyObject* self, PyObject* args)
+{
+	PyObject *oRes=0;
+	try
+	{
+		double prcB=0, prcA=0, prcBInt=0, prcFrc=0, prcTrjCrd=0, prcTrjAng=0;
+		if(!PyArg_ParseTuple(args, "dddddd:FldCmpCrt", &prcB, &prcA, &prcBInt, &prcFrc, &prcTrjCrd, &prcTrjAng)) throw CombErStr(strEr_BadFuncArg, ": FldCmpCrt");
+		if((prcB <= 0) || (prcA <= 0) || (prcBInt <= 0) || (prcFrc <= 0) || (prcTrjCrd <= 0) || (prcTrjAng <= 0)) throw CombErStr(strEr_BadFuncArg, ": FldCmpCrt");
+
+		int dummy;
+		g_pyParse.ProcRes(RadFldCmpCrt(&dummy, prcB, prcA, prcBInt, prcFrc, prcTrjCrd, prcTrjAng));
+
+		oRes = Py_BuildValue("i", dummy);
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return oRes;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Sets general absolute accuracy levels for computation of magnetic field induction (PrcB), vector potential (PrcA), induction integral along straight line (PrcBInt), field force (PrcForce), torque (PrcTorque), energy (PrcEnergy); relativistic charged particle trajectory coordinates (PrcCoord) and angles (PrcAngle). The function works according to the mechanism of string options. The name(s) of the option(s) should be: PrcB, PrcA, PrcBInt, PrcForce, PrcTorque, PrcEnergy, PrcCoord, PrcAngle.
+ ***************************************************************************/
+static PyObject* radia_FldCmpPrc(PyObject* self, PyObject* args)
+{
+	PyObject *oOpt=0, *oRes=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "O:FldCmpPrc", &oOpt)) throw CombErStr(strEr_BadFuncArg, ": FldCmpPrc");
+		if(oOpt == 0) throw CombErStr(strEr_BadFuncArg, ": FldCmpPrc");
+
+		char sOpt[1024]; *sOpt = '\0';
+		CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
+
+		int dummy;
+		g_pyParse.ProcRes(RadFldCmpPrc(&dummy, sOpt));
+
+		oRes = Py_BuildValue("i", dummy);
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return oRes;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Shows the physical units currently in use.
+ ***************************************************************************/
+static PyObject* radia_FldUnits(PyObject* self, PyObject* args)
+{
+	PyObject* oResUnits = 0;
+	try
+	{
+		char sUnits[2048];
+		g_pyParse.ProcRes(RadFldUnits(sUnits));
+
+		oResUnits = Py_BuildValue("s", sUnits); //to check
+		Py_XINCREF(oResUnits); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return oResUnits;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Switches on or off the randomization of all the length values. The randomization magnitude can be set by the function radFldLenTol.
+ ***************************************************************************/
+static PyObject* radia_FldLenRndSw(PyObject* self, PyObject* args)
+{
+	PyObject *oOnOff=0, *oRes=0;
+	try
+	{
+		if(!PyArg_ParseTuple(args, "O:FldLenRndSw", &oOnOff)) throw CombErStr(strEr_BadFuncArg, ": FldLenRndSw");
+		if(oOnOff == 0) throw CombErStr(strEr_BadFuncArg, ": FldLenRndSw");
+
+		char sOnOff[256]; *sOnOff = '\0';
+		CPyParse::CopyPyStringToC(oOnOff, sOnOff, 255);
+
+		int res=0;
+		g_pyParse.ProcRes(RadFldLenRndSw(&res, sOnOff));
+
+		oRes = Py_BuildValue("i", res);
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return oRes;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Sets absolute and relative randomization magnitudes for all the length values, including coordinates and dimensions of the objects producing magnetic field, and coordinates of points where the field is computed. Optimal values of the variables can be: RelVal=10^(-11), AbsVal=L*RelVal, ZeroVal=AbsVal, where L is the distance scale value (in mm) for the problem to be solved. Too small randomization magnitudes can result in run-time code errors.
+ ***************************************************************************/
+static PyObject* radia_FldLenTol(PyObject* self, PyObject* args)
+{
+	PyObject *oRes=0;
+	try
+	{
+		double AbsVal=0, RelVal=0, ZeroVal=0;
+		if(!PyArg_ParseTuple(args, "dd|d:FldLenTol", &AbsVal, &RelVal, &ZeroVal)) throw CombErStr(strEr_BadFuncArg, ": FldLenTol");
+		if((AbsVal <= 0) || (RelVal <= 0) || (ZeroVal <= 0)) throw CombErStr(strEr_BadFuncArg, ": FldLenTol");
+
+		int dummy;
+		g_pyParse.ProcRes(RadFldLenTol(&dummy, AbsVal, RelVal, ZeroVal));
+
+		oRes = Py_BuildValue("i", dummy);
+		Py_XINCREF(oRes); //?
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	return oRes;
+}
+
+/************************************************************************//**
+ * Magnetic Field Calculation Methods: Computes a virtual "shim signature", i.e. variation of a given magnetic field component introduced by given displacement of magnetic field source object.
+ ***************************************************************************/
+static PyObject* radia_FldShimSig(PyObject* self, PyObject* args)
+{
+	PyObject *oCmpnId=0, *oD=0, *oP1=0, *oP2=0, *oV=0, *oResShimSig=0;
+	double *arB=0;
+	try
+	{
+		int ind=0, np=0;
+		if(!PyArg_ParseTuple(args, "iOOOOi|O:FldShimSig", &ind, &oCmpnId, &oD, &oP1, &oP2, &np, &oV)) throw CombErStr(strEr_BadFuncArg, ": FldShimSig");
+		if((oCmpnId == 0) || (oD == 0) || (oP1 == 0) || (oP2 == 0)) throw CombErStr(strEr_BadFuncArg, ": FldShimSig");
+
+		char sCmpnId[256];
+		CPyParse::CopyPyStringToC(oCmpnId, sCmpnId, 255);
+
+		double arD[3], arP1[3], arP2[3], arV[]={0,0,0};
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oD, 'd', arD, 3, CombErStr(strEr_BadFuncArg, ": FldShimSig, incorrect definition of displacement vector"));
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP1, 'd', arP1, 3, CombErStr(strEr_BadFuncArg, ": FldShimSig, incorrect definition of the first point of the segment along which the shim signature should be calculated"));
+		CPyParse::CopyPyListElemsToNumArrayKnownLen(oP2, 'd', arP2, 3, CombErStr(strEr_BadFuncArg, ": FldShimSig, incorrect definition of the last point of the segment along which the shim signature should be calculated"));
+		if(oV != 0)
+		{
+			CPyParse::CopyPyListElemsToNumArrayKnownLen(oV, 'd', arV, 3, CombErStr(strEr_BadFuncArg, ": FldShimSig, incorrect definition of the vector specifying integration direction (for field integral calculation)"));
+		}
+
+		const int maxNumFldCmpn = 9;
+		arB = new double[maxNumFldCmpn*np];
+		int nTot = 0; //?
+		g_pyParse.ProcRes(RadFldShimSig(arB, &nTot, ind, sCmpnId, arD, arP1, arP2, np, arV));
+
+		if(nTot == 1) oResShimSig = Py_BuildValue("d", *arB);
+		else if(nTot > 1) oResShimSig = CPyParse::SetDataListOfLists(arB, nTot, np);
+		if(oResShimSig) Py_XINCREF(oResShimSig);
+	}
+	catch(const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+	}
+	if(arB != 0) delete[] arB;
+	return oResShimSig;
+}
+
+/************************************************************************//**
+ * Utilities: Outputs information about an object or list of objects.
  ***************************************************************************/
 static PyObject* radia_UtiDmp(PyObject *self, PyObject *args)
 {
@@ -2069,7 +2937,7 @@ static PyObject* radia_UtiDmp(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
- * Parses byte-string produced by UtiDmp(elem,"bin") and attempts to instantiate 
+ * Utilities: Parses byte-string produced by UtiDmp(elem,"bin") and attempts to instantiate 
  * elem objects(s); returns either index of one instantiated object 
  * (if elem was an index of one object) or a list of indexes of instantiated 
  * objects (if elem was a list of objects).
@@ -2124,7 +2992,7 @@ static PyObject* radia_UtiDmpPrs(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
- * Deletes an object.
+ * Utilities: Deletes an object.
  ***************************************************************************/
 static PyObject* radia_UtiDel(PyObject *self, PyObject *args)
 {
@@ -2171,77 +3039,118 @@ static PyObject* radia_UtiDelAll(PyObject *self, PyObject *args)
 }
 
 /************************************************************************//**
+ * Utilities: Returns Radia library version number.
+ ***************************************************************************/
+static PyObject* radia_UtiVer(PyObject* self, PyObject *args)
+{
+	PyObject *oVerNum = 0;
+	try
+	{
+		double verNum = 0.;
+		g_pyParse.ProcRes(RadUtiVer(&verNum));
+
+		oVerNum = Py_BuildValue("d", verNum);
+		if(oVerNum) Py_XINCREF(oVerNum);
+	}
+	catch (const char* erText)
+	{
+		PyErr_SetString(PyExc_RuntimeError, erText);
+		//PyErr_PrintEx(1);
+	}
+	return oVerNum;
+}
+
+/************************************************************************//**
  * Python C API stuff: module & method definition2, etc.
  ***************************************************************************/
 
 static PyMethodDef radia_methods[] = {
-	{"ObjRecMag", radia_ObjRecMag, METH_VARARGS, "ObjRecMag() instantiates Rectangular Parallelepiped with Constant Magnetizatiom over volume"},
-	{"ObjThckPgn", radia_ObjThckPgn, METH_VARARGS, "ObjThckPgn() instantiates a uniformly magnetized extruded polygon"},
-	{"ObjPolyhdr", radia_ObjPolyhdr, METH_VARARGS, "ObjPolyhdr() creates a uniformly magnetized polyhedron (closed volume limited by planes)"},
-	{"ObjArcPgnMag", radia_ObjArcPgnMag, METH_VARARGS, "ObjArcPgnMag() creates a uniformly magnetized finite-length arc of polygonal cross-section"},
-	{"ObjMltExtPgn", radia_ObjMltExtPgn, METH_VARARGS, "ObjMltExtPgn() attempts to create one uniformly magnetized convex polyhedron or a set of convex polyhedrons based on slices."},
-	{"ObjMltExtRtg", radia_ObjMltExtRtg, METH_VARARGS, "ObjMltExtRtg() attempts to create one uniformly magnetized convex polyhedron or a set of convex polyhedrons based on rectangular slices"},
-	{"ObjMltExtTri", radia_ObjMltExtTri, METH_VARARGS, "ObjMltExtTri() creates triangulated extruded polygon block, i.e. an extruded polygon with its bases subdivided by triangulation"},
-	{"ObjCylMag", radia_ObjCylMag, METH_VARARGS, "ObjCylMag() creates a cylindrical magnet"},
-	{"ObjFullMag", radia_ObjFullMag, METH_VARARGS, "ObjFullMag() instantiates Rectangular Parallelepiped with Constant Magnetizatiom over volume, subdivided, and added to a group, with some color assigned"},
-	
-	{"ObjRecCur", radia_ObjRecCur, METH_VARARGS, "ObjRecCur() creates a current carrying rectangular parallelepiped block"},
-	{"ObjArcCur", radia_ObjArcCur, METH_VARARGS, "ObjArcCur() creates a current carrying finite-length arc of rectangular cross-section"},
-	{"ObjRaceTrk", radia_ObjRaceTrk, METH_VARARGS, "ObjRaceTrk() instantiates Recetrack conductor with rectangular cross-secton and constant current density over the volume"},
-	{"ObjFlmCur", radia_ObjFlmCur, METH_VARARGS, "ObjFlmCur() creates a filament polygonal line conductor with current"},
-	
-	{"ObjScaleCur", radia_ObjScaleCur, METH_VARARGS, "ObjScaleCur() scales current (density) in a 3D object by multiplying it by a constant"},
-	{"ObjBckg", radia_ObjBckg, METH_VARARGS, "ObjBckg() creates a source of uniform background magnetic field"},
-	{"ObjCnt", radia_ObjCnt, METH_VARARGS, "ObjCnt() instantiates Container of Magnetic Field Sources"},
-	{"ObjAddToCnt", radia_ObjAddToCnt, METH_VARARGS, "ObjAddToCnt() adds objects to the container object"},
-	{"ObjCntSize", radia_ObjCntSize, METH_VARARGS, "ObjCntSize() calculates the number of objects in the container"},
-	{"ObjCntStuf", radia_ObjCntStuf, METH_VARARGS, "ObjCntStuf() returns list with the reference numbers of objects present in container"}, 
-	{"ObjDpl", radia_ObjDpl, METH_VARARGS, "ObjDpl() duplicates 3D object"},
-	{"ObjM", radia_ObjM, METH_VARARGS, "ObjM() provides coordinates of geometrical center point(s) and magnetization(s) of an object"},
-	{"ObjCenFld", radia_ObjCenFld, METH_VARARGS, "ObjCenFld() provides coordinates of geometrical center point and field at that point"},
-	{"ObjSetM", radia_ObjSetM, METH_VARARGS, "ObjSetM() sets magnetization of an object"},
+	{"ObjRecMag", radia_ObjRecMag, METH_VARARGS, "ObjRecMag([x,y,z],[wx,wy,wz],[mx,my,mz]:[0,0,0]) creates a rectangular parallelepiped block with center point [x,y,z], dimensions [wx,wy,wz], and magnetization [mx,my,mz]."},
+	{"ObjThckPgn", radia_ObjThckPgn, METH_VARARGS, "ObjThckPgn(x,lx,[[y1,z1],[y2,z2],...],a:'x',[mx,my,mz]:[0,0,0]) creates an extruded polygon block; x is the position of the block's center of gravity in the extrusion direction, lx is the thickness, [[y1,z1],[y2,z2],...] is a list of points describing the polygon in 2D; the extrusion direction is defined by the character a (which can be 'x', 'y' or 'z'), [mx,my,mz] is the block magnetization."},
+	{"ObjPolyhdr", radia_ObjPolyhdr, METH_VARARGS, "ObjPolyhdr([[x1,y1,z1],[x2,y2,z2],...],[[f1i1,f1i2,...],[f2i1,f2i2,...],...],[mx,my,mz]:[0,0,0],J:[jx,jy,jz]|[[jx,jy,jz],[[djxdy,djxdy,djxdz],[djydy,djydy,djydz],[djzdy,djzdy,djzdz]]],Lin:'Rel') creates a uniformly magnetized polyhedron (closed volume limited by planes). [[x1,y1,z1],[x2,y2,z2],...] is a list of the polyhedron vertex points, [[f1n1,f1n2,...],[f2n1,f2n2,...],...] is a list of lists of indexes of vertex points defining the polyhedron faces, [mx,my,mz] is magnetization inside the polyhedron. The optional parameter J can be used to define constant [jx,jy,jz] or linearly-varying current density vector inside the polyhedron; the linear dependence can be defined through 3x3 matrix of coefficients [[djxdy,djxdy,djxdz],[djydy,djydy,djydz],[djzdy,djzdy,djzdz]]; depending on the value of the optional parameter Lin this linear dependence is treated with respect to the polyhedron center (Lin='Rel', default) or with respect to the origin of the Cartesian frame (Lin='Abs')."},
+	{"ObjMltExtPgn", radia_ObjMltExtPgn, METH_VARARGS, "ObjMltExtPgn([[[[x11,y11],[x12,y12],...],z1],[[[x21,y21],[x22,y22],...],z2],...],[mx,my,mz]:[0,0,0]) attempts to create one uniformly magnetized convex polyhedron or a set of convex polyhedrons based on slices. The slice polygons are defined by the nested list [[[[x11,y11],[x12,y12],...],z1],[[[x21,y21],[x22,y22],...],z2],...], with [[x11,y11],[x12,y12],...],... describing the polygons in 2D, and z1, z2,... giving their attitudes (vertical coordinates). [mx,my,mz] is the magnetization inside the polyhedron(s) created."},
+	//{"ObjMltExtPgnCur", radia_ObjMltExtPgnCur, METH_VARARGS, "ObjMltExtPgnCur(z:0,a:\"z\",{{{x1,y1},{x2,y2},...},{{R1,T1,H1},{R2,T2,H2},...}},I,Frame->Loc|Lab) attempts to create a set of current-carrying convex polyhedron objects by applying a generalized extrusion to the initial planar convex polygon. The initial polygon is defined for the \"attitude\" z (0 by default) by the list of 2D points {{x1,y1},{x2,y2},...}, with the  a  character specifying orientation of this polygon normal in 3D space: if a = \"z\" (default orientation), the polygon is assumed to be parallel to XY plane of the laboratory frame (\"y\" for ZX plane, \"x\" for YZ plane). The extrusion can consist of a number of \"steps\", with each step creating one convex polyhedron defined optionally by one (or combination of) rotation(s), and/or translation(s), and/or one homothety: {Rk,Tk,Hk}, k = 1,2,..., applied to the base polygon (i.e. either the initial base polygon, or the polygon obtained by previous extrusion step). In case if k-th extrusion step contains one rotation Rk about an axis, it is defined as {{xRk,yRk,zRk},{vxRk,vyRk,vzRk},phRk}}, where {xRk,yRk,zRk} and {vxRk,vyRk,vzRk} are respectively 3D coordinates of a point and a vector difining the rotation axis, and phRk the rotation angle in radians; in case if Rk is a combination of \"atomic\" rotations about different axes, it should be defined as list: {Rk1,Rk2,...}. If k-th extrusion step includes translation Tk, it must be defined by vector {vxTk,vyTk,vzTk}; optional homothety with respect to the base polygon center of gravity should be defined either by two different coefficients {pxHk,pyHk} with respect to two orthogonal axes of the base polygon local frame, or by nested list {{pxHk,pyHk},phHk}, where phHk is rotation angle of the two homothety axes in radians. A real number I defines average current in Amperes along the extrusion path. The Frame->Loc or Frame->Lab option specifies whether the transformations at each step of the extrusion path are defined in the frame of the previous base polygon (Frame->Loc, default), or all the transformations are defined in the laboratory frame (Frame->Lab)."},
+	//{"ObjMltExtPgnMag", radia_ObjMltExtPgnMag, METH_VARARGS, "ObjMltExtPgnMag(z:0,a:\"z\",{{{x1,y1},{x2,y2},...},{{k1,q1},{k2,q2},...}:{{1,1},{1,1},...},{{R1,T1,H1},{R2,T2,H2},...}},{{mx1,my1,mz1},{mx2,my2,mz2},...}:{{0,0,0},{0,0,0},...},Frame->Loc|Lab,ki->Numb|Size,TriAngMin->...,TriAreaMax->...,TriExtOpt->\"...\") attempts to create a set of uniformly magnetized polyhedron objects by applying a generalized extrusion to the initial planar convex polygon. The initial polygon is defined for the \"altitude\" z (0 by default) by the list of 2D points {{x1,y1},{x2,y2},...}, with the  a  character specifying orientation of this polygon normal in 3D space: if a = \"z\" (default orientation), the polygon is assumed to be parallel to XY plane of the laboratory frame (\"y\" for ZX plane, \"x\" for YZ plane). The extrusion can consist of a number of \"steps\", with each step creating one convex polyhedron defined optionally by one (or combination of) rotation(s), and/or translation(s), and/or one homothety: {Rk,Tk,Hk}, k = 1,2,..., applied to the base polygon (i.e. either the initial base polygon, or the polygon obtained by previous extrusion step). In case if k-th extrusion step contains one rotation Rk about an axis, it is defined as {{xRk,yRk,zRk},{vxRk,vyRk,vzRk},phRk}}, where {xRk,yRk,zRk} and {vxRk,vyRk,vzRk} are respectively 3D coordinates of a point and a vector difining the rotation axis, and phRk the rotation angle in radians; in case if Rk is a combination of \"atomic\" rotations about different axes, it should be defined as a list: {Rk1,Rk2,...}. If k-th extrusion step includes translation Tk, it must be defined by vector {vxTk,vyTk,vzTk}; optional homothety with respect to the base polygon center of gravity should be defined either by two different coefficients {pxHk,pyHk} with respect to two orthogonal axes of the base polygon local frame, or by nested list {{pxHk,pyHk},phHk}, where phHk is rotation angle of the two homothety axes in radians. Optional list {{mx1,my1,mz1},{mx2,my2,mz2},...} defines magnetization vectors in each of polyhedrons to be created. The Frame->Loc or Frame->Lab option specifies whether the transformations at each step of the extrusion path are defined in the frame of the previous base polygon (Frame->Loc, default), or all the transformations are defined in the laboratory frame (Frame->Lab). Optionally, the object can be subdivided by (extruded) triangulation at its creation; this occurs if {{k1,q1},{k2,q2},...} subdivision (triangulation) parameters for each segment of the base polygon border are defined; the meaning of k1, k2,... depends on value of the option ki: if ki->Numb (default), then k1, k2,... are subdivision numbers; if ki->Size, they are average sizes of sub-segments to be produced; q1, q2,... are ratios of the last-to-first sub-segment lengths; the TriAngMin option defines minimal angle of triangles to be produced (in degrees, default is 20); the TriAreaMax option defines maximal area of traingles to be produced (in mm^2, not defined by default); the ExtOpt option allows to specify additional parameters for triangulation function in a string." },
+	{"ObjMltExtRtg", radia_ObjMltExtRtg, METH_VARARGS, "ObjMltExtRtg([[[x1,y1,z1],[wx1,wy1]],[[x2,y2,z2],[wx2,wy2]],...],[mx,my,mz]:[0,0,0]) attempts to create one uniformly magnetized convex polyhedron or a set of convex polyhedrons based on rectangular slices. The slice rectangles are defined by the nested list [[[x1,y1,z1],[wx1,wy1]],[[x2,y2,z2],[wx2,wy2]],...], with [x1,y1,z1], [x2,y2,z2],... being center points of the rectangles, and [wx1,wy1], [wx2,wy2],... their dimensions. [mx,my,mz] is the magnetization inside the polyhedron(s) created."},
+	{"ObjMltExtTri", radia_ObjMltExtTri, METH_VARARGS, "ObjMltExtTri(x,lx,[[y1,z1],[y2,z2],...],[[k1,q1],[k2,q2],...],a:'x',[mx,my,mz]:[0,0,0],Opt:'ki->Numb|Size,TriAngMin->...,TriAreaMax->...') creates triangulated extruded polygon block, i.e. a straight prism with its bases being (possibly non-convex) polygons subdivided by triangulation. x is the position of the block's center of gravity in the extrusion direction, lx is the thickness, [[y1,z1],[y2,z2],...] is a list of points describing the polygon in 2D; [[k1,q1],[k2,q2],...] are subdivision (triangulation) parameters for each segment of the base polygon border; the meaning of k1, k2,... depends on value of the option ki (to be defined in the string Opt): if ki->Numb (default), then k1, k2,... are subdivision numbers; if ki->Size, they are average sizes of sub-segments to be produced; q1, q2,... are ratios of the last-to-first sub-segment lengths; the extrusion direction is defined by the character a (which can be 'x', 'y' or 'z'); [mx,my,mz] is magnetization inside the block. The TriAngMin option defines minimal angle of triangles to be produced (in degrees, default is 20); the TriAreaMax option defines maximal area of traingles to be produced (in mm^2, not defined by default)."},
+	{"ObjArcPgnMag", radia_ObjArcPgnMag, METH_VARARGS, "ObjArcPgnMag([x,y],a,[[r1,z1],[r2,z2],...],[phimin,phimax],nseg,'sym|nosym':'nosym',[mx,my,mz]:[0,0,0]) creates a uniformly magnetized finite-length arc of polygonal cross-section with the position and orientation of the rotation axis defined by pair of coordinates {x,y} and character a (which can be 'x', 'y' or 'z'), the cross-section 2D polygon [[r1,z1],[r2,z2],...], initial and final rotation angles [phimin,phimax], number of sectors (segments) vs azimuth nseg, and magnetization vector [mx,my,mz]. Depending on the value of the 'sym|nosym' switch, the magnetization vectors in nseg sector polyhedrons are either assumed to satisfy rotational symmetry conditions ('sym'), or are assumed independent (i.e. will be allowed to vary independently at further relaxation)."},
+	{"ObjCylMag", radia_ObjCylMag, METH_VARARGS, "ObjCylMag([x,y,z],r,h,nseg,a:'z',[mx,my,mz]:[0,0,0]) creates a cylindrical magnet approximated by a straight prism with a right polygon in base with center point [x,y,z], base radius r, height h, number of segments nseg, orientation of the rotation axis defined by character a (which can be 'x', 'y' or 'z'), and magnetization vector [mx,my,mz]."},
+	{"ObjFullMag", radia_ObjFullMag, METH_VARARGS, "ObjFullMag([x,y,z],[wx,wy,wz],[mx,my,mz],[kx,ky,kz],cnt,mat,[r,g,b]) creates rectangular parallelepiped block with constant magnetizatiom over volume, center point [x,y,z], dimensions [wx,wy,wz] and color [r,g,b]. The block is magnetized according to [mx,my,mz], subdivided according to [kx,ky,kz] and added into the container cnt, that should be defined in advance by calling ObjCnt()."},
+	{"ObjRecCur", radia_ObjRecCur, METH_VARARGS, "ObjRecCur([x,y,z],[wx,wy,wz],[jx,jy,jz]) creates a current carrying rectangular parallelepiped block with center point [x,y,z], dimensions [wx,wy,wz], and current density [jx,jy,jz]."},
+	{"ObjArcCur", radia_ObjArcCur, METH_VARARGS, "ObjArcCur([x,y,z],[rmin,rmax],[phimin,phimax],h,nseg,j,'man|auto':'man',a:'z') creates a current carrying finite-length arc of rectangular cross-section, with center point [x,y,z], inner and outer radii [rmin,rmax], initial and final angles [phimin,phimax], height h, number of segments nseg, and azimuthal current density j. According to the value of the 'man|auto' switch, the field from the arc is computed based on the number of segments nseg ('man'), or on the general absolute precision level specified by the function FldCmpCrt ('auto'). The orientation of the rotation axis is defined by the character a (which can be either 'x', 'y' or 'z')."},
+	{"ObjRaceTrk", radia_ObjRaceTrk, METH_VARARGS, "ObjRaceTrk([x,y,z],[rmin,rmax],[lx,ly],h,nseg,j,'man|auto':'man',a:'z') creates a current carrying racetrack coil consisting of four 90-degree bents connected by four straight parts of rectangular straight section, center point [x,y,z], inner and outer bent radii [rmin,rmax], straight section lengths [lx,ly], height h, number of segments in bents nseg, and azimuthal current density j. According to the value of the 'man|auto' switch, the field from the bents is computed based on the number of segments nseg ('man'), or on the general absolute precision level specified by the function FldCmpCrt ('auto'). The orientation of the racetrack axis is defined by the character a (which can be either 'x', 'y' or 'z')."},
+	{"ObjFlmCur", radia_ObjFlmCur, METH_VARARGS, "ObjFlmCur([[x1,y1,z1],[x2,y2,z2],...],i) creates a filament polygonal line conductor defined by the sequence of points [[x1,y1,z1],[x2,y2,z2],...] with current i."},
+	{"ObjBckg", radia_ObjBckg, METH_VARARGS, "ObjBckg([bx,by,bz]) creates a source of uniform background magnetic field [bx,by,bz]."},
+	{"ObjCnt", radia_ObjCnt, METH_VARARGS, "ObjCnt([obj1,obj2,...]) creates a container object for magnetic field source objects [obj1,obj2,...]."},
+	{"ObjAddToCnt", radia_ObjAddToCnt, METH_VARARGS, "ObjAddToCnt(cnt,[obj1,obj2,...]) adds objects [obj1,obj2,...] to the container object cnt."},
+	{"ObjCntStuf", radia_ObjCntStuf, METH_VARARGS, "ObjCntStuf(obj) returns list of general indexes of the objects present in container if obj is a container; or returns [obj] if obj is not a container."}, 
+	{"ObjCntSize", radia_ObjCntSize, METH_VARARGS, "ObjCntSize(cnt) calculates the number of objects in the container cnt."},
+	{"ObjCutMag", radia_ObjCutMag, METH_VARARGS, "ObjCutMag(obj,[x,y,z],[nx,ny,nz],'Frame->Loc|Lab|LabTot') cuts 3D object by a plane normal to the vector [nx,ny,nz] and passing through the point [x,y,z]. The 'Frame->Loc', 'Frame->Lab' or 'Frame->LabTot' option specifies whether the cuting plane is defined in the local frame of the object obj or in the laboratory frame (default). The actions of 'Frame->Lab' and 'Frame->LabTot' differ for containers only: 'Frame->Lab' means that each of the objects in the container is cut separately; 'Frame->LabTot' means that the objects in the container are cut as one object, by the same plane. The function returns a list of indexes of the objects produced by the cutting."},
+	{"ObjDivMag", radia_ObjDivMag, METH_VARARGS, "ObjDivMag(obj,[[k1,q1],[k2,q2],[k3,q3]],'pln|cyl',[[n1x,n1y,n1z],[n2x,n2y,n2z],[n3x,n3y,n3z]]|[[ax,ay,az],[vx,vy,vz],[px,py,pz],rat],'kxkykz->Numb|Size,Frame->Loc|Lab|LabTot') subdivides (segments) a 3D object obj. The main subdivision parameters are defined by the list [[k1,q1],[k2,q2],[k3,q3]] or [k1,k2,k3]. The meaning of k1, k2 and k3 depends on the value of the option kxkykz: if kxkykz->Numb (default), then k1, k2 and k3 are subdivision numbers; if kxkykz->Size, these are average sizes of the sub-objects to be produced. q1, q2 and q3 in any case are ratios of the last-to-first sub-object sizes (if these parameters are omitted, they are assumed to be equal to 1). The third string variable defines type of the subdivision. If it is not used, the subdivision is performed in directions X, Y and Z (by a set of parallel planes). If it is equal to 'pln', the function performs subdivision by three sets of parallel planes normal to the vectors [n1x,n1y,n1z], [n2x,n2y,n2z] and [n3x,n3y,n3z], that should be defined by the next list variable [[n1x,n1y,n1z],[n2x,n2y,n2z],[n3x,n3y,n3z]]. The distances between the parallel planes are defined by the parameters [k1,q1],[k2,q2] and [k3,q3]. If the third variable is equal to 'cyl', the function performs subdivision by a system of coaxial elliptic cylinders, with their parameters defined by the next list variable, [[ax,ay,az],[vx,vy,vz],[px,py,pz],rat]. The cylinder axis is defined by the point [ax,ay,az] and vector [vx,vy,vz]. One of two axes of the cylinder base ellipses is exactly the perpendicular from the point [px,py,pz] to the cylinder axis; rat is the ratio of the ellipse axes lengths. In the case of the subdivision by elliptic cylinders, the parameters [k1,q1],[k2,q2] and [k3,q3] correspond to radial, azimuthal, and axial directions respectively. If the option Frame is set to 'Frame->Loc' (default), the subdivision is performed in local frame(s) of the object(s); if it is set to 'Frame->Lab' or 'Frame->LabTot', the subdivision is performed in the laboratory frame. The actions of 'Frame->Lab' and 'Frame->LabTot' differ for containers only: 'Frame->Lab' means that each of the objects in the container is subdivided separately; 'Frame->LabTot' means that the objects in the container are subdivided as one object, by the same planes."},
+	{"ObjDivMagPln", radia_ObjDivMagPln, METH_VARARGS, "ObjDivMagPln(obj,[[k1,q1],[k2,q2],[k3,q3]],[n1x,n1y,n1z],[n2x,n2y,n2z],[n3x,n3y,n3z],'kxkykz->Numb|Size,Frame->Loc|Lab|LabTot') subdivides (segments) a 3D object by 3 sets of parallel planes. The main subdivision parameters are defined by the list [[k1,q1],[k2,q2],[k3,q3]] or [k1,k2,k3]. The meaning of k1, k2 and k3 depends on the value of the option kxkykz: if kxkykz->Numb (default), then k1, k2 and k3 are subdivision numbers; if kxkykz->Size, these are average sizes of the sub-objects to be produced. q1, q2 and q3 in any case are ratios of the last-to-first sub-object sizes (if these parameters are omitted, they are assumed to be equal to 1). The orientation of the three sets of parallel planes normal to the vectors [n1x,n1y,n1z], [n2x,n2y,n2z] and [n3x,n3y,n3z]. If these variables are not submitted, the subdivision is performed in directions X, Y and Z. The distances between the parallel planes are defined by the parameters [k1,q1],[k2,q2] and [k3,q3]. If the option Frame is set to 'Frame->Loc' (default), the subdivision is performed in local frame(s) of the object(s); if it is set to 'Frame->Lab' or 'Frame->LabTot', the subdivision is performed in the laboratory frame. The actions of 'Frame->Lab' and 'Frame->LabTot' differ for containers only: 'Frame->Lab' means that each of the objects in the container is subdivided separately; 'Frame->LabTot' means that the objects in the container are subdivided as one object, by the same planes."},
+	{"ObjDivMagCyl", radia_ObjDivMagCyl, METH_VARARGS, "ObjDivMagCyl(obj,[[k1,q1],[k2,q2],[k3,q3]],[ax,ay,az],[vx,vy,vz],[px,py,pz],rat,'kxkykz->Numb|Size,Frame->Loc|Lab|LabTot') subdivides (segments) a 3D object obj by a set of coaxial elliptical cylinders. The main subdivision parameters are defined by the list [[k1,q1],[k2,q2],[k3,q3]] or [k1,k2,k3]. The meaning of k1, k2 and k3 depends on the value of the option kxkykz: if kxkykz->Numb (default), then k1, k2 and k3 are subdivision numbers; if kxkykz->Size, these are average sizes of the sub-objects to be produced. q1, q2 and q3 in any case are ratios of the last-to-first sub-object sizes (if these parameters are omitted, they are assumed to be equal to 1). The cylinder axis is defined by the point [ax,ay,az] and vector [vx,vy,vz]. One of two axes of the cylinder base ellipses is exactly the perpendicular from the point [px,py,pz] to the cylinder axis; rat is the ratio of the ellipse axes lengths. The parameters [k1,q1],[k2,q2] and [k3,q3] correspond to radial, azimuthal, and axial directions respectively. If the option Frame is set to 'Frame->Loc' (default), the subdivision is performed in local frame(s) of the object(s); if it is set to 'Frame->Lab' or 'Frame->LabTot', the subdivision is performed in the laboratory frame. The actions of 'Frame->Lab' and 'Frame->LabTot' differ for containers only: 'Frame->Lab' means that each of the objects in the container is subdivided separately; 'Frame->LabTot' means that the objects in the container are subdivided as one object, by the same planes."},
+	{"ObjDpl", radia_ObjDpl, METH_VARARGS, "ObjDpl(obj,'FreeSym->False|True') duplicates 3D object obj. The option 'FreeSym->False|True' specifies whether the symmetries (transformations with multiplicity more than one) previously applied to the object obj should be simply copied at the duplication ('FreeSym->False', default), or a container of new independent objects should be created in place of any symmetry previously applied to the object obj. In both cases the final object created by the duplication has exactly the same geometry as the initial object obj."},
+	{"ObjGeoVol", radia_ObjGeoVol, METH_VARARGS, "ObjGeoVol(obj) computes geometrical volume of 3D object obj."},
+	{"ObjGeoLim", radia_ObjGeoLim, METH_VARARGS, "ObjGeoLim(obj) computes geometrical limits of 3D object obj in the laboratory frame. Returns [xmin, xmax, ymin, ymax, zmin, zmax]."},
+	{"ObjDegFre", radia_ObjDegFre, METH_VARARGS, "ObjDegFre(obj) gives number of degrees of freedom for the relaxation of 3D object obj."},
+	{"ObjM", radia_ObjM, METH_VARARGS, "ObjM(obj) returns coordinates of geometrical center point and magnetization vector of 3D object obj at that point. If obj is a container, a list of the container members' center points and their magnetizations is returned."},
+	{"ObjCenFld", radia_ObjCenFld, METH_VARARGS, "ObjCenFld(obj,'A|B|H|J|M') provides coordinates of geometrical center point of the object obj and a field characteristic vector at that point. The type of field characteristic is defined by the second parameter (character); it can be one of the following: 'A' for vector potential, 'B' for magnetic field induction, 'H' for magnetic field strength, 'J' for current density, 'M' for magnetization. If obj is a container, a list of the container members' center points and their field characteristics is returned."},
+	{"ObjSetM", radia_ObjSetM, METH_VARARGS, "ObjSetM(obj,[mx,my,mz]) sets magnetization [mx,my,mz] in 3D object obj."},
+	{"ObjScaleCur", radia_ObjScaleCur, METH_VARARGS, "ObjScaleCur(obj,k) scales current (density) in 3D object obj by multiplying it by constant k (if obj is a current-carying object). If obj is a container, the current (density) scaling applies to all its members."},
+	{"ObjDrwAtr", radia_ObjDrwAtr, METH_VARARGS, "ObjDrwAtr(obj,[r,g,b],thcn) assigns drawing attributes - RGB color [r,g,b] and line thickness thcn - to 3D object obj."},
+	{"ObjDrwOpenGL", radia_ObjDrwOpenGL, METH_VARARGS, "ObjDrwOpenGL(obj,'EdgeLines->True|False,Faces->True|False,Axes->True|False') starts an application for viewing 3D geometry of the object obj. The viewer is based on the GLUT / OpenGL graphics library. The option 'EdgeLines->True|False' (default 'EdgeLines->True') highlights the edge lines of objects; the option 'Faces->True|False' (default 'Faces->True') shows faces of the objects; the option 'Axes->True|False' (default 'Axes->True') shows the Cartesian frame axes."},
+	{"ObjDrwVTK", radia_ObjDrwVTK, METH_VARARGS, "ObjDrwVTK(obj,'EdgeLines->True|False,Faces->True|False,Axes->True|False') exports data for viewing 3D geometry of the object obj. The data is in the format compatible with VTK graphics library. The option 'EdgeLines->True|False' (default 'EdgeLines->True') highlights the edge lines of objects; the option 'Faces->True|False' (default 'Faces->True') shows faces of the objects; the option 'Axes->True|False' (default 'Axes->True') shows the Cartesian frame axes."},
 
-	{"ObjCutMag", radia_ObjCutMag, METH_VARARGS, "ObjCutMag() cuts 3D object by a plane passing through a given point normally to a given vector"},
-	{"ObjDivMagPln", radia_ObjDivMagPln, METH_VARARGS, "ObjDivMagPln() subdivides (segments) a 3D object by 3 sets of parallel planes"},
-	{"ObjDivMagCyl", radia_ObjDivMagCyl, METH_VARARGS, "ObjDivMagCyl() subdivides (segments) a 3D object obj by a set of coaxial elliptical cylinders"},
-	{"ObjDivMag", radia_ObjDivMag, METH_VARARGS, "ObjDivMag() subdivides (segments) a 3D object obj by sets of parallel planes or coaxial elliptical cylinders"},
-	{"ObjGeoVol", radia_ObjGeoVol, METH_VARARGS, "ObjGeoVol() computes geometrical volume of a 3D object"},
-	{"ObjGeoLim", radia_ObjGeoLim, METH_VARARGS, "ObjGeoLim() computes coordinates of object extrimities in laboratory frame"},
-	{"ObjDegFre", radia_ObjDegFre, METH_VARARGS, "ObjDegFre() gives number of degrees of freedom for the relaxation of an object"},
-	
-	{"ObjDrwAtr", radia_ObjDrwAtr, METH_VARARGS, "ObjDrwAtr() assigns drawing attributes - RGB color (r,g,b) and line thickness thcn - to a Magnetic Field Source object"},
-	{"ObjDrwOpenGL", radia_ObjDrwOpenGL, METH_VARARGS, "ObjDrwOpenGL() assigns drawing attributes - RGB color (r,g,b) and line thickness thcn - to a Magnetic Field Source object"},
+	{"TrfTrsl", radia_TrfTrsl, METH_VARARGS, "TrfTrsl([vx,vy,vz]) creates a translation by vector [vx,vy,vz]."},
+	{"TrfRot", radia_TrfRot, METH_VARARGS, "TrfRot([x,y,z],[vx,vy,vz],phi) creates a rotation of angle phi around the axis defined by the point [x,y,z] and the vector [vx,vy,vz]."},
+	{"TrfPlSym", radia_TrfPlSym, METH_VARARGS, "TrfPlSym([x,y,z],[nx,ny,nz]) creates a symmetry with respect to plane defined by point [x,y,z] and normal vector [nx,ny,nz]."},
+	{"TrfInv", radia_TrfInv, METH_VARARGS, "TrfInv() creates a field inversion."},
+	{"TrfCmbL", radia_TrfCmbL, METH_VARARGS, "TrfCmbL(trfOrig,trf) multiplies original transformation trfOrig by another transformation trf from left."},
+	{"TrfCmbR", radia_TrfCmbR, METH_VARARGS, "TrfCmbR(trfOrig,trf) multiplies original transformation trfOrig by another transformation trf from right."},
+	{"TrfMlt", radia_TrfMlt, METH_VARARGS, "TrfMlt(obj,trf,mlt) creates mlt-1 objects. Each object is derived from the previous one by applying the transformation trf. Following this, the object obj becomes equivalent to mlt different objects."},
+	{"TrfOrnt", radia_TrfOrnt, METH_VARARGS, "TrfOrnt(obj,trf) orients object obj by applying transformation trf to it once."},
+	{"TrfZerPara", radia_TrfZerPara, METH_VARARGS, "TrfZerPara(obj,[x,y,z],[nx,ny,nz]) creates an object mirror of obj with respect to the plane with normal [nx,ny,nz] and passing by the point [x,y,z]. The object mirror presents the same geometry as obj, but its magnetization and/or current densities are modified in such a way that the magnetic field produced by the obj and its mirror in the plane of mirroring is PERPENDICULAR to this plane."},
+	{"TrfZerPerp", radia_TrfZerPerp, METH_VARARGS, "TrfZerPerp(obj,[x,y,z],[nx,ny,nz]) creates an object mirror of obj with respect to the plane with normal [nx,ny,nz] and passing by the point [x,y,z]. The object mirror presents the same geometry as obj, but its magnetization and/or current densities are modified in such a way that the magnetic field produced by the obj and its mirror in the plane of mirroring is PARALLEL to this plane."},
 
-	{"TrfPlSym", radia_TrfPlSym, METH_VARARGS, "TrfPlSym() creates a symmetry with respect to plane defined by a point and a normal vector"},
-	{"TrfRot", radia_TrfRot, METH_VARARGS, "TrfRot() creates a rotation about an axis"},
-	{"TrfTrsl", radia_TrfTrsl, METH_VARARGS, "TrfTrsl() creates a translation"},
-	{"TrfInv", radia_TrfInv, METH_VARARGS, "TrfInv() creates a field inversion"},
-	{"TrfCmbL", radia_TrfCmbL, METH_VARARGS, "TrfCmbL() multiplies original space transformation by another transformation from left"},
-	{"TrfCmbR", radia_TrfCmbR, METH_VARARGS, "TrfCmbR() multiplies original space transformation by another transformation from right"},
-	{"TrfMlt", radia_TrfMlt, METH_VARARGS, "TrfMlt() creates mlt-1 symmetry objects of a 3D object"},
-	{"TrfOrnt", radia_TrfOrnt, METH_VARARGS, "TrfOrnt() orients 3D object by applying a space transformation to it once"},
-	{"TrfZerPara", radia_TrfZerPara, METH_VARARGS, "TrfZerPara() creates an object mirror with respect to a plane. The object mirror possesses the same geometry as obj, but its magnetization and/or current densities are modified in such a way that the magnetic field produced by the obj and its mirror in the plane of mirroring is perpendicular to this plane"},
-	{"TrfZerPerp", radia_TrfZerPerp, METH_VARARGS, "TrfZerPerp() creates an object mirror with respect to a plane. The object mirror possesses the same geometry as obj, but its magnetization and/or current densities are modified in such a way that the magnetic field produced by the obj and its mirror in the plane of mirroring is parallel to this plane"},
+	{"MatLin", radia_MatLin, METH_VARARGS, "MatLin([ksipar,ksiper],mr) or MatLin([ksipar,ksiper],[mrx,mry,mrz]) creates a linear anisotropic magnetic material with susceptibilities parallel (perpendicular) to the easy magnetization axis given by ksipar (ksiper). In the first form of the function, mr is the magnitude of the remanent magnetization vector; the direction of the easy magnetisation axis is set up by the magnetization vector in the object to which the material is applied (the magnetization vector is specified at the object creation). In the second form, [mrx,mry,mrz] is the remanent magnetization vector explicitly defining the direction of the easy magnetization axis in any object to which the material is later applied."},
+	{"MatSatIsoFrm", radia_MatSatIsoFrm, METH_VARARGS, "MatSatIsoFrm([ksi1,ms1],[ksi2,ms2],[ksi3,ms3]) creates a nonlinear isotropic magnetic material with the M versus H curve defined by the formula M = ms1*tanh(ksi1*H/ms1) + ms2*tanh(ksi2*H/ms2) + ms3*tanh(ksi3*H/ms3), where H is the magnitude of the magnetic field strength vector (in Tesla). The parameters [ksi3,ms3] and [ksi2,ms2] may be omitted; in such a case the corresponding terms in the formula will be omitted too."},
+	{"MatSatIsoTab", radia_MatSatIsoTab, METH_VARARGS, "MatSatIsoTab([[H1,M1],[H2,M2],...]) creates a nonlinear isotropic magnetic material with the M versus H curve defined by the list of pairs [[H1,M1],[H2,M2],...] in Tesla."},
+	{"MatSatLamFrm", radia_MatSatLamFrm, METH_VARARGS, "MatSatLamFrm([ksi1,ms1],[ksi2,ms2],[ksi3,ms3],p,[nx,ny,nz]) creates laminated nonlinear anisotropic magnetic material with packing factor p and the lamination planes perpendicular to the vector [nx,ny,nz]. The magnetization magnitude vs magnetic field strength for the corresponding isotropic material is defined by the formula M = ms1*tanh(ksi1*H/ms1) + ms2*tanh(ksi2*H/ms2) + ms3*tanh(ksi3*H/ms3), where H is the magnitude of the magnetic field strength vector (in Tesla). The parameters [ksi3,ms3] and [ksi2,ms2] may be omitted; in such a case the corresponding terms in the formula will be omitted too."},
+	{"MatSatLamTab", radia_MatSatLamTab, METH_VARARGS, "MatSatLamTab([[H1,M1],[H2,M2],...],p,[nx,ny,nz]) creates laminated nonlinear anisotropic magnetic material with packing factor p and the lamination planes perpendicular to the vector [nx,ny,nz]. The magnetization magnitude vs magnetic field strength for the corresponding isotropic material is defined by pairs [[H1,M1],[H2,M2],...] in Tesla."},
+	{"MatSatAniso", radia_MatSatAniso, METH_VARARGS, "MatSatAniso(datapar,dataper) where datapar can be [[ksi1,ms1,hc1],[ksi2,ms2,hc2],[ksi3,ms3,hc3],[ksi0,hc0]] or ksi0, and dataper can be [[ksi1,ms1],[ksi2,ms2],[ksi3,ms3],ksi0] or ksi0 - creates a nonlinear anisotropic magnetic material. If the first argument is set to [[ksi1,ms1,hc1],[ksi2,ms2,hc2],[ksi3,ms3,hc3],[ksi0,hc0]], the magnetization vector component parallel to the easy axis is computed as ms1*tanh(ksi1*(hpa-hc1)/ms1) + ms2*tanh(ksi2*(hpa-hc2)/ms2) + ms3*tanh(ksi3*(hpa-hc3)/ms3) + ksi0*(hpa-hc0), where hpa is the field strength vector component parallel to the easy axis. If the second argument is set to [[ksi1,ms1],[ksi2,ms2],[ksi3,ms3],ksi0], the magnetization vector component perpendicular to the easy axis is computed as ms1*tanh(ksi1*hpe/ms1) + ms2*tanh(ksi2*hpe/ms2) + ms3*tanh(ksi3*hpe/ms3) + ksi0*hpe, where hpe is the field strength vector component perpendicular to the easy axis. If the first or second argument is set to ksi0, the magnetization component parallel (perpendicular) to the easy axis is computed by ksi0*hp, where hp is the corresponding component of field strength vector. At least one of the magnetization vector components should non-linearly depend on the field strength. The direction of the easy magnetisation axis is set up by the magnetization vector in the object to which the material is later applied."},
+	{"MatStd", radia_MatStd, METH_VARARGS, "MatStd(name,mr) creates a pre-defined magnetic material with an optional absolute remanent magnetization mr. The material is identified by its name/formula, which can be one of the following:\n'NdFeB' for NdFeB permanent magnet material (default mr = 1.2 T);\n'SmCo5' for SmCo5 permanent magnet material (default mr = 0.85 T);\n'Sm2Co17' for Sm2Co17 permanent magnet material (default mr = 1.05 T);\n'Ferrite' for Ferrite permanent magnet material (default mr = 0.35 T);\n'Xc06' for an inexpensive Low Carbon Steel with C<0.06% (AFNOR);\n'Steel37' for an inexpensive Steel with C<0.13%;\n'Steel42' for an inexpensive Steel with C<0.19%;\n'AFK502' for a Vanadium Permendur type material from MetalImphy (Fe:49%, Co:49%, V:2%) similar to Vacoflux50 from VacuumSchmelze;\n'AFK1' for an inexpensive FeCo alloy from MetalImphy (Fe:74.2%, Co:25%, Cr:0.3%, Mn:0.5%)."},
+	{"MatApl", radia_MatApl, METH_VARARGS, "MatApl(obj,mat) applies material mat to object obj."},
+	{"MatMvsH", radia_MatMvsH, METH_VARARGS, "MatMvsH(obj,'mx|my|mz'|'',[hx,hy,hz]) computes magnetization from magnetic field strength vector [hx,hy,hz] for the material of the object obj; the magnetization components are specified by the second argument."},
 
-	{"MatApl", radia_MatApl, METH_VARARGS, "MatApl() applies magnetic material to a 3D object"},
-	{"MatStd", radia_MatStd, METH_VARARGS, "MatStd() creates a pre-defined magnetic material (the material is identified by its name/formula, e.g. \"NdFeB\")"},
-	{"MatSatIsoFrm", radia_MatSatIsoFrm, METH_VARARGS, "MatSatIsoFrm() creates a nonlinear isotropic magnetic material with the M versus H curve defined by the formula M = ms1*tanh(ksi1*H/ms1) + ms2*tanh(ksi2*H/ms2) + ms3*tanh(ksi3*H/ms3), where H is the magnitude of the magnetic field strength vector (in Tesla)"},
-	{"MatSatIsoTab", radia_MatSatIsoTab, METH_VARARGS, "MatSatIsoTab() creates a nonlinear isotropic magnetic material with the M versus H curve defined by the list of pairs corresponding values of H and M [[H1,M1],[H2,M2],...]"},
-	{"MatMvsH", radia_MatMvsH, METH_VARARGS, "MatMvsH() computes magnetization from magnetic field strength vector for a given material"},
+	{"RlxPre", radia_RlxPre, METH_VARARGS, "RlxPre(obj,srcobj:0) builds an interaction matrix for the object obj, treating the object srcobj as additional external field source."},
+	{"RlxMan", radia_RlxMan, METH_VARARGS, "RlxMan(intrc,meth,iternum,rlxpar) executes manual relaxation procedure for interaction matrix intrc using method number meth, by making iternum iterations with relaxation parameter value rlxpar."},
+	{"RlxAuto", radia_RlxAuto, METH_VARARGS, "RlxAuto(intrc,prec,maxiter,meth:4,'ZeroM->True|False') executes automatic relaxation procedure with the interaction matrix intrc using the method number meth. Relaxation stops whenever the change in magnetization (averaged over all sub-elements) between two successive iterations is smaller than prec or the number of iterations is larger than maxiter. The option value 'ZeroM->True' (default) starts the relaxation by setting the magnetization values in all paricipating objects to zero; 'ZeroM->False' starts the relaxation with the existing magnetization values in the sub-volumes."},
+	{"RlxUpdSrc", radia_RlxUpdSrc, METH_VARARGS, "RlxUpdSrc(intrc) updates external field data for the relaxation (to take into account e.g. modification of currents in coils, if any) without rebuilding the interaction matrix."},
+	{"Solve", radia_Solve, METH_VARARGS, "Solve(obj,prec,maxiter,meth:4) solves a magnetostatic problem, i.e. builds an interaction matrix for the object obj and performs a relaxation procedure using the method number meth (default is 4). The relaxation stops whenever the change in magnetization (averaged over all sub-elements) between two successive iterations is smaller than prec or the number of iterations is larger than maxiter."},
 
-	{"RlxPre", radia_RlxPre, METH_VARARGS, "RlxPre() builds interaction matrix for an object"},
-	{"RlxMan", radia_RlxMan, METH_VARARGS, "RlxMan() executes manual relaxation procedure on a given interaction matrix"},
-	{"RlxAuto", radia_RlxAuto, METH_VARARGS, "RlxAuto() executes automatic relaxation procedure on a given interaction matrix"},
+	{"Fld", radia_Fld, METH_VARARGS,  "Fld(obj,'bx|by|bz|hx|hy|hz|ax|ay|az|mx|my|mz'|'',[x,y,z]|[[x1,y1,z1],[x2,y2,z2],...]) computes magnetic field created by the object obj in point(s) {x,y,z} ({x1,y1,z1},{x2,y2,z2},...). The field component is specified by the second input variable. The function accepts a list of 3D points of arbitrary nestness: in this case it returns the corresponding list of magnetic field values."},
+	{"FldLst", radia_FldLst, METH_VARARGS,  "FldLst(obj,'bx|by|bz|hx|hy|hz|ax|ay|az|mx|my|mz'|'',[x1,y1,z1],[x2,y2,z2],np,'arg|noarg':'noarg',strt:0.) computes magnetic field created by object obj in np equidistant points along a line segment from [x1,y1,z1] to [x2,y2,z2]; the field component is specified by the second input variable; the 'arg|noarg' string variable specifies whether to output a longitudinal position for each point where the field is computed, and strt gives the start-value for the longitudinal position."},
+	{"FldInt", radia_FldInt, METH_VARARGS, "FldInt(obj,'inf|fin','ibx|iby|ibz'|'',[x1,y1,z1],[x2,y2,z2]) computes magnetic field induction integral produced by the object obj along a straight line specified by points [x1,y1,z1] and [x2,y2,z2]; depending on the second variable value, the integral is infinite ('inf') or finite from [x1,y1,z1] to [x2,y2,z2] ('fin'); the field integral component is specified by the third input variable. The units are Tesla x millimeters."},
+	{"FldPtcTrj", radia_FldPtcTrj, METH_VARARGS, "FldPtcTrj(obj,E,[x0,dxdy0,z0,dzdy0],[y0,y1],np) computes transverse coordinates and its derivatives (angles) of a relativistic charged particle trajectory in 3D magnetic field produced by the object obj, using the 4th order Runge-Kutta integration. The particle energy is E [GeV], initial transverse coordinates and derivatives are {x0,dxdy0,z0,dzdy0}; the longitudinal coordinate y is varied from y0 to y1 in np steps. All positions are in millimeters and angles in radians."},
+	{"FldEnr", radia_FldEnr, METH_VARARGS, "FldEnr(objdst,objsrc) or radFldEnr(objdst,objsrc,[kx,ky,kz]) computes potential energy (in Joule) of the object objdst in the field created by the object objsrc. The first form of the function performes the computation based on absolute accuracy value for the energy (by default 10 Joule; can be modified by the function radFldCmpPrc). The second form performs the computation based on the destination object subdivision numbers [kx,ky,kz]."},
+	{"FldEnrFrc", radia_FldEnrFrc, METH_VARARGS, "FldEnrFrc(objdst,objsrc,'fx|fy|fz'|'') or radFldEnrFrc(objdst,objsrc,'fx|fy|fz'|'',[kx,ky,kz]) computes force (in Newton) acting on the object objdst in the field produced by the object objsrc. The first form of the function performes the computation based on absolute accuracy value for the force (by default 10 Newton; can be modified by the function FldCmpPrc). The second form performs the computation based on the destination object subdivision numbers [kx,ky,kz]."},
+	{"FldEnrTrq", radia_FldEnrTrq, METH_VARARGS, "radFldEnrTrq(objdst,objsrc,'tx|ty|tz'|'',[x,y,z]) or radFldEnrTrq[objdst,objsrc,'tx|ty|tz'|'',[x,y,z],[kx,ky,kz]] computes torque (in Newton*mm) with respect to point [x,y,z], acting on the object objdst in the field produced by the object objsrc. The first form of the function performes the computation based on absolute accuracy value for the torque (by default 10 Newton*mm; can be modified by the function FldCmpPrc). The second form performs the computation based on the destination object subdivision numbers [kx,ky,kz]."},
+	{"FldFrc", radia_FldFrc, METH_VARARGS, "FldFrc(obj,shape) computes force of the field produced by the object obj acting onto objects within / after a shape defined by shape. shape can be the result of ObjRecMag() (parallelepiped) or FldFrcShpRtg() (rectangular surface). This function uses the algorithm based on Maxwell tensor, which may not always provide high efficiency. We suggest to use the function FldEnrFrc instead of this function."},
+	{"FldFrcShpRtg", radia_FldFrcShpRtg, METH_VARARGS, "FldFrcShpRtg([x,y,z],[wx,wy]) creates a rectangle with central point [x,y,z] and dimensions [wx,wy], to be used for force computation via Maxwell tensor."},
+	{"FldFocPot", radia_FldFocPot, METH_VARARGS, "FldFocPot(obj,[x1,y1,z1],[x2,y2,z2],np) computes \"focusing potential\" for trajectory of relativistic charged particle in magnetic field produced by the object obj. The integration is made from [x1,y1,z1] to [x2,y2,z2] with np equidistant points."},
+	{"FldFocKickPer", radia_FldFocKickPer, METH_VARARGS, "FldFocKickPer(obj,[x1,y1,z1],[nsx,nsy,nsz],per,nper,[n1x,n1y,n1z],r1,np1,r2,np2,com:'',[nh:1,nps:8,d1:0,d2:0],'T2m2|rad|microrad':'T2m2',en:1,'fix|tab':'fix') computes matrices of 2nd order kicks of trajectory of relativistic charged particle in periodic magnetic field produced by the object obj. The longitudinal integration along one period starts at point [x1,y1,z1] and is done along direction pointed by vector [nsx,nsy,nsz]; per is period length, nper is number of full periods; one direction of the transverse grid is pointed by vector [n1x,n1y,n1z], the other transverse direction is given by vector product of [n1x,n1y,n1z] and [nsx,nsy,nsz]; r1 and r2 are ranges of the transverse grid, np1 and np2 are corresponding numbers of points; com is arbitrary string comment; nh is maximum number of magnetic field harmonics to treat (default 1), nps is number of longitudinal points (default 8), d1 and d2 are steps of transverse differentiation (by default equal to the steps of the transverse grid); the 'T2m2|rad|microrad' string variable specifies the units for the resulting 2nd order kick values (default 'T2m2'); en is electron elergy in GeV (optional, required only if units are 'rad' or 'microrad'); the 'fix|tab' string variable specifies the format of the output data string (i.e. element [5] of the output list), 'fix' for fixed-width (default), 'tab' for tab-delimited. Returns list containing: [0]- matrix of kick values in the first transverse direction, [1]- matrix of kick values in the second transverse direction, [2]- matrix of longitudinally-integrated squared transverse magnetic field calculated on same transverse mesh as kicks, [3],[4]- lists of positions defining the transverse grid, [5]- formatted string containing the computed results (for saving into a text file)."},
+	{"FldCmpCrt", radia_FldCmpCrt, METH_VARARGS, "FldCmpCrt(prcB,prcA,prcBint,prcFrc,prcTrjCrd,prcTrjAng) sets general absolute accuracy levels for computation of field induction (prcB), vector potential (prcA), induction integrals along straight line (prcBint), field force (prcFrc), relativistic particle trajectory coordinates (prcTrjCrd) and angles (prcTrjAng)."},
+	{"FldCmpPrc", radia_FldCmpPrc, METH_VARARGS, "FldCmpPrc('PrcB->prb,PrcA->pra,PrcBInt->prbint,PrcForce->prfrc,PrcTorque->prtrq,PrcEnergy->pre,PrcCoord->prcrd,PrcAngle->prang') sets general absolute accuracy levels for computation of magnetic field induction, vector potential, induction integral along straight line, field force, torque, energy; relativistic charged particle trajectory coordinates and angles. The function works in line with the Mathematica mechanism of Options. PrcB, PrcA, PrcBInt, PrcForce, PrcTorque, PrcEnergy, PrcCoord, PrcAngle are names of the options; prb, pra, prbint, prfrc, prtrq, pre, prcrd, prang are the corresponding values (real numbers specifying the accuracy levels)."},
+	{"FldUnits", radia_FldUnits, METH_VARARGS, "FldUnits() shows the physical units currently in use."},
+	{"FldLenRndSw", radia_FldLenRndSw, METH_VARARGS, "FldLenRndSw('on|off') switches on or off the randomization of all the length values. The randomization magnitude can be set by the function FldLenTol."},
+	{"FldLenTol", radia_FldLenTol, METH_VARARGS, "FldLenTol(abs,rel,zero:0) sets absolute and relative randomization magnitudes for all the length values, including coordinates and dimensions of the objects producing magnetic field, and coordinates of points where the field is computed. Optimal values of the variables can be: rel=10^(-11), abs=L*rel, zero=abs, where L is the distance scale value (in mm) for the problem to be solved. Too small randomization magnitudes can result in run-time code errors."},
+	{"FldShimSig", radia_FldShimSig, METH_VARARGS, "FldShimSig(obj,'bx|by|bz|hx|hy|hz|ibx|iby|ibz'|'',[dx,dy,dz],[x1,y1,z1],[x2,y2,z2],np,[vix,viy,viz]:[0,0,0]) computes virtual 'shim signature', i.e. variation of magnetic field component defined by the second variable, introduced by displacement [dx,dy,dz] of magnetic field source object obj. The field variation is computed at np equidistant points along a line segment from [x1,y1,z1] to [x2,y2,z2]; the vector [vix,viy,viz] is taken into account if a field integral variation should be computed: in this case, it defines orientation of the integration line."},
 
-	{"Solve", radia_Solve, METH_VARARGS, "Solve() solves a magnetostatic problem, i.e. builds an interaction matrix and performs a relaxation procedure"},
-
-	{"Fld", radia_Fld, METH_VARARGS,  "Fld() computes field created by the object obj at one or many points"},
-	{"FldInt", radia_FldInt, METH_VARARGS, "FldInt() computes magnetic field integral produced by magnetic field source object along a straight line"},
-
-	{"UtiDmp", radia_UtiDmp, METH_VARARGS, "UtiDmp() outputs information (in bnary or in ASCII format) about an object or list of objects"},
-	{"UtiDmpPrs", radia_UtiDmpPrs, METH_VARARGS, "UtiDmpPrs() parses byte-string produced previously by UtiDmp(elem,\"bin\") and attempts to instantiate objects(s) identical to elem"},
-	{"UtiDel", radia_UtiDel, METH_VARARGS, "UtiDel() deletes an object"},
-	{"UtiDelAll", radia_UtiDelAll, METH_VARARGS, "UtiDelAll() deletes all previously created objects"},
+	{"UtiDmp", radia_UtiDmp, METH_VARARGS, "UtiDmp(elem,'asc|bin':'asc') outputs information about elem, which can be either one element or list of elements; second argument specifies whether the output should be in ASCII ('asc', default) or in Binary ('bin') format."},
+	{"UtiDmpPrs", radia_UtiDmpPrs, METH_VARARGS, "UtiDmpPrs(bstr) parses byte-string bstr produced by UtiDmp(elem,'bin') and attempts to instantiate elem objects(s); returns either index of one instantiated object (if elem was an index of one object) or a list of indexes of instantiated objects (if elem was a list of objects)."},
+	{"UtiDel", radia_UtiDel, METH_VARARGS, "UtiDel(elem) deletes element elem."},
+	{"UtiDelAll", radia_UtiDelAll, METH_VARARGS, "UtiDelAll() deletes all previously created elements."},
+	{"UtiVer", radia_UtiVer, METH_VARARGS, "UtiVer() returns version number of the Radia library."},
 
 	{NULL, NULL}
 };

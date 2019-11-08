@@ -462,6 +462,31 @@ EXP int CALL RadObjDrwQD3D(int obj, char* opt);
 */
 EXP int CALL RadObjDrwOpenGL(int obj, char* opt);
 
+/** Generates data for viewing 3D geometry of an object obj as polygons and lines with VTK (or compatible) viewer, and outputs integer parameters defining the lengths / sizes of these polygons' and lines' data. The data itself has to be "taken" using the function RadObjDrwDataGetVTK
+@param nVP [out] number of polygon vertices
+@param nP [out] number of polygons
+@param nVL [out] number of line vertices
+@param nL [out] number of lines
+@param obj [in] reference number of the object to be viewed
+@param opt [in] pointer to options string, which can be "Axes->True" (default) or "Axes->False" for showing or not the axes of the Cartesian laboratory frame; "Faces->True" (default) or "Faces->False" for showing or not visible faces of 3D objects; "EdgeLines->True" (default) or "EdgeLines->False" for highlighting or not the edge lines of 3D objects. opt can contain composition of these option sub-strings separated by ";".
+@return integer error code (0 : no error, >0 : error number, <0 : warning number)
+@author O.C.
+*/
+EXP int CALL RadObjDrwVTK(int* nVP, int* nP, int* nVL, int* nL, int* pKey, int obj, char* opt);
+
+/** Extracts data for viewing 3D geometry of an object obj as polygons and lines with VTK (or compatible) viewer; to be called after the function RadObjDrwVTK
+@param arCrdVP [out] array of coordinates of polygons' vertex points
+@param arLenP [out] array of numbers of vertex points in polygons
+@param arColP [out] array of polygons' RGB colors
+@param arCrdVL [out] array of coordinates of lines' vertex points
+@param arLenL [out] array of numbers of vertex points in lines' (segments)
+@param arColL [out] array of lines' RGB colors
+@param key [in] reference number of data to be extracted for viewing
+@return integer error code (0 : no error, >0 : error number, <0 : warning number)
+@author O.C.
+*/
+EXP int CALL RadObjDrwDataGetVTK(double* arCrdVP, int* arLenP, float* arColP, double* arCrdVL, int* arLenL, float* arColL, int key);
+
 /** Applies drawing attributes - RGB color (r,g,b) and line thickness thcn - to object obj.
 @param obj [in] reference number of the object to which drawing attributes should be applied
 @param RGB [in] array of 3 numbers from 0 to 1 specifying intensities of red, green and blue colors
@@ -886,7 +911,7 @@ EXP int CALL RadFldLst(double* B, int* nB, int obj, char* id, double* P1, double
 */
 EXP int CALL RadFldPtcTrj(double* f, int* nf, int obj, double E, double* InitCond, double* LongLim, int np);
 
-/** Computes matrices of 2nd order kicks for trajectory of relativistic charged particle in periodic magnetic field produced by the object obj. The computed kick matrices can be used in charged particle tracking codes.  The longitudinal integration along one period starts at point P1 and is done along direction pointed by vector Ns; one direction of the transverse grid is pointed by vector Ntr, the other transverse direction is given by vector product of Ntr and Ns.
+/** Computes matrices of 2nd order kicks for trajectory of relativistic charged particle in periodic magnetic field produced by the object obj. The computed kick matrices can be used in charged particle tracking codes. The longitudinal integration along one period starts at point P1 and is done along direction pointed by vector Ns; one direction of the transverse grid is pointed by vector Ntr, the other transverse direction is given by vector product of Ntr and Ns.
 @param M1 [out] flat array of real numbers representing the matrix of kick values in the first transverse direction given by the Ntr vector
 @param M2 [out] flat array of real numbers representing the matrix of kick values in the second transverse direction given by vector product of Ntr and Ns
 @param IntBtrE2 [out] flat array of real numbers representing the matrix of longitudinally-integrated squared transverse magnetic field
@@ -911,7 +936,8 @@ EXP int CALL RadFldPtcTrj(double* f, int* nf, int obj, double E, double* InitCon
 @return integer error code (0 : no error, >0 : error number, <0 : warning number)
 @authors: P.E., O.C.
 */
-EXP int CALL RadFldFocKickPer(double* M1, double* M2, double* IntBtrE2, double* Arg1, double* Arg2, int* size, int obj, double* P1, double* Ns, double per, int nper, int nps, double* Ntr, double r1, int np1, double d1, double r2, int np2, double d2, int nh, char* com);
+EXP int CALL RadFldFocKickPer(double* M1, double* M2, double* IntBtrE2, double* Arg1, double* Arg2, int* size, int obj, double* P1, double* Ns, double per, int nper, int nps, double* Ntr, double r1, int np1, double d1, double r2, int np2, double d2, int nh, char* com, char* unit, double en, char* frm); //OC03112019
+//EXP int CALL RadFldFocKickPer(double* M1, double* M2, double* IntBtrE2, double* Arg1, double* Arg2, int* size, int obj, double* P1, double* Ns, double per, int nper, int nps, double* Ntr, double r1, int np1, double d1, double r2, int np2, double d2, int nh, char* com);
 
 /** Prepares a formatted string containing second-order kick matrices for trajectory of relativistic charged particle in periodic magnetic field.
 @param str [out] C-string containing second-order kick matrices values in the format compatible with particle tracking computer codes (e.g. BETA, TRACY)
@@ -1000,7 +1026,6 @@ EXP int CALL RadUtiDmp(char* OutStr, int* pSize, int* arObj, int nObj, char* Asc
 */
 //EXP int CALL RadUtiDmpSize(int* size, int* arElem, int nElem, char* AscOrBin, bool doEraseBuf);
 ////EXP int CALL RadUtiDmpSize(int* size, int Elem);
-
 
 EXP int CALL RadUtiDmpPrs(int* arElem, int* nElem, unsigned char* sBytes, int nBytes); //OC01102018
 

@@ -84,9 +84,11 @@ def uti_plot1d(ar1d, x_range, labels=('Photon Energy [eV]', 'ph/s/0.1%bw'), unit
         strTitle = '' if(len(labels) < 3) else labels[2]
         labels = (labels[0] + ' [' + units[0] + ']', labels[1] + ' [' + units[1] + ']', strTitle)
 
+    #print('uti_plot1d:', x_range)
     _backend.uti_plot1d(ar1d, x_range, labels)
 
-def uti_plot1d_ir(ary, arx, labels=('Longitudinal Position [m]', 'Horizontal Position [m]'), units=None): #OC15112017
+def uti_plot1d_ir(ary, arx=None, labels=('Longitudinal Position [m]', 'Horizontal Position [m]'), units=None): #OC25102019
+#def uti_plot1d_ir(ary, arx, labels=('Longitudinal Position [m]', 'Horizontal Position [m]'), units=None): #OC15112017
     """Generate one-dimensional line plot from given array
 
     :param array arx: abscissa array
@@ -102,7 +104,38 @@ def uti_plot1d_ir(ary, arx, labels=('Longitudinal Position [m]', 'Horizontal Pos
         strTitle = '' if(len(labels) < 3) else labels[2]
         labels = (labels[0] + ' [' + units[0] + ']', labels[1] + ' [' + units[1] + ']', strTitle)
 
+    #OC25102019 (added stuff below)
+    if(arx is None):
+        ary0 = ary
+        if(not(isinstance(ary0, list) or isinstance(ary0, array) or isinstance(ary0, tuple))):
+            raise Exception("Incorrect definition of data arrays / lists to be plotted")
+
+        lenData = len(ary)
+        #arx = array.array('d', [0]*lenData)
+        #aryNew = array.array('d', [0]*lenData)
+        arx = [0]*lenData
+        aryNew = [0]*lenData
+        for i in range(lenData):
+            ay_i = ary[i]
+            arx[i] = ay_i[0]
+            aryNew[i] = ay_i[1]
+        ary = aryNew
+    
     _backend.uti_plot1d_ir(ary, arx, labels)
+
+def uti_plot1d_m(ars, labels=('X', 'Y'), units=None, styles=None, legend=None): #OC25102019
+    """Plot multiple one-dimensional curves in one graph
+
+    :param array ars: multiple data arrays, including abscissa and ordinate sub-array
+    :param tuple labels: (x-axis, y-axis)
+    :param tuple units: (x-units, y-units)
+    """
+    #if '_backend' not in locals(): uti_plot_init() #?
+    if(units is not None):
+        strTitle = '' if(len(labels) < 3) else labels[2]
+        labels = (labels[0] + ' [' + units[0] + ']', labels[1] + ' [' + units[1] + ']', strTitle)
+
+    _backend.uti_plot1d_m(ars, labels, styles, legend)
 
 def uti_plot2d(ar2d, x_range, y_range, labels=('Horizontal Position [m]','Vertical Position [m]'), units=None):
     """Generate quad mesh plot from given "flattened" array
@@ -134,20 +167,36 @@ def uti_plot2d1d(ar2d, x_range, y_range, x=0, y=0, labels=('Horizontal Position'
     :param tuple units: [x-axis, y-axis, z-axis]
     :param graphs_joined: switch specifying whether the 2d plot and 1d cuts have to be displayed in one panel or separately
     """
+    
     #if '_backend' not in locals(): uti_plot_init() #?
     if(units is not None): #checking / re-scaling x, y
+
+        #OC17032019
+        xRangeOrig = x_range[1] - x_range[0]
+        yRangeOrig = y_range[1] - y_range[0] #AH30082019
+        #yStartOrig = y_range[1] - y_range[0]
+        
         x_range, x_unit = uti_plot_com.rescale_dim(x_range, units[0])
         y_range, y_unit = uti_plot_com.rescale_dim(y_range, units[1])
+
+        #OC17032019
+        if(x != 0): x *= (x_range[1] - x_range[0])/xRangeOrig
+        if(y != 0): y *= (y_range[1] - y_range[0])/yRangeOrig
+        
         units = [x_unit, y_unit,  units[2]]
 
         strTitle = labels[2]
         label2D = (labels[0] + ' [' + units[0]+ ']', labels[1] + ' [' + units[1] + ']', strTitle)
 
-        strTitle = 'At ' + labels[1] + ': ' + str(y)
+        #strTitle = 'At ' + labels[1] + ': ' + str(y)
+        strTitle = 'At ' + labels[1] + ': ' + str(round(y, 6)) #OC17032019
+        
         if y != 0: strTitle += ' ' + units[1]
         label1X = (labels[0] + ' [' + units[0] + ']', labels[2] + ' [' + units[2] + ']', strTitle)
 
-        strTitle = 'At ' + labels[0] + ': ' + str(x)
+        #strTitle = 'At ' + labels[0] + ': ' + str(x)
+        strTitle = 'At ' + labels[0] + ': ' + str(round(x, 6)) #OC17032019
+        
         if x != 0: strTitle += ' ' + units[0]
         label1Y = (labels[1] + ' [' + units[1] + ']', labels[2] + ' [' + units[2] + ']', strTitle)
         

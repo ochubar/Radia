@@ -790,6 +790,23 @@ void radTSend::Line(const TVector3d* EdgePoints, int lenEdgePoints, char DrawFac
 }
 
 //-------------------------------------------------------------------------
+
+int radTSend::GeomDataToBuffer() //OC04112019
+//int radTSend::GeomDataToBuffer(int& nVP, int& nP, int& nVL, int& nL, int& key) //OC04112019
+{
+	int key = 0;
+	int nP = (int)(GeomPolygons.size());
+	int nL = (int)(GeomLines.size());
+	if((nP > 0) || (nL > 0))
+	{
+		key = rand(); //to improve?
+		if(nP > 0) ioBuffer.StoreGeomPolygData(GeomPolygons, key);
+		if(nL > 0) ioBuffer.StoreGeomPolygData(GeomLines, key + 1);
+	}
+	return key;
+}
+
+//-------------------------------------------------------------------------
 /**
 void radTSend::FrameLines(char DrawFacilityInd)
 {//Don't use this ! Use radTg3dGraphPresent::DrawFrameLines() instead !
