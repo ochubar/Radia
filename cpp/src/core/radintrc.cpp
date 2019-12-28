@@ -44,7 +44,6 @@ radTInteraction::radTInteraction()
 
 	NewMagnArray = NULL;
 	NewFieldArray = NULL;
-	IdentTransPtr = NULL;
 
 	RelaxSubIntervArray = NULL; // New
 	mKeepTransData = 0;
@@ -65,7 +64,6 @@ int radTInteraction::Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, c
 
 	NewMagnArray = NULL;
 	NewFieldArray = NULL;
-	IdentTransPtr = NULL;
 
 	RelaxSubIntervArray = NULL; // New
 	AmOfRelaxSubInterv = 0; // New
@@ -79,7 +77,7 @@ int radTInteraction::Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, c
 
 	MemAllocTotAtOnce = InMemAllocTotAtOnce;
 
-	IdentTransPtr = new radIdentTrans();
+	IdentTransPtr.reset(new radIdentTrans());
 
 	radTlphgPtr NewListOfTransPtr;
 	CountMainRelaxElems((radTg3d*)(SourceHandle.rep), &NewListOfTransPtr);
@@ -156,7 +154,6 @@ radTInteraction::~radTInteraction()
         DestroyMainTransPtrArray();
         EmptyVectOfPtrToListsOfTrans();
 	}
-	if(IdentTransPtr != NULL) delete IdentTransPtr; //required by EmptyVectOfPtrToListsOfTrans();
 }
 
 //-------------------------------------------------------------------------
@@ -423,7 +420,7 @@ void radTInteraction::FillInMainTransPtrArray()
 		{
 			MainTransPtrArray[i] = new radTrans(*(TransPtrVect[0]));
 		}
-		else MainTransPtrArray[i] = IdentTransPtr;
+		else MainTransPtrArray[i] = IdentTransPtr.get();
 		EmptyTransPtrVect();
 	}
 	FillInMainTransOnly = 0;
@@ -1043,7 +1040,7 @@ void radTInteraction::DumpBin(CAuxBinStrVect& oStr, vector<int>& vElemKeysOut, m
 	//radVectPtr_lphgPtr ExtVectOfPtrToListsOfTransPtr; //required
 	DumpBinVectOfPtrToListsOfTransPtr(oStr, ExtVectOfPtrToListsOfTransPtr, gMapOfHandlers);
 
-	//radIdentTrans* IdentTransPtr; //required, but doesn't need to be saved
+	//std::unique_ptr<radIdentTrans> IdentTransPtr; //required, but doesn't need to be saved
 	//radTCast Cast; //no members?
 	//radTSend Send; //no members?
 
@@ -1145,8 +1142,8 @@ void radTInteraction::DumpBinParseVectOfPtrToListsOfTransPtr(CAuxBinStrVect& inS
 
 radTInteraction::radTInteraction(CAuxBinStrVect& inStr, map<int, int>& mKeysOldNew, radTmhg& gMapOfHandlers)
 {
-	//radIdentTrans* IdentTransPtr; //required
-	IdentTransPtr = new radIdentTrans();
+	//std::unique_ptr<radIdentTrans> IdentTransPtr; //required
+	IdentTransPtr.reset(new radIdentTrans());
 
 	//int AmOfMainElem;
 	inStr >> AmOfMainElem;
@@ -1190,7 +1187,7 @@ radTInteraction::radTInteraction(CAuxBinStrVect& inStr, map<int, int>& mKeysOldN
 	{
 		radThg hg;
 		int oldKey = DumpBinParseSourceHandle(inStr, mKeysOldNew, gMapOfHandlers, false, false, hg);
-		if(oldKey < 0) TransPtrVect.push_back(IdentTransPtr);
+		if(oldKey < 0) TransPtrVect.push_back(IdentTransPtr.get());
 		else if(hg.rep != 0) TransPtrVect.push_back(new radTrans(*((radTrans*)hg.rep))); //will be deleted at distraction
 	}
 
@@ -1372,7 +1369,7 @@ radTInteraction::radTInteraction(CAuxBinStrVect& inStr, map<int, int>& mKeysOldN
 		{
 			radThg hg;
 			int oldKey = DumpBinParseSourceHandle(inStr, mKeysOldNew, gMapOfHandlers, false, false, hg);
-			if(oldKey < 0) MainTransPtrArray[i] = IdentTransPtr;
+			if(oldKey < 0) MainTransPtrArray[i] = IdentTransPtr.get();
 			else if(hg.rep != 0) MainTransPtrArray[i] = new radTrans(*((radTrans*)hg.rep)); //will be deleted at distraction
 		}
 	}

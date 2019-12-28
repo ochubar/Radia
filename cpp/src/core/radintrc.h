@@ -24,6 +24,7 @@
 #include "gmtrans.h"
 #include "radg3d.h"
 
+#include <memory>
 #include <sstream>
 #include <vector>
 
@@ -171,7 +172,7 @@ class radTInteraction : public radTg {
 
 	radTCast Cast;
 	radTSend Send;
-	radIdentTrans* IdentTransPtr;
+	std::unique_ptr<radIdentTrans> IdentTransPtr;
 	short FillInMainTransOnly;
 	char mKeepTransData;
 
@@ -290,8 +291,8 @@ inline void radTInteraction::FillInTransPtrVectForElem(int ElemLocInd, char I_or
 	if(I_or_E == 'I') PtrToListOfPtrToTrans = IntVectOfPtrToListsOfTransPtr[ElemLocInd];
 	else PtrToListOfPtrToTrans = ExtVectOfPtrToListsOfTransPtr[ElemLocInd];
 
-	if(PtrToListOfPtrToTrans->empty()) TransPtrVect.push_back(IdentTransPtr);
-	else NestedFor_Trans(IdentTransPtr, PtrToListOfPtrToTrans->begin(), ElemLocInd, I_or_E);
+	if(PtrToListOfPtrToTrans->empty()) TransPtrVect.push_back(IdentTransPtr.get());
+	else NestedFor_Trans(IdentTransPtr.get(), PtrToListOfPtrToTrans->begin(), ElemLocInd, I_or_E);
 }
 
 //-------------------------------------------------------------------------
