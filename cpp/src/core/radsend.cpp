@@ -1957,15 +1957,15 @@ void radTSend::OutRelaxResultsInfo(double* RelaxStatusParamArray, int lenRelaxSt
 //#ifdef __JAVA__
 #if defined __JAVA__ || defined ALPHA__DLL__ || defined ALPHA__LIB__
 	int TotOutElem = lenRelaxStatusParamArray + 1;
-	double *TotOutArray = new double[TotOutElem];
-	if(TotOutArray == 0) { ErrorMessage("Radia::Error900"); return;}
-	double *t = TotOutArray;
+	std::vector<double> TotOutArray;
+	TotOutArray.resize(TotOutElem);
+	double *t = TotOutArray.data();
 	double *tRelaxStatusParamArray = RelaxStatusParamArray;
 	for(int i=0; i<lenRelaxStatusParamArray; i++) *(t++) = *(tRelaxStatusParamArray++);
 	*t = ActualIterNum;
 
 	int Dims[] = { TotOutElem};
-	MultiDimArrayOfDouble(TotOutArray, Dims, 1);
+	MultiDimArrayOfDouble(TotOutArray.data(), Dims, 1);
 #endif
 }
 
