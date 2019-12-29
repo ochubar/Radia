@@ -266,14 +266,14 @@ inline void radTInteraction::PushFrontNativeElemTransList(radTg3d* g3dPtr, radTl
 
 inline void radTInteraction::EmptyVectOfPtrToListsOfTrans()
 {
-	for(unsigned i=1; i<IntVectOfPtrToListsOfTransPtr.size(); i++) 
+	for(unsigned i=0; i<IntVectOfPtrToListsOfTransPtr.size(); i++)
 	{
 		radTlphgPtr*& p_lphgPtr = IntVectOfPtrToListsOfTransPtr[i];
 		if(p_lphgPtr != 0) delete p_lphgPtr;
 		p_lphgPtr = 0;
 	}
 	IntVectOfPtrToListsOfTransPtr.erase(IntVectOfPtrToListsOfTransPtr.begin(), IntVectOfPtrToListsOfTransPtr.end());
-	for(unsigned k=1; k<ExtVectOfPtrToListsOfTransPtr.size(); k++) 
+	for(unsigned k=0; k<ExtVectOfPtrToListsOfTransPtr.size(); k++)
 	{
 		radTlphgPtr*& p_lphgPtr = ExtVectOfPtrToListsOfTransPtr[k];
 		if(p_lphgPtr != 0) delete p_lphgPtr;
