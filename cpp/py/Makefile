@@ -1,10 +1,12 @@
 .PHONY: python clean
 
+MODE ?= 0 
+
 python: radia.so
 
 radia.so:
-	python setup.py build_ext --build-lib='../gcc'
-	cp ../gcc/radia*.so ../../env/radia_python/
+	MODE=$(MODE) python setup.py build_ext --build-lib='../gcc' 
+	cp ../gcc/radia*.so ../../env/radia_python/radia.so
 	rm -rf build
 
 clean:

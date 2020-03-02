@@ -1966,6 +1966,8 @@ void radTSend::OutRelaxResultsInfo(double* RelaxStatusParamArray, int lenRelaxSt
 
 	int Dims[] = { TotOutElem};
 	MultiDimArrayOfDouble(TotOutArray, Dims, 1);
+
+	delete[] TotOutArray; //OC30122019 (pointed-out by per-gron)
 #endif
 }
 

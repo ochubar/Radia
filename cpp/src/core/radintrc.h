@@ -175,6 +175,9 @@ class radTInteraction : public radTg {
 	short FillInMainTransOnly;
 	char mKeepTransData;
 
+	int m_rankMPI; //21122019 (to set from Application?)
+	int m_nProcMPI;
+
 public:
 
 	int AmOfRelaxSubInterv;
@@ -182,16 +185,22 @@ public:
 	short SomethingIsWrong;
 	short MemAllocTotAtOnce;
 
-	radTInteraction(const radThg&, const radThg&, const radTCompCriterium&, short =0, char =0, char =0);
+	radTInteraction(const radThg&, const radThg&, const radTCompCriterium&, short =0, char =0, char =0, int =-1, int =0); //OC08012020
+	//radTInteraction(const radThg&, const radThg&, const radTCompCriterium&, short =0, char =0, char =0);
 	radTInteraction(CAuxBinStrVect& inStr, map<int, int>& mKeysOldNew, radTmhg& gMapOfHandlers);
 	radTInteraction();
 	~radTInteraction();
 
-	int Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, const radTCompCriterium& InCompCriterium, short InMemAllocTotAtOnce, char AuxOldMagnArrayIsNeeded, char KeepTransData);
+	int Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, const radTCompCriterium& InCompCriterium, short InMemAllocTotAtOnce, char AuxOldMagnArrayIsNeeded, char KeepTransData, int rankMPI=-1, int nProcMPI=0); //OC08012020
+	//int Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, const radTCompCriterium& InCompCriterium, short InMemAllocTotAtOnce, char AuxOldMagnArrayIsNeeded, char KeepTransData);
 
 	void CountMainRelaxElems(radTg3d*, radTlphgPtr*);
 	void AllocateMemory(char ExtraExternFieldArrayIsNeeded);
-	void SetupInteractMatrix();
+	void DeallocateMemory(); //OC27122019
+
+	int SetupInteractMatrix(); //OC26122019
+	//void SetupInteractMatrix();
+
 	void SetupExternFieldArray();
 	void AddExternFieldFromMoreExtSource();
 	void AddMoreExternField(const radThg& hExtraExtSrc);
@@ -243,6 +252,12 @@ public:
 
 	inline void UpdateExternalField();
 
+	inline void LongLongToFloatAr(long long, float*); //OC24122019
+	inline long long FloatArToLongLong(float*); //OC27122019
+
+	template<class T> inline long OutMagnVals(T*& arMagnVals, int nExtraVals=0); //OC02012020
+	template<class T> inline void SetRelaxObjMagnVals(T* arMagnVals); //OC02012020
+
 	friend class radTIterativeRelaxMeth;
 	friend class radTSimpleRelaxation;
 	friend class radTRelaxationMethNo_2;
@@ -266,7 +281,8 @@ inline void radTInteraction::PushFrontNativeElemTransList(radTg3d* g3dPtr, radTl
 
 inline void radTInteraction::EmptyVectOfPtrToListsOfTrans()
 {
-	for(unsigned i=1; i<IntVectOfPtrToListsOfTransPtr.size(); i++) 
+	for(unsigned i=1; i<IntVectOfPtrToListsOfTransPtr.size(); i++)
+	//for(unsigned i=0; i<IntVectOfPtrToListsOfTransPtr.size(); i++) //OC30122019: this correction was suggested by per-gron
 	{
 		radTlphgPtr*& p_lphgPtr = IntVectOfPtrToListsOfTransPtr[i];
 		if(p_lphgPtr != 0) delete p_lphgPtr;
@@ -274,6 +290,7 @@ inline void radTInteraction::EmptyVectOfPtrToListsOfTrans()
 	}
 	IntVectOfPtrToListsOfTransPtr.erase(IntVectOfPtrToListsOfTransPtr.begin(), IntVectOfPtrToListsOfTransPtr.end());
 	for(unsigned k=1; k<ExtVectOfPtrToListsOfTransPtr.size(); k++) 
+	//for(unsigned k=0; k<ExtVectOfPtrToListsOfTransPtr.size(); k++) //OC30122019: this correction was suggested by per-gron
 	{
 		radTlphgPtr*& p_lphgPtr = ExtVectOfPtrToListsOfTransPtr[k];
 		if(p_lphgPtr != 0) delete p_lphgPtr;
@@ -548,6 +565,67 @@ inline void radTInteraction::UpdateExternalField()
 {
 	SetupExternFieldArray(); //zeros and then sets the ExternFieldArray from g3dExternPtrVect
 	AddExternFieldFromMoreExtSource(); //adds field to ExternFieldArray from MoreExtSourceHandle
+}
+
+//-------------------------------------------------------------------------
+
+template<class T> inline long radTInteraction::OutMagnVals(T*& arMagnVals, int nExtraVals) //OC02012020
+{//Allocates arMagnVals!
+ //This assumes that after the Relaxation, the resulting Magnetization data is stored in radTInteraction::g3dRelaxPtrVect
+ //(but can be changed to take the Magnetization data from radTInteraction::NewMagnArray)
+	//arMagnVals = 0;
+	if(AmOfMainElem <= 0) return 0;
+	long nMagnVals = AmOfMainElem*3 + nExtraVals; //nExtraVals can be used e.g. for attaching extra data to the Magnetization array
+
+	if(arMagnVals == 0) arMagnVals = new T[nMagnVals];
+	if(arMagnVals == 0) { Send.ErrorMessage("Radia::Error900"); return 0;}
+	T *t_arMagnVals = arMagnVals + nExtraVals;
+	for(long i=0; i<AmOfMainElem; i++)
+	{
+		TVector3d &M = (g3dRelaxPtrVect[i])->Magn;
+		*(t_arMagnVals++) = (T)M.x; *(t_arMagnVals++) = (T)M.y; *(t_arMagnVals++) = (T)M.z;
+	}
+	return nMagnVals;
+}
+
+//-------------------------------------------------------------------------
+
+template<class T> inline void radTInteraction::SetRelaxObjMagnVals(T* arMagnVals)
+{
+	if((AmOfMainElem <= 0) || (arMagnVals == 0)) return;
+
+	T *t_arMagnVals = arMagnVals;
+	for(long i=0; i<AmOfMainElem; i++)
+	{
+		TVector3d &M = (g3dRelaxPtrVect[i])->Magn;
+		 M.x = *(t_arMagnVals++);  M.y = *(t_arMagnVals++); M.z = *(t_arMagnVals++);
+	}
+}
+
+//-------------------------------------------------------------------------
+
+inline void radTInteraction::LongLongToFloatAr(long long inVal, float outAr[4]) //24122019
+{//Aux. function to encode one long long number to 4 floats (consider moving to some parser class)
+	long long mask = 0xFFFF;
+	for(int j=0; j<4; j++)
+	{
+		outAr[j] = (float)((inVal & mask) >> (j*16));
+		mask <<= 16;
+	}
+}
+
+//-------------------------------------------------------------------------
+
+inline long long radTInteraction::FloatArToLongLong(float inAr[4]) //OC27122019
+{//Aux. function to decode one long long number from 4 floats (consider moving to some parser class)
+	long long res=0, aux;
+	for(int j=0; j<4; j++)
+	{
+		aux = (long long)inAr[j];
+		aux <<= (j*16);
+		res |= aux;
+	}
+	return res;
 }
 
 //-------------------------------------------------------------------------

@@ -46,6 +46,8 @@ class radTApplication {
 
 	char QD3D_ViewerWasInitialized;
 
+	int m_nProcMPI, m_rankMPI; //OC01012020
+
 public:
 
 	short SendingIsRequired;
@@ -71,6 +73,8 @@ public:
 		MemAllocForIntrctMatrTotAtOnce = 0;
 
 		QD3D_ViewerWasInitialized = 0;
+
+		m_nProcMPI = 0; m_rankMPI = -1; //OC01012020
 	}
 
 	int ValidateVector3d(double* ArrayToCheck, long LenArray, TVector3d* VectorPtr);
@@ -261,6 +265,8 @@ public:
 	void ReplaceInAllGroups(radThg& OldHandle, radThg& NewHandle);
 	void ReplaceInGlobalMap(radThg& OldHandle, radThg& NewHandle);
 	inline void CopyDrawAttr(int OldElemKey, int NewElemKey);
+
+	int ProcMPI(const char* OnOrOff);
 };
 
 //-------------------------------------------------------------------------

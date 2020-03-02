@@ -18,12 +18,18 @@
 #include "radintrc.h"
 #include "radsbdrc.h"
 
+#ifdef _WITH_MPI
+#include <mpi.h>
+#endif
+
 //-------------------------------------------------------------------------
 //-------------------------------------------------------------------------
 
-radTInteraction::radTInteraction(const radThg& In_hg, const radThg& In_hgMoreExtSrc, const radTCompCriterium& InCompCriterium, short InMemAllocTotAtOnce, char ExtraExternFieldArrayIsNeeded, char KeepTransData)
+radTInteraction::radTInteraction(const radThg& In_hg, const radThg& In_hgMoreExtSrc, const radTCompCriterium& InCompCriterium, short InMemAllocTotAtOnce, char ExtraExternFieldArrayIsNeeded, char KeepTransData, int rankMPI, int nProcMPI) //OC08012020
+//radTInteraction::radTInteraction(const radThg& In_hg, const radThg& In_hgMoreExtSrc, const radTCompCriterium& InCompCriterium, short InMemAllocTotAtOnce, char ExtraExternFieldArrayIsNeeded, char KeepTransData)
 {
-	if(!Setup(In_hg, In_hgMoreExtSrc, InCompCriterium, InMemAllocTotAtOnce, ExtraExternFieldArrayIsNeeded, KeepTransData)) 
+	if(!Setup(In_hg, In_hgMoreExtSrc, InCompCriterium, InMemAllocTotAtOnce, ExtraExternFieldArrayIsNeeded, KeepTransData, rankMPI, nProcMPI)) //OC08012020
+	//if(!Setup(In_hg, In_hgMoreExtSrc, InCompCriterium, InMemAllocTotAtOnce, ExtraExternFieldArrayIsNeeded, KeepTransData)) 
 	{
 		SomethingIsWrong = 1;
 		Send.ErrorMessage("Radia::Error118");
@@ -52,7 +58,8 @@ radTInteraction::radTInteraction()
 
 //-------------------------------------------------------------------------
 
-int radTInteraction::Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, const radTCompCriterium& InCompCriterium, short InMemAllocTotAtOnce, char AuxOldMagnArrayIsNeeded, char KeepTransData)
+int radTInteraction::Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, const radTCompCriterium& InCompCriterium, short InMemAllocTotAtOnce, char AuxOldMagnArrayIsNeeded, char KeepTransData, int rankMPI, int nProcMPI) //OC08012020
+//int radTInteraction::Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, const radTCompCriterium& InCompCriterium, short InMemAllocTotAtOnce, char AuxOldMagnArrayIsNeeded, char KeepTransData)
 {
 	SomethingIsWrong = 0;
 
@@ -85,21 +92,45 @@ int radTInteraction::Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, c
 	CountMainRelaxElems((radTg3d*)(SourceHandle.rep), &NewListOfTransPtr);
 
 	if(!NotEmpty()) return 0;
-	AllocateMemory(AuxOldMagnArrayIsNeeded);
-	if(SomethingIsWrong)
+
+	//m_rankMPI = -1; //OC20122019 (to set from Application?) 
+	//m_nProcMPI = 0;
+	m_rankMPI = rankMPI; //OC08012019 (to set from Application?) 
+	m_nProcMPI = nProcMPI; 
+
+	bool IntrctMatrMemAllocShouldBeDone = true;
+	if(m_rankMPI > 0) IntrctMatrMemAllocShouldBeDone = false;
+
+//#ifdef _WITH_MPI
+//	if(MPI_Comm_size(MPI_COMM_WORLD, &m_nProcMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0;}
+//	if(MPI_Comm_rank(MPI_COMM_WORLD, &m_rankMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0;} //Get the rank of the process
+//	if(m_rankMPI > 0) IntrctMatrMemAllocShouldBeDone = false;
+//#endif
+
+	if(IntrctMatrMemAllocShouldBeDone) //OC20122019
 	{
-		EmptyVectOfPtrToListsOfTrans(); return 0;
+		AllocateMemory(AuxOldMagnArrayIsNeeded); //In case of MPI-parallelization, this has to be executed by master only
+
+		if(SomethingIsWrong)
+		{
+			EmptyVectOfPtrToListsOfTrans(); return 0;
+		}
+		FillInRelaxSubIntervArray(); //New
 	}
-
-	FillInRelaxSubIntervArray(); // New
-
 	FillInMainTransPtrArray();
-	SetupInteractMatrix();
-	SetupExternFieldArray();
 
-	AddExternFieldFromMoreExtSource();
-	//ZeroAuxOldMagnArray();
-	ZeroAuxOldArrays();
+	if(!SetupInteractMatrix()) { DeallocateMemory(); return 0;} //OC26122019 //Most CPU-intensive
+	//SetupInteractMatrix(); //Most CPU-intensive
+
+	if(IntrctMatrMemAllocShouldBeDone) //OC29122019
+	{
+		SetupExternFieldArray();
+		AddExternFieldFromMoreExtSource();
+		//ZeroAuxOldMagnArray();
+		ZeroAuxOldArrays();
+
+		InitAuxArrays();
+	}
 
 	mKeepTransData = KeepTransData;
 	if(!KeepTransData) //OC021103
@@ -108,8 +139,8 @@ int radTInteraction::Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, c
         EmptyVectOfPtrToListsOfTrans();
 	}
 
-	//ResetM();
-	InitAuxArrays();
+	////ResetM();
+	//InitAuxArrays(); //OC30122019 (moved up)
 
 	return 1;
 }
@@ -118,11 +149,18 @@ int radTInteraction::Setup(const radThg& In_hg, const radThg& In_hgMoreExtSrc, c
 
 radTInteraction::~radTInteraction()
 {
+	DeallocateMemory(); //OC27122019
+}
+
+//-------------------------------------------------------------------------
+
+void radTInteraction::DeallocateMemory() //OC27122019
+{
 	if(MemAllocTotAtOnce)
 	{
 		if(InteractMatrix != NULL)
 		{
-			if(InteractMatrix[0] != NULL) delete[] (InteractMatrix[0]);
+			if(InteractMatrix[0] != NULL) delete[](InteractMatrix[0]);
 			delete[] InteractMatrix;
 		}
 	}
@@ -153,8 +191,8 @@ radTInteraction::~radTInteraction()
 
 	if(mKeepTransData) //OC021103
 	{
-        DestroyMainTransPtrArray();
-        EmptyVectOfPtrToListsOfTrans();
+		DestroyMainTransPtrArray();
+		EmptyVectOfPtrToListsOfTrans();
 	}
 	if(IdentTransPtr != NULL) delete IdentTransPtr; //required by EmptyVectOfPtrToListsOfTrans();
 }
@@ -452,7 +490,8 @@ int radTInteraction::CountRelaxElemsWithSym()
 
 //-------------------------------------------------------------------------
 
-void radTInteraction::SetupInteractMatrix()
+int radTInteraction::SetupInteractMatrix() //OC26122019
+//void radTInteraction::SetupInteractMatrix()
 {
 	radTFieldKey FieldKeyInteract; FieldKeyInteract.B_=FieldKeyInteract.H_=FieldKeyInteract.PreRelax_=1;
 	TVector3d ZeroVect(0.,0.,0.);
@@ -461,45 +500,321 @@ void radTInteraction::SetupInteractMatrix()
 	int AmOfElemWithSym = CountRelaxElemsWithSym();
 	//--EndNew
 
-	for(int ColNo=0; ColNo<AmOfMainElem; ColNo++)
+	if(m_nProcMPI < 2) //OC01012020
 	{
-		FillInTransPtrVectForElem(ColNo, 'I');
-		radTg3dRelax* g3dRelaxPtrColNo = g3dRelaxPtrVect[ColNo];
-
-		for(int StrNo=0; StrNo<AmOfMainElem; StrNo++) 
+		for(int ColNo=0; ColNo<AmOfMainElem; ColNo++)
 		{
-			TVector3d InitObsPoiVect = MainTransPtrArray[StrNo]->TrPoint((g3dRelaxPtrVect[StrNo])->ReturnCentrPoint());
+			FillInTransPtrVectForElem(ColNo, 'I');
+			radTg3dRelax* g3dRelaxPtrColNo = g3dRelaxPtrVect[ColNo];
 
-			TMatrix3d SubMatrix(ZeroVect, ZeroVect, ZeroVect), BufSubMatrix;
-			for(unsigned i=0; i<TransPtrVect.size(); i++)
+			for(int StrNo=0; StrNo<AmOfMainElem; StrNo++)
 			{
-				TVector3d ObsPoiVect = TransPtrVect[i]->TrPoint_inv(InitObsPoiVect);
+				TVector3d InitObsPoiVect = MainTransPtrArray[StrNo]->TrPoint((g3dRelaxPtrVect[StrNo])->ReturnCentrPoint());
 
-				radTField Field(FieldKeyInteract, CompCriterium, ObsPoiVect, ZeroVect, ZeroVect, ZeroVect, ZeroVect, 0.);
-				Field.AmOfIntrctElemWithSym = AmOfElemWithSym; // New, may be changed later
+				TMatrix3d SubMatrix(ZeroVect, ZeroVect, ZeroVect), BufSubMatrix;
+				for(unsigned i=0; i<TransPtrVect.size(); i++)
+				{
+					TVector3d ObsPoiVect = TransPtrVect[i]->TrPoint_inv(InitObsPoiVect);
 
-				g3dRelaxPtrColNo->B_comp(&Field);
+					radTField Field(FieldKeyInteract, CompCriterium, ObsPoiVect, ZeroVect, ZeroVect, ZeroVect, ZeroVect, 0.);
+					Field.AmOfIntrctElemWithSym = AmOfElemWithSym; // New, may be changed later
 
-				BufSubMatrix.Str0 = Field.B; 
-				BufSubMatrix.Str1 = Field.H; 
-				BufSubMatrix.Str2 = Field.A; 
+					g3dRelaxPtrColNo->B_comp(&Field);
 
-				TransPtrVect[i]->TrMatrix(BufSubMatrix);
-				SubMatrix += BufSubMatrix;
+					BufSubMatrix.Str0 = Field.B;
+					BufSubMatrix.Str1 = Field.H;
+					BufSubMatrix.Str2 = Field.A;
+
+					TransPtrVect[i]->TrMatrix(BufSubMatrix);
+					SubMatrix += BufSubMatrix;
+				}
+				MainTransPtrArray[StrNo]->TrMatrix_inv(SubMatrix);
+				InteractMatrix[StrNo][ColNo] = SubMatrix;
 			}
-			MainTransPtrArray[StrNo]->TrMatrix_inv(SubMatrix);
-			InteractMatrix[StrNo][ColNo] = SubMatrix;
+			EmptyTransPtrVect();
 		}
-		EmptyTransPtrVect();
+		//--New
+		for(int ClNo=0; ClNo<AmOfMainElem; ClNo++)
+		{
+			radTg3dRelax* g3dRelaxPtrClNo = g3dRelaxPtrVect[ClNo];
+			g3dRelaxPtrVect[ClNo] = g3dRelaxPtrClNo->FormalIntrctMemberPtr();
+		}
+		//--EndNew
 	}
-
-	//--New
-	for(int ClNo=0; ClNo<AmOfMainElem; ClNo++)
+#ifdef _WITH_MPI
+	else
 	{
-		radTg3dRelax* g3dRelaxPtrClNo = g3dRelaxPtrVect[ClNo];
-		g3dRelaxPtrVect[ClNo] = g3dRelaxPtrClNo->FormalIntrctMemberPtr();
+		vector<pair<long long, long long> > vPacketElemStartEnd;
+		int nProc_mi_1 = m_nProcMPI - 1;
+		const long long switchAmOfElem = 1000; //threshold to switch between different data packaging for sending via MPI
+		
+		int nPacketsTot = 0; //required for master process
+		long long nMaxMatrElemInPacket = 0;
+
+		if(m_nProcMPI < 3)
+		{
+			long long nTotMainElem = ((long long)AmOfMainElem)*((long long)AmOfMainElem);
+
+			if(m_rankMPI > 0)
+			{
+				pair<long long, long long> pairStartEnd(0, nTotMainElem);
+				vPacketElemStartEnd.push_back(pairStartEnd);
+			}
+			else
+			{//required for master process
+				nPacketsTot = 1;
+				nMaxMatrElemInPacket = nTotMainElem;
+			}
+		}
+		else if((m_nProcMPI < AmOfMainElem + 1) && (AmOfMainElem >= switchAmOfElem))
+		//else if(nProcMPI < AmOfMainElem + 1)
+		{//Send matrix elements to master by packets of AmOfMainElem in length
+
+			if(m_rankMPI > 0)
+			{
+				pair<long long, long long> pairStartEnd(0, 0);
+				long long nPerGen = AmOfMainElem*nProc_mi_1;
+				long long nPackets = (long long)(AmOfMainElem/nProc_mi_1 + 1.e-14);
+				long long iStart = (m_rankMPI - 1)*AmOfMainElem;
+				for(long long i=1; i<=nPackets; i++)
+				{
+					pairStartEnd.first = iStart;
+					pairStartEnd.second = iStart + AmOfMainElem;
+					vPacketElemStartEnd.push_back(pairStartEnd);
+					iStart += nPerGen;
+				}
+				if(nPackets*nProc_mi_1 < AmOfMainElem)
+				{
+					//iStart += (AmOfMainElem - nPerGen);
+					long long nTotMainElem = ((long long)AmOfMainElem)*((long long)AmOfMainElem);
+					if((iStart + AmOfMainElem) <= nTotMainElem)
+					{
+						pairStartEnd.first = iStart;
+						pairStartEnd.second = iStart + AmOfMainElem;
+						vPacketElemStartEnd.push_back(pairStartEnd);
+					}
+				}
+			}
+			else
+			{//required for master process
+				//long long nTotMainElem = ((long long)AmOfMainElem)*((long long)AmOfMainElem); //required for master process
+				//nPacketsTot = (int)(nTotMainElem/nProc_mi_1 + 1.e-14);
+				//if(((long long)nPacketsTot)*((long long)nProc_mi_1) < nTotMainElem) nPacketsTot++;
+
+				nPacketsTot = AmOfMainElem; //OC30122019
+				nMaxMatrElemInPacket = AmOfMainElem;
+			}
+		}
+		else
+		{//Send matrix elements to master by one packet (by each worker process) of ~AmOfMainElem*AmOfMainElem/(nProcMPI - 1) in length
+			long long nTotMatrElem = ((long long)AmOfMainElem)*((long long)AmOfMainElem);
+			long long nElemPerProc = (long long)(nTotMatrElem/nProc_mi_1 + 1.e-14);
+			long long nExtraLast = nTotMatrElem - nElemPerProc*nProc_mi_1;
+
+			if(m_rankMPI > 0)
+			{
+				pair<long long, long long> pairStartEnd((m_rankMPI - 1)*nElemPerProc, m_rankMPI*nElemPerProc);
+				if(nExtraLast > 0)
+				{
+					if(m_rankMPI == nProc_mi_1) pairStartEnd.second += nExtraLast;
+				}
+				vPacketElemStartEnd.push_back(pairStartEnd);
+				
+				//std::cout << "rank=" << rankMPI << " nTotMatrElem=" << nTotMatrElem << "\n"; //DEBUG
+				//std::cout << "rank=" << rankMPI << " pairStartEnd.first=" << pairStartEnd.first << " pairStartEnd.second=" << pairStartEnd.second << "\n"; //DEBUG
+				//std::cout.flush(); //DEBUG
+			}
+			else
+			{//required for master process
+				nPacketsTot = nProc_mi_1; //required for master process
+				nMaxMatrElemInPacket = nElemPerProc + nExtraLast;
+			}
+		}
+
+		if(m_rankMPI > 0)
+		{//Workers: calculate Interactin Matrix elements and send them to master
+			long long nBufElem=0;
+			int nPackets = (int)vPacketElemStartEnd.size(), ii;
+			for(ii=0; ii<nPackets; ii++)
+			{
+				pair<long long, long long> &pairStartEnd = vPacketElemStartEnd[ii];
+				long long nElemCur = pairStartEnd.second - pairStartEnd.first;
+				if(nBufElem < nElemCur) nBufElem = nElemCur;
+			}
+
+			float *arBufElem=0;
+			if(nBufElem > 0)
+			{
+				arBufElem = new float[nBufElem*9 + 8]; //the first 8 float values encode long long iStart, iEnd, all other values - elements of interaction matrix
+				if(arBufElem == 0) { Send.ErrorMessage("Radia::Error900"); return 0;}
+
+				for(ii=0; ii<nPackets; ii++)
+				{
+					pair<long long, long long> &pairStartEnd = vPacketElemStartEnd[ii];
+					long long iStart = pairStartEnd.first;
+					long long iEnd = pairStartEnd.second;
+
+					float *t_arBufElem = arBufElem; //the first 8 float values encode long long iStart, iEnd
+					LongLongToFloatAr(iStart, t_arBufElem); t_arBufElem += 4;
+					LongLongToFloatAr(iEnd, t_arBufElem); t_arBufElem += 4;
+
+					int ColNoStart = (int)(iStart/AmOfMainElem + 1.e-14);
+					int StrNoStart = (int)(iStart - ((long long)ColNoStart)*((long long)AmOfMainElem));
+					int ColNoEnd = (int)(iEnd/AmOfMainElem + 1.e-14);
+					int StrNoEnd = (int)(iEnd - ((long long)ColNoEnd)*((long long)AmOfMainElem));
+					
+					if(StrNoEnd > 0) ColNoEnd++; //OC29122019
+					else if(ColNoEnd - ColNoStart > 0) StrNoEnd = AmOfMainElem;
+
+					//std::cout << "Before sending, rank=" << rankMPI << " iStart=" << iStart << " iEnd=" << iEnd << "\n"; //DEBUG
+					//std::cout << "Before sending, rank=" << rankMPI << " ColNoStart=" << ColNoStart << " StrNoStart=" << StrNoStart << " ColNoEnd=" << ColNoEnd << " StrNoEnd=" << StrNoEnd << " AmOfMainElem=" << AmOfMainElem << "\n"; //DEBUG
+					//std::cout.flush(); //DEBUG
+
+					int ColNoEnd_mi_1 = ColNoEnd - 1;
+
+					long long iElem = 0;
+					for(int iCol=ColNoStart; iCol<ColNoEnd; iCol++)
+					{
+						int iStrStart = (iCol > ColNoStart)? 0 : StrNoStart;
+						int iStrEnd = (iCol < ColNoEnd_mi_1)? AmOfMainElem : StrNoEnd;
+
+						FillInTransPtrVectForElem(iCol, 'I');
+						radTg3dRelax* g3dRelaxPtrColNo = g3dRelaxPtrVect[iCol];
+
+						for(int iStr=iStrStart; iStr<iStrEnd; iStr++)
+						{
+							TVector3d InitObsPoiVect = MainTransPtrArray[iStr]->TrPoint((g3dRelaxPtrVect[iStr])->ReturnCentrPoint());
+
+							//if((iCol == 0) && (iStr == 0)) //DEBUG
+							//{
+							//	std::cout << "SetupInteractMatrix, rank=" << rankMPI; // << " InitObsPoiVect:" << InitObsPoiVect.x << InitObsPoiVect.y << InitObsPoiVect.z; //DEBUG
+							//	std::cout.flush(); //DEBUG
+							//}
+
+							TMatrix3d SubMatrix(ZeroVect, ZeroVect, ZeroVect), BufSubMatrix;
+							for(unsigned i=0; i<TransPtrVect.size(); i++)
+							{
+								TVector3d ObsPoiVect = TransPtrVect[i]->TrPoint_inv(InitObsPoiVect);
+								radTField Field(FieldKeyInteract, CompCriterium, ObsPoiVect, ZeroVect, ZeroVect, ZeroVect, ZeroVect, 0.);
+								Field.AmOfIntrctElemWithSym = AmOfElemWithSym; // New, may be changed later
+
+								//if((ColNo == 0) && (StrNo == 0) && (rankMPI != 0)) //DEBUG
+								//{
+								//	std::cout << "radTInteraction::SetupInteractMatrix, rank=" << rankMPI << " ObsPoiVect:" << ObsPoiVect.x << ObsPoiVect.y << ObsPoiVect.z; //DEBUG
+								//	std::cout.flush(); //DEBUG
+								//}
+
+								g3dRelaxPtrColNo->B_comp(&Field);
+								BufSubMatrix.Str0 = Field.B;
+								BufSubMatrix.Str1 = Field.H;
+								BufSubMatrix.Str2 = Field.A;
+
+								TransPtrVect[i]->TrMatrix(BufSubMatrix);
+								SubMatrix += BufSubMatrix;
+							}
+							MainTransPtrArray[iStr]->TrMatrix_inv(SubMatrix);
+							TVector3d &v0 = SubMatrix.Str0, &v1 = SubMatrix.Str1, &v2 = SubMatrix.Str2;
+							*(t_arBufElem++) = (float)v0.x; *(t_arBufElem++) = (float)v0.y;  *(t_arBufElem++) = (float)v0.z;
+							*(t_arBufElem++) = (float)v1.x; *(t_arBufElem++) = (float)v1.y;  *(t_arBufElem++) = (float)v1.z;
+							*(t_arBufElem++) = (float)v2.x; *(t_arBufElem++) = (float)v2.y;  *(t_arBufElem++) = (float)v2.z;
+							//InteractMatrix[StrNo][ColNo] = SubMatrix; //To be done by master process
+						}
+						EmptyTransPtrVect();
+					}
+					//Send Interact. Matr. elem. data to master:
+					long long nVal = t_arBufElem - arBufElem;
+
+					if(MPI_Send(arBufElem, (int)nVal, MPI_FLOAT, 0, 0, MPI_COMM_WORLD) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); if(arBufElem != 0) delete[] arBufElem; return 0;}
+
+					//std::cout << "Sending done by rank=" << rankMPI << " nVal=" << nVal; //DEBUG
+					//std::cout.flush(); //DEBUG
+				}
+				if(arBufElem != 0) delete[] arBufElem;
+			}
+		}
+		else if((nPacketsTot > 0) && (nMaxMatrElemInPacket > 0))
+		{//Master: receive calculated Interactin Matrix elements from workers and store them
+
+			long long nMaxValInPacket = nMaxMatrElemInPacket*9 + 8;
+			float *arBufElemRecv = new float[nMaxValInPacket];
+			if(arBufElemRecv == 0) { Send.ErrorMessage("Radia::Error900"); return 0;}
+
+			MPI_Status statusMPI;
+			int trueNumValInPacket = 0;
+
+			//std::cout << "rank=" << rankMPI << " nPacketsTot=" << nPacketsTot << "\n"; //DEBUG
+			//std::cout.flush(); //DEBUG
+
+			for(int i=0; i<nPacketsTot; i++)
+			{
+				if(MPI_Recv(arBufElemRecv, (int)nMaxValInPacket, MPI_FLOAT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &statusMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); delete[] arBufElemRecv; return 0;}
+				if(MPI_Get_count(&statusMPI, MPI_FLOAT, &trueNumValInPacket) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); delete[] arBufElemRecv; return 0;}
+
+				if(trueNumValInPacket < 8) { Send.ErrorMessage("Radia::Error601"); delete[] arBufElemRecv; return 0;}
+
+				float *t_arBufElemRecv = arBufElemRecv;
+				long long iStart = FloatArToLongLong(t_arBufElemRecv);
+				t_arBufElemRecv += 4;
+				long long iEnd = FloatArToLongLong(t_arBufElemRecv);
+				t_arBufElemRecv += 4;
+
+				long long expectedNumValInPacket = (iEnd - iStart)*9 + 8;
+
+				if(expectedNumValInPacket > trueNumValInPacket) { Send.ErrorMessage("Radia::Error601"); delete[] arBufElemRecv; return 0;}
+
+				int ColNoStart = (int)(iStart/AmOfMainElem + 1.e-14);
+				int StrNoStart = (int)(iStart - ((long long)ColNoStart)*((long long)AmOfMainElem));
+				int ColNoEnd = (int)(iEnd/AmOfMainElem + 1.e-14);
+				int StrNoEnd = (int)(iEnd - ((long long)ColNoEnd)*((long long)AmOfMainElem));
+
+				if(StrNoEnd > 0) ColNoEnd++; //OC29122019
+				else if(ColNoEnd - ColNoStart > 0) StrNoEnd = AmOfMainElem;
+
+				//std::cout << "Received, rank=" << rankMPI << " iStart=" << iStart << " iEnd=" << iEnd << "\n"; //DEBUG
+				//std::cout << "Received, rank=" << rankMPI << " ColNoStart=" << ColNoStart << " StrNoStart=" << StrNoStart << " ColNoEnd=" << ColNoEnd << " StrNoEnd=" << StrNoEnd << " AmOfMainElem=" << AmOfMainElem << "\n"; //DEBUG
+				//std::cout.flush(); //DEBUG
+
+				int ColNoEnd_mi_1 = ColNoEnd - 1;
+
+				for(int iCol=ColNoStart; iCol<ColNoEnd; iCol++)
+				{
+					int iStrStart = (iCol > ColNoStart)? 0 : StrNoStart;
+					int iStrEnd = (iCol < ColNoEnd_mi_1)? AmOfMainElem : StrNoEnd;
+
+					//std::cout << "rank=" << rankMPI << " iCol=" << iCol << " iStrStart=" << iStrStart << " iStrEnd=" << iStrEnd << "\n"; //DEBUG
+					//std::cout.flush(); //DEBUG
+
+					for(int iStr=iStrStart; iStr<iStrEnd; iStr++)
+					{
+						//if((iCol == 0) && (iStr == 0)) //DEBUG
+						//{
+						//	std::cout << "SetupInteractMatrix, rank=" << rankMPI; // << " InitObsPoiVect:" << InitObsPoiVect.x << InitObsPoiVect.y << InitObsPoiVect.z; //DEBUG
+						//	std::cout.flush(); //DEBUG
+						//}
+
+						TMatrix3df &SubMatrix = InteractMatrix[iStr][iCol];
+						TVector3df &Str0 = SubMatrix.Str0, &Str1 = SubMatrix.Str1, &Str2 = SubMatrix.Str2;
+						Str0.x = *(t_arBufElemRecv++); Str0.y = *(t_arBufElemRecv++); Str0.z = *(t_arBufElemRecv++);
+						Str1.x = *(t_arBufElemRecv++); Str1.y = *(t_arBufElemRecv++); Str1.z = *(t_arBufElemRecv++);
+						Str2.x = *(t_arBufElemRecv++); Str2.y = *(t_arBufElemRecv++); Str2.z = *(t_arBufElemRecv++);
+
+						//std::cout << "rank=" << rankMPI << " iCol=" << iCol << " iStr=" << iStr << "\n"; //DEBUG
+						//std::cout.flush(); //DEBUG
+					}
+				}
+				//std::cout << "Packet number " << i << " received by rank=" << rankMPI << "\n"; //DEBUG
+				//std::cout.flush(); //DEBUG
+			}
+			delete[] arBufElemRecv;
+		}
+		//To consider synchronization:
+		//if(MPI_Barrier(MPI_COMM_WORLD) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); throw 0; } //OC18012020
 	}
-	//--EndNew
+	//std::cout << "rank=" << rankMPI << " about to exit radTInteraction::SetupInteractMatrix\n"; //DEBUG
+	//std::cout.flush(); //DEBUG
+
+#endif
+	return 1; //OC26122019
 }
 
 //-------------------------------------------------------------------------

@@ -28,6 +28,10 @@
 #include <math.h>
 #include <string.h>
 
+#ifdef _WITH_MPI
+#include <mpi.h>
+#endif
+
 //-------------------------------------------------------------------------
 
 extern radTConvergRepair& radCR;
@@ -2307,6 +2311,46 @@ int radTApplication::ApplySymmetry(int g3dElemKey, int TransElemKey, int Multipl
 	{
 		Initialize(); return 0;
 	}
+}
+
+//-------------------------------------------------------------------------
+
+int radTApplication::ProcMPI(const char* OnOrOff)
+{	
+	int arParMPI[] = {-1,0};
+
+#ifdef _WITH_MPI
+
+	char SwitchOn;
+	if((!strcmp(OnOrOff, "on")) || (!strcmp(OnOrOff, "On")) || (!strcmp(OnOrOff, "ON"))) SwitchOn = 1;
+	else if((!strcmp(OnOrOff, "off")) || (!strcmp(OnOrOff, "Off")) || (!strcmp(OnOrOff, "OFF"))) SwitchOn = 0;
+	else { Send.ErrorMessage("Radia::Error043"); return 0; }
+
+	if(SwitchOn)
+	{
+		if(MPI_Init(NULL, NULL) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0;} // Initialize the MPI environment
+		if(MPI_Comm_size(MPI_COMM_WORLD, &m_nProcMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0;} // Get the number of processes
+		if(MPI_Comm_rank(MPI_COMM_WORLD, &m_rankMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0;} // Get the rank of the process
+		arParMPI[0] = m_rankMPI; arParMPI[1] = m_nProcMPI;
+
+		//MPI_Init(NULL, NULL); // Initialize the MPI environment
+		//MPI_Comm_size(MPI_COMM_WORLD, arParMPI + 1); // Get the number of processes
+		//MPI_Comm_rank(MPI_COMM_WORLD, arParMPI); // Get the rank of the process
+	}
+	else
+	{
+		MPI_Finalize(); // Finalize the MPI environment.
+	}
+
+#else
+
+	Send.WarningMessage("Radia::Warning019"); return 1;
+	//Send.ErrorMessage("Radia::Error600"); return 0;
+
+#endif
+
+	if(SendingIsRequired) Send.IntList(arParMPI, 2);
+	return 1;
 }
 
 //-------------------------------------------------------------------------

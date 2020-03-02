@@ -1054,6 +1054,14 @@ EXP int CALL RadUtiDataGet(char* pcData, const char typeData[3], long key=0); //
 */ 
 EXP int CALL RadUtiVer(double* d);
 
+/** initializes or finalizes the Message Passing Inteface (MPI) for parallel calculations and returns list of basic MPI process parameters (in the case of initialization): rank of a process and total number of processes.
+@param arPar [out] array of basic MPI parameters: rank of a process [0] and total number of processes [1]
+@param OnOrOff [in] string containing either "on" or "off"
+@return integer error code (0 : no error, >0 : error number, <0 : warning number)
+@author O.C.
+*/ 
+EXP int CALL RadUtiMPI(int* arPar, char* OnOrOff);
+
 EXP int CALL RadUtiYeldFuncSet(int (*pExtFunc)());
 
 #ifdef __cplusplus  

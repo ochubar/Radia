@@ -199,7 +199,6 @@ if __name__=="__main__":
 
     #Magnetic Field Plots
     z = 0; x1 = 0; x2 = 30; ymax = 40; np = 20
-    
     Bz1 = rad.FldLst(g, 'bz', [x1,0,z], [x1,ymax,z], np, 'arg', 0)
     Bz2 = rad.FldLst(g, 'bz', [x2,0,z], [x2,ymax,z], np, 'arg',0)
     uti_plot1d_m([Bz1,Bz2],

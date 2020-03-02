@@ -28,6 +28,17 @@
 #include <math.h>
 #include <string.h>
 
+#ifdef _WITH_MPI
+#include <mpi.h>
+
+//#ifdef LINUX
+//#include <unistd.h>
+//#endif
+//#ifdef _WINDOWS
+//#include <windows.h>
+//#endif
+#endif
+
 //-------------------------------------------------------------------------
 //-------------------------------------------------------------------------
 
@@ -1153,7 +1164,8 @@ int radTApplication::PreRelax(int ElemKey, int SrcElemKey)
 		char AllocateExtraArray = 1; //OC300504
 		char KeepTransData = 1; //OC240408 to enable update after scaling of currents
 
-		radTInteraction* InteractionPtr = new radTInteraction(hg, hgMoreExtSrc, CompCriterium, MemAllocForIntrctMatrTotAtOnce, AllocateExtraArray, KeepTransData);
+		radTInteraction* InteractionPtr = new radTInteraction(hg, hgMoreExtSrc, CompCriterium, MemAllocForIntrctMatrTotAtOnce, AllocateExtraArray, KeepTransData, m_rankMPI, m_nProcMPI); //OC08012020
+		//radTInteraction* InteractionPtr = new radTInteraction(hg, hgMoreExtSrc, CompCriterium, MemAllocForIntrctMatrTotAtOnce, AllocateExtraArray, KeepTransData);
 
 		if(InteractionPtr->SomethingIsWrong) 
 		{ 
@@ -1282,46 +1294,52 @@ int radTApplication::MakeAutoRelax(int InteractElemKey, double PrecOnMagnetiz, i
 		radTInteraction* InteractPtr = Cast.InteractCast(hg.rep); 
 		if(InteractPtr==0) { Send.ErrorMessage("Radia::Error017"); return 0;}
 
-		if(PrecOnMagnetiz <= 0.) { Send.ErrorMessage("Radia::Error030"); return 0;}
-		if(MaxIterNumber <= 0) { Send.ErrorMessage("Radia::Error031"); return 0;}
+		int ActualIterNum = 0; //OC02012020
+		int lenRelaxStatusParamArray = 3;
+		double RelaxStatusParamArray[3];
 
-		//if((MethNo < 3) || (MethNo > 5)) { Send.ErrorMessage("Radia::Error041"); return 0;}
-		if(MethNo < 3) { Send.ErrorMessage("Radia::Error041"); return 0;}
-
-		radTOptionNames OptNam;
-		const char** BufNameString = arOptionNames;
-		const char** BufValString = arOptionValues;
-		char MagnResetIsNotNeeded = 0;
-		for(int i=0; i<numOptions; i++)
+		if(m_rankMPI <= 0) //OC02012020
 		{
-			if(!strcmp(*BufNameString, OptNam.ZeroM))
+			if(PrecOnMagnetiz <= 0.) { Send.ErrorMessage("Radia::Error030"); return 0; }
+			if(MaxIterNumber <= 0) { Send.ErrorMessage("Radia::Error031"); return 0; }
+
+			//if((MethNo < 3) || (MethNo > 5)) { Send.ErrorMessage("Radia::Error041"); return 0;}
+			if(MethNo < 3) { Send.ErrorMessage("Radia::Error041"); return 0; }
+
+			radTOptionNames OptNam;
+			const char** BufNameString = arOptionNames;
+			const char** BufValString = arOptionValues;
+			char MagnResetIsNotNeeded = 0;
+			for(int i=0; i<numOptions; i++)
 			{
-				if(!strcmp(*BufValString, (OptNam.ZeroM_Values)[0])) MagnResetIsNotNeeded = 1; //no
-				else if(!strcmp(*BufValString, (OptNam.ZeroM_Values)[1])) MagnResetIsNotNeeded = 0; //yes
-				else if(!strcmp(*BufValString, (OptNam.ZeroM_Values)[2])) MagnResetIsNotNeeded = 1; //false
-				else if(!strcmp(*BufValString, (OptNam.ZeroM_Values)[3])) MagnResetIsNotNeeded = 0; //true
-				else { Send.ErrorMessage("Radia::Error062"); return 0;}
+				if(!strcmp(*BufNameString, OptNam.ZeroM))
+				{
+					if(!strcmp(*BufValString, (OptNam.ZeroM_Values)[0])) MagnResetIsNotNeeded = 1; //no
+					else if(!strcmp(*BufValString, (OptNam.ZeroM_Values)[1])) MagnResetIsNotNeeded = 0; //yes
+					else if(!strcmp(*BufValString, (OptNam.ZeroM_Values)[2])) MagnResetIsNotNeeded = 1; //false
+					else if(!strcmp(*BufValString, (OptNam.ZeroM_Values)[3])) MagnResetIsNotNeeded = 0; //true
+					else { Send.ErrorMessage("Radia::Error062"); return 0; }
+				}
+				else { Send.ErrorMessage("Radia::Error062"); return 0; }
+				BufNameString++; BufValString++;
 			}
-			else { Send.ErrorMessage("Radia::Error062"); return 0;}
-			BufNameString++; BufValString++;
-		}
 
-		int ActualIterNum = 0;
-		switch(MethNo)
-		{
-		case 3:
+			//int ActualIterNum = 0;
+			switch(MethNo)
+			{
+			case 3:
 			{
 				radTRelaxationMethNo_3 RelaxMethNo_3(InteractPtr);
 				ActualIterNum = RelaxMethNo_3.AutoRelax(PrecOnMagnetiz, MaxIterNumber, MagnResetIsNotNeeded);
 			}
 			break;
-		case 4:
+			case 4:
 			{
 				radTRelaxationMethNo_4 RelaxMethNo_4(InteractPtr);
 				ActualIterNum = RelaxMethNo_4.AutoRelax(PrecOnMagnetiz, MaxIterNumber, MagnResetIsNotNeeded);
 			}
 			break;
-		case 5:
+			case 5:
 			{
 				if(InteractPtr->AmOfRelaxSubInterv == 0)
 				{
@@ -1335,17 +1353,76 @@ int radTApplication::MakeAutoRelax(int InteractElemKey, double PrecOnMagnetiz, i
 				}
 			}
 			break;
-		case 8:
+			case 8:
 			{
 				radTRelaxationMethNo_8 RelaxMethNo_8(InteractPtr);
 				ActualIterNum = RelaxMethNo_8.AutoRelax(PrecOnMagnetiz, MaxIterNumber, MagnResetIsNotNeeded);
 			}
 			break;
+			}
+
+			InteractPtr->OutRelaxStatusParam(RelaxStatusParamArray);
 		}
 
-		int lenRelaxStatusParamArray = 3;
-		double RelaxStatusParamArray[3];
-		InteractPtr->OutRelaxStatusParam(RelaxStatusParamArray);
+#ifdef _WITH_MPI
+
+		if((m_rankMPI >= 0) && (m_nProcMPI >= 2))
+		{
+			float *arMagnVals = 0;
+			long nValsToSend = InteractPtr->OutMagnVals(arMagnVals, 4);
+			if(nValsToSend <= 0) { if(arMagnVals != 0) delete[] arMagnVals; throw 0; }
+			for(int i=0; i<3; i++) arMagnVals[i] = (float)RelaxStatusParamArray[i]; //Prepending relaxation results data
+			arMagnVals[3] = (float)ActualIterNum;
+
+//			if(m_rankMPI == 0)
+//			{
+//				for(int ir=1; ir<m_nProcMPI; ir++)
+//				{
+//					if(MPI_Send(arMagnVals, (int)nValsToSend, MPI_FLOAT, ir, 0, MPI_COMM_WORLD) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); if(arMagnVals != 0) delete[] arMagnVals; return 0;}
+//				}
+//			}
+//			else //if(m_rankMPI > 0)
+//			{//Try to make Workers release CPU resources while they are waiting for the results from Master
+//				MPI_Status statusMPI;
+//				int flag;
+//				long timeSleep_ms = 1000;
+//				for(;;)
+//				{
+//					if(MPI_Iprobe(0, 0, MPI_COMM_WORLD, &flag, &statusMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); if(arMagnVals != 0) delete[] arMagnVals; return 0;}
+//					if(flag) break;
+//					//std::this_thread::sleep_for(std::chrono::seconds(1));
+//					//this_thread::sleep_for(std::chrono::seconds(1));
+//#ifdef LINUX
+//					usleep(timeSleep_ms*1000);   // usleep takes sleep time in us (1 millionth of a second)
+//#endif
+//#ifdef _WINDOWS
+//					Sleep(timeSleep_ms);
+//#endif
+//				}
+//				//DEBUG
+//				//std::cout << "rank=" << m_rankMPI << " After MPI_Probe\n"; //DEBUG
+//				//std::cout.flush(); //DEBUG
+//
+//				if(MPI_Recv(arMagnVals, (int)nValsToSend, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &statusMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); delete[] arMagnVals; return 0; }
+//			}
+			//DEBUG
+			//std::cout << "rank=" << m_rankMPI << " MakeAutoRelax before MPI_Bcast\n"; //DEBUG
+			//std::cout.flush(); //DEBUG
+
+			if(MPI_Bcast(arMagnVals, (int)nValsToSend, MPI_FLOAT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); if(arMagnVals != 0) delete[] arMagnVals; return 0;}
+
+			if(m_rankMPI > 0)
+			{
+				float *t_arMagnVals = arMagnVals;
+				for(int i=0; i<3; i++) RelaxStatusParamArray[i] = *(t_arMagnVals++);
+				ActualIterNum = (int)(*(t_arMagnVals++));
+				InteractPtr->SetRelaxObjMagnVals(t_arMagnVals);
+			}
+			if(arMagnVals != 0) { delete[] arMagnVals; arMagnVals=0; }
+		}
+		//To consider synchronization:
+		//if(MPI_Barrier(MPI_COMM_WORLD) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); throw 0; } //OC18012020
+#endif
 
 		if(ActualIterNum >= MaxIterNumber) { Send.WarningMessage("Radia::Warning015");}
 		if(SendingIsRequired) Send.OutRelaxResultsInfo(RelaxStatusParamArray, lenRelaxStatusParamArray, ActualIterNum);

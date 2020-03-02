@@ -20,7 +20,7 @@
 
 //-------------------------------------------------------------------------
 
-int radTIOBuffer::AmOfErrors = 137; //modify this when adding new error !!!
+int radTIOBuffer::AmOfErrors = 139; //modify this when adding new error !!!
 string radTIOBuffer::err_ar[] = {
 
 	"Radia::ErrorXXX::::Wrong Error Number.\0",
@@ -156,6 +156,8 @@ string radTIOBuffer::err_ar[] = {
 	"Radia::Error500::::Incorrect input: Byte string is expected.\0", //keep on adding new "Incorrect inputs" after this
 	"Radia::Error501::::Incorrect input: Wrong / unsupported magnetic kick units.\0", //keep on adding new "Incorrect inputs" after this
 	"Radia::Error502::::Incorrect input: Wrong / unsupported kick-map string/file format specification.\0", //keep on adding new "Incorrect inputs" after this
+	"Radia::Error600::::MPI is not supported in this version of code (it may need to be re-compiled with an appropriate option).\0",
+	"Radia::Error601::::Failed to execute MPI function.\0",
 	"Radia::Error900::::Memory allocation failure.\0",
 	"Radia::Error990::::Graphical presentation of this element is not available.\0",
 	"Radia::Error998::::Execution aborted by User.\0",
@@ -165,7 +167,7 @@ string radTIOBuffer::err_ar[] = {
 
 //-------------------------------------------------------------------------
 
-int radTIOBuffer::AmOfWarnings = 10; //modify this when adding new warning !!!
+int radTIOBuffer::AmOfWarnings = 11; //modify this when adding new warning !!!
 string radTIOBuffer::warn_ar[] = {
 
 	"Radia::WarningXXX::::Wrong Warning Number.\0",
@@ -178,6 +180,7 @@ string radTIOBuffer::warn_ar[] = {
 	"Radia::Warning016::::Polygon edge points seem to coinside. Certain algorithms may not work for such polygon definition.\0",
 	"Radia::Warning017::::A symbol was supplied to field computation function, in place where a number was expected; the symbol was replaced by 0.\0",
 	"Radia::Warning018::::Current density scaling was not performed because no current-carrying 3D objects were found.\0",
+	"Radia::Warning019::::MPI is not supported in this version of code; MPI-related command(s) ignored.\0",
 	//insert new warning here
 };
 

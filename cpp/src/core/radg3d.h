@@ -432,6 +432,23 @@ struct radTFieldKey {
 			B_= H_= PreRelax_= 1;
 		}
 	}
+
+	short NumValues() //OC02012020
+	{//Number of scalar values describing the field
+		short nVal = 0;
+		if(B_) nVal += 3;
+		if(H_) nVal += 3;
+		if(A_) nVal += 3;
+		if(M_) nVal += 3;
+		if(J_) nVal += 3;
+		if(Phi_) nVal++;
+		if(Ib_) nVal += 3;
+		if(Ih_) nVal += 3;
+		if(Force_) nVal += 3;
+		if(Torque_) nVal += 3;
+		if(Energy_) nVal++; //?
+		return nVal;
+	}
 };
 
 //-------------------------------------------------------------------------
@@ -608,8 +625,39 @@ public:
 		return *this;
 	}
 
+	void OutVals(const radTFieldKey& key, double*& t_ar) //OC02012020
+	{
+		if(key.B_) { *(t_ar++) = B.x; *(t_ar++) = B.y; *(t_ar++) = B.z;}
+		if(key.H_) { *(t_ar++) = H.x; *(t_ar++) = H.y; *(t_ar++) = H.z;}
+		if(key.A_) { *(t_ar++) = A.x; *(t_ar++) = A.y; *(t_ar++) = A.z;}
+		if(key.M_) { *(t_ar++) = M.x; *(t_ar++) = M.y; *(t_ar++) = M.z;}
+		if(key.J_) { *(t_ar++) = J.x; *(t_ar++) = J.y; *(t_ar++) = J.z;}
+		if(key.Phi_) { *(t_ar++) = Phi;}
+		if(key.Ib_) { *(t_ar++) = Ib.x; *(t_ar++) = Ib.y; *(t_ar++) = Ib.z;}
+		if(key.Ih_) { *(t_ar++) = Ih.x; *(t_ar++) = Ih.y; *(t_ar++) = Ih.z;}
+		if(key.Force_) { *(t_ar++) = Force.x; *(t_ar++) = Force.y; *(t_ar++) = Force.z;}
+		if(key.Torque_) { *(t_ar++) = Torque.x; *(t_ar++) = Torque.y; *(t_ar++) = Torque.z;}
+		if(key.Energy_) { *(t_ar++) = Energy;}
+	}
+	void InVals(const radTFieldKey& key, double*& t_ar) //OC02012020
+	{
+		if(key.B_) { B.x = *(t_ar++); B.y = *(t_ar++); B.z = *(t_ar++);}
+		if(key.H_) { H.x = *(t_ar++); H.y = *(t_ar++); H.z = *(t_ar++);}
+		if(key.A_) { A.x = *(t_ar++); A.y = *(t_ar++); A.z = *(t_ar++);}
+		if(key.M_) { M.x = *(t_ar++); M.y = *(t_ar++); M.z = *(t_ar++);}
+		if(key.J_) { J.x = *(t_ar++); J.y = *(t_ar++); J.z = *(t_ar++);}
+		if(key.Phi_) { Phi = *(t_ar++);}
+		if(key.Ib_) { Ib.x = *(t_ar++); Ib.y = *(t_ar++); Ib.z = *(t_ar++);}
+		if(key.Ih_) { Ih.x = *(t_ar++); Ih.y = *(t_ar++); Ih.z = *(t_ar++);}
+		if(key.Force_) { Force.x = *(t_ar++); Force.y = *(t_ar++); Force.z = *(t_ar++);}
+		if(key.Torque_) { Torque.x = *(t_ar++); Torque.y = *(t_ar++); Torque.z = *(t_ar++);}
+		if(key.Energy_) { Energy = *(t_ar++);}
+	}
+
+
 	inline friend radTField operator +(const radTField&, const radTField&);
 	inline friend radTField operator -(const radTField&, const radTField&);
+
 };
 
 //-------------------------------------------------------------------------

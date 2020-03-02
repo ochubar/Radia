@@ -292,6 +292,8 @@ public:
 	}
 	void OutMultiDimArrayOfDouble(double* Array, int* Dims, int& NumDims)
 	{
+		NumDims = 0; //OC19012020
+
 		if((DoubleBufferMulti != 0) && (DimsDoubleBufferMulti != 0))
 		{
 			long TotLen = 1;

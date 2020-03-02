@@ -17,6 +17,10 @@ LIB_DIR=	$(RAD_CPP_DIR)/../ext_lib
 
 SH_INCLUDE=	-I$(SH_SRC_GEN_MATH_DIR) -I$(SH_SRC_PARSE_DIR)
 
+MPI_INCLUDE_DIR_01=	/usr/lib/openmpi/include #NSLS-II cpu-001
+MPI_INCLUDE_DIR_02=	/home/expdev/conda_envs/expdev_gcc7_openmp4/include #NSLS-II gpu-002
+#Add more options here
+
 MATHVERSION=	10.2
 SYS=		Linux-x86-64
 
@@ -29,12 +33,15 @@ ML_INCLUDE=	-I$(ML_ORIG_DIR) -I$(RAD_SRC_ML_DIR)
 #MLMPREP=	$(ML_ORIG_DIR)/mprep
 
 CC  = cc
+#CC  = mpicxx
 CXX = c++
 
 #RAD_SRC_DEF=	-D__GCC__ -D__MATHEMATICA__ -DFFTW_ENABLE_FLOAT -DNO_TIMER -DANSI_DECLARATORS -DTRILIBRARY -DLINUX -D_GM_WITHOUT_BASE -DMLINTERFACE=4
+#RAD_SRC_DEF=	-D__GCC__ -DFFTW_ENABLE_FLOAT -DNO_TIMER -DANSI_DECLARATORS -DTRILIBRARY -DLINUX -D_GM_WITHOUT_BASE -D_WITH_MPI
 RAD_SRC_DEF=	-D__GCC__ -DFFTW_ENABLE_FLOAT -DNO_TIMER -DANSI_DECLARATORS -DTRILIBRARY -DLINUX -D_GM_WITHOUT_BASE
 
 #CFLAGS=	-O3 -fPIC -I$(RAD_SRC_CORE_DIR) -I$(RAD_SRC_LIB_DIR) -I$(SH_SRC_PARSE_DIR) -I$(SH_SRC_GEN_MATH_DIR) -I$(RAD_SRC_TRI_DIR) $(ML_INCLUDE) $(RAD_SRC_DEF)
+#LIBCFLAGS=	-O3 -fPIC -I$(RAD_SRC_CORE_DIR) -I$(RAD_SRC_LIB_DIR) -I$(SH_SRC_PARSE_DIR) -I$(SH_SRC_GEN_MATH_DIR) -I$(RAD_SRC_TRI_DIR) -I$(MPI_INCLUDE_DIR) $(RAD_SRC_DEF) -DALPHA__LIB__
 LIBCFLAGS=	-O3 -fPIC -I$(RAD_SRC_CORE_DIR) -I$(RAD_SRC_LIB_DIR) -I$(SH_SRC_PARSE_DIR) -I$(SH_SRC_GEN_MATH_DIR) -I$(RAD_SRC_TRI_DIR) $(RAD_SRC_DEF) -DALPHA__LIB__
 
 LIB_MATH=	-L$(MMA_LIB_DIR) -lML64i4 -ldl -luuid -L$(LIB_DIR) -lfftw -lm -lpthread -lrt
@@ -42,13 +49,27 @@ LIB_MATH=	-L$(MMA_LIB_DIR) -lML64i4 -ldl -luuid -L$(LIB_DIR) -lfftw -lm -lpthrea
 
 LDFLAGS=	-L$(LIB_DIR) -lm -lfftw -lpthread -lrt -ldl -luuid
 
+MODE ?= 0
+
+ifeq ($(MODE), mpi)
+LIBCFLAGS+= -I$(MPI_INCLUDE_DIR_01) -I$(MPI_INCLUDE_DIR_02) -D_WITH_MPI
+else
+ifeq ($(MODE), mpi_nersc)
+LIBCFLAGS += -D_WITH_MPI
+else
+ifneq ($(MODE), 0)
+$(error Unknown Radia compilation option)
+endif
+endif
+endif
+
 #OBJ=		radia_tm_linux.o radapl1.o radapl2.o radapl3.o radapl4.o radapl5.o radapl6.o radapl7.o radarccu.o radcast.o radexpgn.o radflm.o radg3d.o radg3dgr.o radgroup.o radinter.o radintrc.o radiobuf.o radmamet.o radmater.o radplnr1.o radplnr2.o radptrj.o radrec.o radrlmet.o radsbdac.o radsbdep.o radsbdrc.o radsbdvp.o radsend.o radvlpgn.o gmtrans.o gmfft.o triangle.o auxparse.o
 OBJ=		radapl1.o radapl2.o radapl3.o radapl4.o radapl5.o radapl6.o radapl7.o radarccu.o radcast.o radexpgn.o radflm.o radg3d.o radg3dgr.o radgroup.o radinter.o radintrc.o radiobuf.o radmamet.o radmater.o radplnr1.o radplnr2.o radptrj.o radrec.o radrlmet.o radsbdac.o radsbdep.o radsbdrc.o radsbdvp.o radsend.o radvlpgn.o gmtrans.o gmfft.o triangle.o auxparse.o
 OBJ_LIB=	radentry.o $(OBJ)
 #OBJ_MATH=	radia_tm_linux.o $(OBJ)
 
 PRG_LIB=		libradia.a
-#PRG_MATH=		Radia.exels
+#PRG_MATH=		Radia.exe
 
 lib:	$(OBJ_LIB)
 	ar -cvq $(PRG_LIB) *.o

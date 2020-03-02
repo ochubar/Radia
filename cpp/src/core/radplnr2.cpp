@@ -194,7 +194,6 @@ void radTPolygon::B_comp(radTField* FieldPtr)
 			if((R1pbpkx1 < AbsRandR1) && (R1 > 100.*AbsRandR1) && ((x1e2 + ze2) < bpkx1e2*MaxRelTolToSwitch)) R1pbpkx1 = 0.5*(x1e2 + ze2)/Abs(bpkx1); //OC170504
 			if((R2pbpkx2 < AbsRandR2) && (R2 > 100.*AbsRandR2) && ((x2e2 + ze2) < bpkx2e2*MaxRelTolToSwitch)) R2pbpkx2 = 0.5*(x2e2 + ze2)/Abs(bpkx2); //OC170504
 
-
 			double FlpRep1ForSumAtans1 = 0.;
 
 			double four_be2ke2 = 4.*be2*ke2; 
@@ -256,6 +255,10 @@ void radTPolygon::B_comp(radTField* FieldPtr)
 			double Arg2ForSumAtans1 = (ke2ze2pbe2*kx1mb*R1pbpkx1 + ke2ze2mbe2*x1e2pze2)*z;
 			double Arg3ForSumAtans1 = ke2ze2pbe2*(bx2 + kze2)*R2pbpkx2 + kze2*twob*x2e2pze2;
 			double Arg4ForSumAtans1 = (ke2ze2pbe2*kx2mb*R2pbpkx2 + ke2ze2mbe2*x2e2pze2)*z;
+
+			//OC18122019
+			if(Arg2ForSumAtans1 == 0.) Arg2ForSumAtans1 = 1.e-50; //?
+			if(Arg4ForSumAtans1 == 0.) Arg4ForSumAtans1 = 1.e-50; //?
 
 			double PiMult1=0., PiMult2=0.;
 			double CurArgSumAtans1 = TransAtans(Arg1ForSumAtans1/Arg2ForSumAtans1, Arg3ForSumAtans1/Arg4ForSumAtans1, PiMult1);

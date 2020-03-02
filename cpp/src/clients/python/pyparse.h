@@ -38,6 +38,7 @@ static const char strEr_BadNum[] = "Incorrect or no Python number";
 static const char strEr_BadStr[] = "Error at parsing / converting Python string or byte array";
 static const char strEr_BadClassName[] = "Error at retrieving Python class name";
 static const char strEr_FailedCreateList[] = "Failed to create resulting data list";
+static const char strEr_FailedCreateTuple[] = "Failed to create resulting data tuple";
 
 //-------------------------------------------------------------------------
 
@@ -176,7 +177,7 @@ public:
 	 * ATTENTION: it can allocate T *ar !
 	 * arType can be 'i', 'f' or 'd'
 	 * Supports both Py lists and arrays
-	 * If obj is neither List nor Array - returns without thowing error
+	 * If obj is neither List nor Array - returns without throwing error
 	 * If the length of Py list or array is larger than nElem at input, then nElemTooSmall is set to true
 	 ***************************************************************************/
 	template<class T> static char CopyPyListElemsToNumArray(PyObject* obj, char arType, T*& ar, int& nElem, bool& nElemTooSmall)
@@ -461,7 +462,8 @@ public:
 	 * Find lengths of Py lists or arrays that are elements of a list
 	 * ATTENTION: it can allocate int *arLen !
 	 ***************************************************************************/
-	static void FindLengthsOfElemListsOrArrays(PyObject* oList, int*& arLens, int& nElem)
+	static void FindLengthsOfElemListsOrArrays(PyObject* oList, int*& arLens, int& nElem, bool treatItemAsLen1=false) //OC29022020
+	//static void FindLengthsOfElemListsOrArrays(PyObject* oList, int*& arLens, int& nElem)
 	{
 		if(oList == 0) throw strEr_BadList;
 		if(!PyList_Check(oList)) throw strEr_BadList;
@@ -491,7 +493,10 @@ public:
 
 #if PY_MAJOR_VERSION >= 3
 
-			if(!(isList || isArray)) throw strEr_BadListArray;
+			if(!treatItemAsLen1) //OC29022020
+			{
+				if(!(isList || isArray)) throw strEr_BadListArray;
+			}
 
 #endif
 
@@ -502,16 +507,16 @@ public:
 			}
 			else
 			{
-				void *pVoidBuffer = 0;
+				//void *pVoidBuffer = 0; //OC26022020
 				Py_ssize_t sizeBuf = 0;
 
 				Py_buffer pb;
-				PyObject *pOldBuf = 0;
+				//PyObject *pOldBuf = 0; //OC26022020
 
 				if(isArray)
 				{
 					if(PyObject_GetBuffer(o, &pb, PyBUF_SIMPLE)) throw strEr_BadListArray;
-					pVoidBuffer = pb.buf;
+					//pVoidBuffer = pb.buf; //OC26022020
 					sizeBuf = pb.len;
 				}
 
@@ -519,16 +524,22 @@ public:
 
 				else
 				{
-					pOldBuf = PyBuffer_FromReadWriteObject(o, 0, Py_END_OF_BUFFER);
+					PyObject *pOldBuf = PyBuffer_FromReadWriteObject(o, 0, Py_END_OF_BUFFER); //OC26022020
+					//pOldBuf = PyBuffer_FromReadWriteObject(o, 0, Py_END_OF_BUFFER);
 					if(pOldBuf != 0)
 					{
+						void *pVoidBuffer = pb.buf; //OC26022020
+
 						if(PyObject_AsWriteBuffer(pOldBuf, &pVoidBuffer, &sizeBuf)) throw strEr_BadListArray;
 						isArray = true;
 					}
 					else
 					{
 						PyErr_Clear();
-						throw strEr_BadListArray;
+						if(!treatItemAsLen1) //OC29022020
+						{
+							throw strEr_BadListArray;
+						}
 					}
 				}
 
@@ -782,6 +793,23 @@ public:
 			}
 		}
 		arDims[0] = nDims;
+		return oRes;
+	}
+
+	/************************************************************************//**
+	* Sets up output tuple data from an array
+	***************************************************************************/
+	template<class T> static PyObject* SetDataTuple(T* ar, int n, const char* cType="d")
+	{
+		if((ar == 0) || (n <= 0)) return 0;
+		PyObject *oRes = PyTuple_New(n);
+		T *t_ar = ar;
+
+		for(int i=0; i<n; i++)
+		{
+			PyObject *oElem = Py_BuildValue(cType, *(t_ar++));
+			if(PyTuple_SetItem(oRes, (Py_ssize_t)i, oElem)) throw strEr_FailedCreateTuple;
+		}
 		return oRes;
 	}
 };

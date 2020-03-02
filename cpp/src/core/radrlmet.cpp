@@ -637,11 +637,9 @@ void radTRelaxationMethNo_4::DefineNewMagnetizations()
 		TVector3d& InstantM = MagnAr[StrNo];
 		TVector3d PrevH = InstantH;
 
-
 		if(StrNo == 42)
 		{
 			int aha = 1;
-
 		}
 
 		MaterPtr->FindNewH(InstantH, MatrArrayPtr[StrNo], QuasiExtFieldAtElemStrNo, LocPrecMagnE2);

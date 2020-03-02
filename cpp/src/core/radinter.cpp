@@ -208,9 +208,10 @@ void OutCommandsInfo();
 void ReturnInput(double, int);
 void MemAllocMethForIntrctMatr(char*);
 
+void ProcMPI( const char* );
+
 //int AuxSetOptionNameAndValue(const char* OptTot, char* OptName, char** OptValue);
 int AuxSetOptionNameAndValue(const char* OptTot, char* OptName, const char** OptValue);
-
 }
 
 //-------------------------------------------------------------------------
@@ -242,10 +243,13 @@ int AuxSetOptionNameAndValue(const char* OptTot, char* OptName, const char** Opt
 	if(*OptTot != '\0') 
 	{
 		strcpy(OptName, OptTot);
-		char *pEndOptName = strrchr(OptName, '-');
-		if(pEndOptName == NULL) { rad.Send.ErrorMessage("Radia::Error062"); return 0;}
+		//char *pEndOptName = strrchr(OptName, '-');
+		char *pEndOptName = strrchr(OptName, '>'); //OC19122019
+		//if(pEndOptName == NULL) { rad.Send.ErrorMessage("Radia::Error062"); return 0;}
+		if((pEndOptName == NULL) || (*(--pEndOptName) != '-')) { rad.Send.ErrorMessage("Radia::Error062"); return 0;} //OC19122019
 		*pEndOptName = '\0';
-		*OptValue = strrchr(OptTot, '>') + 1;
+		//*OptValue = strrchr(OptTot, '>') + 1;
+		*OptValue = pEndOptName + 2; //OC19122019
 	}
 	return 1;
 }
@@ -3572,11 +3576,14 @@ void CompPrecisionOpt(const char* Opt1, const char* Opt2, const char* Opt3, cons
 			if(*(InOpt[i]) != '\0') 
 			{
 				strcpy(TotCharBuf[i], InOpt[i]);
-				char *pEndOptName = strrchr(TotCharBuf[i], '-');
-				if(pEndOptName == NULL) { rad.Send.ErrorMessage("Radia::Error062"); return;}
+				//char *pEndOptName = strrchr(TotCharBuf[i], '-');
+				char *pEndOptName = strrchr(TotCharBuf[i], '>'); //OC19122019
+				//if(pEndOptName == NULL) { rad.Send.ErrorMessage("Radia::Error062"); return;}
+				if((pEndOptName == NULL) || (*(--pEndOptName) != '-')) { rad.Send.ErrorMessage("Radia::Error062"); return;} //OC19122019
 				*pEndOptName = '\0';
 				OptionNames[i] = TotCharBuf[i];
-				OptionValues[i] = atof(strrchr(InOpt[i], '>') + 1);
+				//OptionValues[i] = atof(strrchr(InOpt[i], '>') + 1);
+				OptionValues[i] = atof(pEndOptName + 2); //OC19122019
 				if(OptionValues[i] == 0) { rad.Send.ErrorMessage("Radia::Error057"); return;}
 				OptionCount++;
 			}
@@ -4345,6 +4352,13 @@ void MemAllocMethForIntrctMatr(char* TotOrParts)
 void OutCommandsInfo()
 {
 	rad.Send.OrdinaryMessage("Radia::usage");
+}
+
+//-------------------------------------------------------------------------
+
+void ProcMPI(const char* OnOrOff)
+{
+	rad.ProcMPI(OnOrOff);
 }
 
 //-------------------------------------------------------------------------

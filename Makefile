@@ -1,4 +1,4 @@
-# This Makefile is to compile RADIA with optional compilation of FFTW-2.1.5.
+# This Makefile is to compile RADIA with optional compilation of FFTW-2.1.5 library.
 #
 # The following options are available:
 # - `make all` - will compile FFTW, C++ core and Python lib;
@@ -18,7 +18,7 @@ fftw_dir = $(fftw_version)
 fftw_file = $(fftw_version).tar.gz
 log_fftw = /dev/null
 examples_dir = $(env_dir)/radia_python
-#example10_data_dir = $(examples_dir)/data_example_10
+export MODE ?= 0
 timeout=20
 
 nofftw: core pylib

@@ -299,13 +299,24 @@ class Backend(object):
                 ar_i_1 = ar_i[1]
                 len_ar_i_0 = len(ar_i_0)
                 len_ar_i_1 = len(ar_i_1)
-                if((len_ar_i_1 == 3) and (len_ar_i_0 == 3)): 
-                    if(ar_i_1[2] == 3): #assuming [[y1,y2,y3],[x_min_i,x_max_i,nx_i]]
+                #if((len_ar_i_1 == 3) and (len_ar_i_0 == 3)): 
+                #    if(ar_i_1[2] == 3): #assuming [[y1,y2,y3],[x_min_i,x_max_i,nx_i]]
+                #        ary = ar_i_0
+                #        arx = np.linspace(ar_i_1[0], ar_i_1[1], ar_i_1[2])
+                #    else: #assuming [[y1,y2,y3],[x1,x2,x3]]
+                #        ary = ar_i_0
+                #        arx = ar_i_1
+                if(len_ar_i_1 == 3): #OC21022019
+                    if(len_ar_i_0 == 3): 
+                        if(ar_i_1[2] == 3): #assuming [[y1,y2,y3],[x_min_i,x_max_i,nx_i]]
+                            ary = ar_i_0
+                            arx = np.linspace(ar_i_1[0], ar_i_1[1], ar_i_1[2])
+                        else: #assuming [[y1,y2,y3],[x1,x2,x3]]
+                            ary = ar_i_0
+                            arx = ar_i_1
+                    elif(len_ar_i_0 == ar_i_1[2]): #assuming [[y1,y2,y3,y4,...],[x_min_i,x_max_i,nx_i]]
                         ary = ar_i_0
                         arx = np.linspace(ar_i_1[0], ar_i_1[1], ar_i_1[2])
-                    else: #assuming [[y1,y2,y3],[x1,x2,x3]]
-                        ary = ar_i_0
-                        arx = ar_i_1
                     
                 elif((len_ar_i_1 == 2) and (len_ar_i_0 == 2)): #assuming [[x1,y1],[x2,y2]]
                     arx = [ar_i_0[0],ar_i_1[0]]

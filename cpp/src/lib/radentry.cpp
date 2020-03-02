@@ -10,6 +10,11 @@
 #include "radentry.h"
 #include "radiobuf.h"
 
+//DEBUG
+//#ifdef _WITH_MPI
+//#include <mpi.h>
+//#endif
+
 //-------------------------------------------------------------------------
 
 extern "C" {
@@ -116,9 +121,9 @@ void RadiaVersion();
 //void DumpElem( int );
 void DumpElemOpt( int*, int, const char* );
 void DumpElemParseOpt( const unsigned char*, int );
-
 void GenDump();
 
+void ProcMPI( const char* );
 }
 
 //-------------------------------------------------------------------------
@@ -986,12 +991,28 @@ int CALL RadFld(double* pB, int* pNb, int Obj, char* ID, double* pCoord, int Np)
 	}
 
 	int Dims[20];
-	int NumDims;
+	int NumDims=0;
 	ioBuffer.OutMultiDimArrayOfDouble(pB, Dims, NumDims);
 
-	int TotLen = 1;
-	for(int k=0; k<NumDims; k++) TotLen *= Dims[k];
+	int TotLen = 0; //OC19012020
+	if(NumDims > 0)
+	{
+		TotLen = 1; 
+		for(int k=0; k<NumDims; k++) TotLen *= Dims[k];
+	}
+	//int TotLen = 1; 
+	//for(int k=0; k<NumDims; k++) TotLen *= Dims[k];
 	*pNb = TotLen;
+
+	//DEBUG
+	//std::cout << "RadFld: Nb=" << *pNb << "\n"; //DEBUG
+	//std::cout.flush(); //DEBUG
+
+	//DEBUG
+	//int rank = 0;
+	//MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	//std::cout << "rank=" << rank << " In RadFld before exiting\n"; //DEBUG
+	//std::cout.flush(); //DEBUG
 
 	if(PointsArray != 0) delete[] PointsArray;
 	return ErrStat;
@@ -1221,25 +1242,36 @@ int CALL RadFldCmpCrt(int* n, double PrcB, double PrcA, double PrcBInt, double P
 
 int CALL RadFldCmpPrc(int* n, char* Opt)
 {
-	const char *Opt1=0, *Opt2=0, *Opt3=0, *Opt4=0, *Opt5=0, *Opt6=0, *Opt7=0, *Opt8=0;
+	//const char *Opt1=0, *Opt2=0, *Opt3=0, *Opt4=0, *Opt5=0, *Opt6=0, *Opt7=0, *Opt8=0;
+	const char *arOpt[8]; //OC18122019
+	for(int i=0; i<8; i++) arOpt[i] = 0;
 	vector<string> AuxStrings;
 	if(Opt != 0)
 	{
-		//char *SepStrArr[] = {";", ","};
-		char *SepStrArr[] = {(char*)";", (char*)","}; //OC04082018 (to please GCC 4.9)
-		CAuxParse::StringSplit(Opt, SepStrArr, 2, (char*)" ", AuxStrings);
-		int AmOfTokens = (int)AuxStrings.size();
-		if(AmOfTokens > 0) Opt1 = (AuxStrings[0]).c_str();
-		if(AmOfTokens > 1) Opt2 = (AuxStrings[1]).c_str();
-		if(AmOfTokens > 2) Opt3 = (AuxStrings[2]).c_str();
-		if(AmOfTokens > 3) Opt4 = (AuxStrings[3]).c_str();
-		if(AmOfTokens > 4) Opt5 = (AuxStrings[4]).c_str();
-		if(AmOfTokens > 5) Opt6 = (AuxStrings[5]).c_str();
-		if(AmOfTokens > 6) Opt7 = (AuxStrings[6]).c_str();
-		if(AmOfTokens > 7) Opt8 = (AuxStrings[7]).c_str();
+		//OC18122019
+		int lenStrOpt = (int)strlen(Opt);
+		char *sOptLoc = new char[lenStrOpt + 1];
+		CAuxParse::StringSymbolsRemove(Opt, (char*)" ", sOptLoc);
+		CAuxParse::StringSplitNested(sOptLoc, ";,", AuxStrings);
+		delete[] sOptLoc;
+		int AmOfOpt = (int)AuxStrings.size();
+		for(int j=0; j<AmOfOpt; j++) arOpt[j] = (AuxStrings[j]).c_str();
+
+		//char *SepStrArr[] = {(char*)";", (char*)","}; //OC04082018 (to please GCC 4.9)
+		//CAuxParse::StringSplit(Opt, SepStrArr, 2, (char*)" ", AuxStrings);
+		//int AmOfTokens = (int)AuxStrings.size();
+		//if(AmOfTokens > 0) Opt1 = (AuxStrings[0]).c_str();
+		//if(AmOfTokens > 1) Opt2 = (AuxStrings[1]).c_str();
+		//if(AmOfTokens > 2) Opt3 = (AuxStrings[2]).c_str();
+		//if(AmOfTokens > 3) Opt4 = (AuxStrings[3]).c_str();
+		//if(AmOfTokens > 4) Opt5 = (AuxStrings[4]).c_str();
+		//if(AmOfTokens > 5) Opt6 = (AuxStrings[5]).c_str();
+		//if(AmOfTokens > 6) Opt7 = (AuxStrings[6]).c_str();
+		//if(AmOfTokens > 7) Opt8 = (AuxStrings[7]).c_str();
 	}
 
-	CompPrecisionOpt(Opt1, Opt2, Opt3, Opt4, Opt5, Opt6, Opt7, Opt8);
+	CompPrecisionOpt(arOpt[0], arOpt[1], arOpt[2], arOpt[3], arOpt[4], arOpt[5], arOpt[6], arOpt[7]); //OC18122019
+	//CompPrecisionOpt(Opt1, Opt2, Opt3, Opt4, Opt5, Opt6, Opt7, Opt8);
 
 	*n = ioBuffer.OutInt();
 	return ioBuffer.OutErrorStatus();
@@ -1565,6 +1597,21 @@ int CALL RadUtiVer(double* d)
 
 	*d = ioBuffer.OutDouble();
 	return ioBuffer.OutErrorStatus();
+}
+
+//-------------------------------------------------------------------------
+
+int CALL RadUtiMPI(int* arPar, char* sOnOff)
+{
+	ProcMPI(sOnOff);
+
+	int ErrStat = ioBuffer.OutErrorStatus();
+	if(ErrStat > 0) return ErrStat;
+
+	int arDims[20], nDims=0;
+	ioBuffer.OutMultiDimArrayOfInt(arPar, arDims, nDims);
+
+	return ErrStat;
 }
 
 //-------------------------------------------------------------------------

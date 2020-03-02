@@ -23,6 +23,10 @@
 #include <math.h>
 #include <string.h>
 
+#ifdef _WITH_MPI
+#include <mpi.h>
+#endif
+
 //-------------------------------------------------------------------------
 //-------------------------------------------------------------------------
 
@@ -140,7 +144,8 @@ void radTApplication::ComputeField(int ElemKey, char* FieldChar, radTVectorOfVec
 
 void radTApplication::ComputeField(int ElemKey, char* FieldChar, double** Points, long Np)
 {
-	radTField* FieldArray = 0;
+	radTField *FieldArray = 0;
+	double *arFldVals = 0, *arFldValsRecv = 0; //OC02012020
 	try
 	{
 		radThg hg;
@@ -150,28 +155,151 @@ void radTApplication::ComputeField(int ElemKey, char* FieldChar, double** Points
 		radTFieldKey FieldKey;
 		if(!ValidateFieldChar(FieldChar, &FieldKey)) return;
 
-		FieldArray = new radTField[Np];
-		if(FieldArray == 0) { Send.ErrorMessage("Radia::Error900"); return;}
-		radTField* tField = FieldArray;
-
-		TVector3d ZeroVect(0.,0.,0.), v;
-		double **tPoints = Points;
-		for(long i=0; i<Np; i++)
+		if(m_nProcMPI < 2) //OC01012020
 		{
-			double *t = *tPoints;
-			v.x = *(t++); v.y = *(t++); v.z = *t;
+			FieldArray = new radTField[Np];
+			if(FieldArray == 0) { Send.ErrorMessage("Radia::Error900"); return;}
+			radTField* tField = FieldArray;
 
-			*tField = radTField(FieldKey, CompCriterium, v, ZeroVect, ZeroVect, ZeroVect, ZeroVect, 0.);
-			g3dPtr->B_genComp(tField); 
-			tField++; tPoints++;
+			TVector3d ZeroVect(0.,0.,0.), v;
+			double **tPoints = Points;
+			for(long i=0; i<Np; i++)
+			{
+				double *t = *tPoints;
+				v.x = *(t++); v.y = *(t++); v.z = *t;
+
+				*tField = radTField(FieldKey, CompCriterium, v, ZeroVect, ZeroVect, ZeroVect, ZeroVect, 0.);
+				g3dPtr->B_genComp(tField);
+				tField++; tPoints++;
+			}
+			if(SendingIsRequired) OutFieldCompRes(FieldChar, FieldArray, Np);
+			if(FieldArray != 0) { delete[] FieldArray; FieldArray = 0;}
 		}
+#ifdef _WITH_MPI
+		else
+		{
+			int nProc_mi_1 = m_nProcMPI - 1;
+			int rank_mi_1 = m_rankMPI - 1;
+			pair<long, long> pairStartEnd(rank_mi_1, m_rankMPI); //if(m_nProcMPI - 1 > Np)
 
-		if(SendingIsRequired) OutFieldCompRes(FieldChar, FieldArray, Np);
-		if(FieldArray != 0) { delete[] FieldArray; FieldArray = 0;}
+			int nPacketsTot = Np; //required for master process
+			long nMaxNpInPacket = 1;
+			long nFldValsPerPt = FieldKey.NumValues();
+
+			if(nProc_mi_1 <= Np)
+			{
+				long minNpPerPacket = (long)(Np/nProc_mi_1 + 1.e-14);
+				long NpResid = Np - minNpPerPacket*nProc_mi_1;
+
+				long iStart = (m_rankMPI - 1)*minNpPerPacket, NpInPacket = minNpPerPacket;
+				if(m_rankMPI <= NpResid)
+				{
+					NpInPacket++;
+					iStart += m_rankMPI;
+				}
+				else //OC26022020
+				{
+					iStart += NpResid;
+				}
+				nPacketsTot = nProc_mi_1;
+				nMaxNpInPacket = minNpPerPacket + 1;
+
+				pairStartEnd.first = iStart;
+				pairStartEnd.second = iStart + NpInPacket;
+			}
+			else
+			{
+				if(m_rankMPI > Np) pairStartEnd.second = rank_mi_1;
+			}
+
+			//std::cout << "rank=" << m_rankMPI << " nPacketsTot=" << nPacketsTot << " nMaxNpInPacket=" << nMaxNpInPacket << "\n"; //DEBUG
+			//std::cout.flush(); //DEBUG
+
+			long locNp = pairStartEnd.second - pairStartEnd.first;
+			if((m_rankMPI > 0) && (locNp > 0))
+			{//workers
+				long long nTotFldVals = nFldValsPerPt*locNp;
+				double *arFldVals = new double[nTotFldVals + 2];
+				if(arFldVals == 0) { Send.ErrorMessage("Radia::Error900"); throw 0;}
+
+				double *t_arFldVals = arFldVals;
+				*(t_arFldVals++) = pairStartEnd.first;
+				*(t_arFldVals++) = pairStartEnd.second;
+
+				//std::cout << "rank=" << m_rankMPI << " about to start field calculation, nTotFldVals=" << nTotFldVals << " from pairStartEnd.first=" << pairStartEnd.first << " to pairStartEnd.second-1=" << pairStartEnd.second-1 << "\n"; //DEBUG
+				//std::cout.flush(); //DEBUG
+
+				TVector3d ZeroVect(0.,0.,0.), v;
+				double **tPoints = Points + pairStartEnd.first;
+				for(long i=0; i<locNp; i++)
+				{
+					double *t = *tPoints;
+					v.x = *(t++); v.y = *(t++); v.z = *t;
+
+					radTField curFld(FieldKey, CompCriterium, v, ZeroVect, ZeroVect, ZeroVect, ZeroVect, 0.);
+					g3dPtr->B_genComp(&curFld);
+					tPoints++;
+
+					curFld.OutVals(FieldKey, t_arFldVals);
+				}
+
+				int nVals = (int)(t_arFldVals - arFldVals); //or nTotFldVals + 2
+				if(MPI_Send(arFldVals, nVals, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); throw 0;}
+
+				//std::cout << "rank=" << m_rankMPI << " field calculated and sent, nVals=" << nVals << "\n"; //DEBUG
+				//std::cout.flush(); //DEBUG
+
+				if(arFldVals != 0) { delete[] arFldVals; arFldVals = 0;}
+			}
+			else if((m_rankMPI <= 0) && (nPacketsTot > 0) && (nMaxNpInPacket > 0))
+			{//master
+				FieldArray = new radTField[Np];
+				if(FieldArray == 0) { Send.ErrorMessage("Radia::Error900"); throw 0;}
+
+				long nMaxValInPacket = nFldValsPerPt*nMaxNpInPacket + 2;
+
+				//std::cout << "rank=" << m_rankMPI << " nMaxValInPacket=" << nMaxValInPacket << "\n"; //DEBUG
+				//std::cout.flush(); //DEBUG
+
+				double *arFldValsRecv = new double[nMaxValInPacket];
+				if(arFldValsRecv == 0) { Send.ErrorMessage("Radia::Error900"); throw 0;}
+
+				//std::cout << "rank=" << m_rankMPI << " about to start receiving\n"; //DEBUG
+				//std::cout.flush(); //DEBUG
+
+				MPI_Status statMPI;
+				for(long i=0; i<nPacketsTot; i++)
+				{
+					if(MPI_Recv(arFldValsRecv, nMaxValInPacket, MPI_DOUBLE, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &statMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); throw 0;}
+
+					double *t_arFldValsRecv = arFldValsRecv;
+					long jStart = (long)(*(t_arFldValsRecv++));
+					long jEnd = (long)(*(t_arFldValsRecv++));
+					radTField *tField = FieldArray + jStart;
+
+					for(long j=jStart; j<jEnd; j++) (tField++)->InVals(FieldKey, t_arFldValsRecv);
+
+					//std::cout << "rank=" << m_rankMPI << " received values from jStart=" << jStart << " to jEnd-1=" << jEnd-1 << "\n"; //DEBUG
+					//std::cout.flush(); //DEBUG
+				}
+
+				//std::cout << "rank=" << m_rankMPI << " all data received\n"; //DEBUG
+				//std::cout.flush(); //DEBUG
+
+				if(SendingIsRequired) OutFieldCompRes(FieldChar, FieldArray, Np);
+				if(FieldArray != 0) { delete[] FieldArray; FieldArray = 0;}
+				if(arFldValsRecv != 0) { delete[] arFldValsRecv; arFldValsRecv = 0;}
+			}
+			//To consider synchronization:
+			//if(MPI_Barrier(MPI_COMM_WORLD) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); throw 0;} //OC18012020
+		}
+#endif
 	}
 	catch(...) 
 	{ 
 		if(FieldArray != 0) delete[] FieldArray;
+		if(arFldVals != 0) delete[] arFldVals; //OC02012020
+		if(arFldValsRecv != 0) delete[] arFldValsRecv; //OC02012020
 		Initialize(); return;
 	}
 }
