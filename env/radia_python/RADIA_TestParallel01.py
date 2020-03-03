@@ -10,10 +10,10 @@ import radia as rad
 from uti_plot import *
 from math import *
 
-import numpy as np
-import matplotlib.pyplot as plt
+#import numpy as np
+#import matplotlib.pyplot as plt
 import time
-import sys
+#import sys
 
 #Initialize MPI
 rank = rad.UtiMPI('on')

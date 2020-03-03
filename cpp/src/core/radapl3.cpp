@@ -195,7 +195,8 @@ void radTApplication::ComputeField(int ElemKey, char* FieldChar, double** Points
 				if(m_rankMPI <= NpResid)
 				{
 					NpInPacket++;
-					iStart += m_rankMPI;
+					iStart += (m_rankMPI - 1); //OC03032020
+					//iStart += m_rankMPI;
 				}
 				else //OC26022020
 				{
