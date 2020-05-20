@@ -38,7 +38,7 @@
     <ProjectGuid>{C66E3422-C0DD-475D-B16B-0D596F188465}</ProjectGuid>
     <RootNamespace>test_lib2</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_mpi|Win32'" Label="Configuration">
@@ -276,7 +276,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\src\core;..\src\ext\triangle;..\src\ext\auxparse;..\src\ext\genmath;..\src\ext\glut_viewer;$(MSMPI_INC);$(MSMPI_INC)\x64;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src\core;..\src\ext\triangle;..\src\ext\auxparse;..\src\ext\genmath;..\src\ext\glut_viewer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_LIB;ALPHA__LIB__;_WITH_GLUT;FFTW_ENABLE_FLOAT;_CRT_SECURE_NO_DEPRECATE;NO_TIMER;ANSI_DECLARATORS;TRILIBRARY;_GM_WITHOUT_BASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>

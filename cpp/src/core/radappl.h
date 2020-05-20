@@ -266,7 +266,8 @@ public:
 	void ReplaceInGlobalMap(radThg& OldHandle, radThg& NewHandle);
 	inline void CopyDrawAttr(int OldElemKey, int NewElemKey);
 
-	int ProcMPI(const char* OnOrOff);
+	int ProcMPI(const char* OnOrOff, double* arData=0, long* pnData=0, long* pRankFrom=0, long* pRankTo=0); //OC19032020
+	//int ProcMPI(const char* OnOrOff);
 };
 
 //-------------------------------------------------------------------------

@@ -33,8 +33,9 @@ if 'MODE' in os.environ:
         ext_kwargs.update({
             'libraries': ['radia', 'm', 'fftw', 'mpichcxx_intel', 'dl'],
             'library_dirs': [os.path.abspath('../gcc'), os.path.abspath('../../ext_lib'), os.path.abspath(os.getenv('MPICH_DIR') + '/lib')]})
-    #elif sMode == '0': 
-    #    ext_kwargs.update({'libraries': ['srw', 'm', 'fftw3f', 'fftw3']}) #OC07022019
+    elif sMode == '0':
+        pass
+        #ext_kwargs.update({'libraries': ['srw', 'm', 'fftw3f', 'fftw3']}) #OC07022019
     else:
         raise Exception("Unknown Radia compilation/linking option")
 

@@ -6,6 +6,18 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>ForOleg_oc.py</LocalDebuggerCommandArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Py3_7|x64'">
+    <LocalDebuggerCommand>C:\SoftwareDevelopments\Python37_x64\python.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>..\..\env\radia_python</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>ForOleg_oc.py</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Py3_8|x64'">
+    <LocalDebuggerCommand>C:\SoftwareDevelopments\Python38_x64\python.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>..\..\env\radia_python</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>ForOleg_oc.py</LocalDebuggerCommandArguments>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Py2_7|x64'">
     <LocalDebuggerCommand>C:\SoftwareDevelopments\Python27_x64\python.exe</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>..\..\env\radia_python</LocalDebuggerWorkingDirectory>
@@ -16,7 +28,13 @@
     <LocalDebuggerCommand>C:\SoftwareDevelopments\Python36_x64\python.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>..\..\env\radia_python</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerCommandArguments>RADIA_TestParallel01.py</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>RADIA_APPLE_II_Optim_02.py</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Py3_8|x64'">
+    <LocalDebuggerCommand>C:\SoftwareDevelopments\Python38_x64\python.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>..\..\env\radia_python</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>RADIA_Example03_kickmap_debug.py</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Py2_7|x64'">
     <LocalDebuggerCommand>C:\SoftwareDevelopments\Python27_x64\python.exe</LocalDebuggerCommand>

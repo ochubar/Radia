@@ -208,7 +208,8 @@ void OutCommandsInfo();
 void ReturnInput(double, int);
 void MemAllocMethForIntrctMatr(char*);
 
-void ProcMPI( const char* );
+void ProcMPI( const char*, double*, long*, long*, long*);
+//void ProcMPI( const char* );
 
 //int AuxSetOptionNameAndValue(const char* OptTot, char* OptName, char** OptValue);
 int AuxSetOptionNameAndValue(const char* OptTot, char* OptName, const char** OptValue);
@@ -4356,9 +4357,11 @@ void OutCommandsInfo()
 
 //-------------------------------------------------------------------------
 
-void ProcMPI(const char* OnOrOff)
+void ProcMPI(const char* OnOrOff, double* arData=0, long* pnData=0, long* pRankFrom=0, long* pRankTo=0) //OC19032020
+//void ProcMPI(const char* OnOrOff)
 {
-	rad.ProcMPI(OnOrOff);
+	rad.ProcMPI(OnOrOff, arData, pnData, pRankFrom, pRankTo); //OC19032020
+	//rad.ProcMPI(OnOrOff);
 }
 
 //-------------------------------------------------------------------------

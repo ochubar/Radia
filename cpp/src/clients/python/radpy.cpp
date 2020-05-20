@@ -1280,7 +1280,19 @@ static PyObject* radia_ObjDivMag(PyObject* self, PyObject* args)
 		//if(resP == 0) throw CombErStr(strEr_BadFuncArg, ": ObjDivMag");	
 		ParseSubdPar(arSbdPar, oSbdPar, "ObjDivMag\0"); //OC29022020
 
+		//char sType[1024];
+		//strcpy(sType, "pln\0");
 		char sOpt[1024]; *sOpt = '\0';
+		if((oType != 0) && (oDir == 0) && (oOpt == 0)) 
+		{//Treating the case like rad.ObjDivMag(u, ndiv, 'Frame->LabTot')
+			if(oType != 0) CPyParse::CopyPyStringToC(oType, sOpt, 1024);
+			char *pEndOptName = strrchr(sOpt, '>');
+			if(pEndOptName != 0)
+			{
+				if(*(--pEndOptName) == '-') oType = 0;
+			}
+		}
+
 		if(oOpt != 0) CPyParse::CopyPyStringToC(oOpt, sOpt, 1024);
 
 		//char sType[32]; *sType = '\0';
@@ -2609,7 +2621,8 @@ static PyObject* radia_FldEnrTrq(PyObject* self, PyObject* args)
 	{
 		int indDst=0, indSrc=0;
 		if(!PyArg_ParseTuple(args, "iiOO|O:FldEnrTrq", &indDst, &indSrc, &oCmpnId, &oP, &oSbdPar)) throw CombErStr(strEr_BadFuncArg, ": FldEnrTrq");
-		if((indDst <= 0) || (indSrc <= 0) || (oCmpnId == 0) || (oP)) throw CombErStr(strEr_BadFuncArg, ": FldEnrTrq");
+		if((indDst <= 0) || (indSrc <= 0) || (oCmpnId == 0) || (oP == 0)) throw CombErStr(strEr_BadFuncArg, ": FldEnrTrq"); //OC14042020
+		//if((indDst <= 0) || (indSrc <= 0) || (oCmpnId == 0) || (oP)) throw CombErStr(strEr_BadFuncArg, ": FldEnrTrq");
 
 		char sCmpnId[256];
 		CPyParse::CopyPyStringToC(oCmpnId, sCmpnId, 255);
@@ -2776,15 +2789,19 @@ static PyObject* radia_FldFocKickPer(PyObject* self, PyObject* args)
 		g_pyParse.ProcRes(RadFldFocKickPer(arM1, arM2, arIntBtrE2, arArg1, arArg2, &sLen, ind, arP1, arNs, per, nPer, nps, arN1, r1, np1, d1, r2, np2, d2, nh, sCom, sUnits, E, sFrm)); //OC03112019
 		//g_pyParse.ProcRes(RadFldFocKickPer(arM1, arM2, arIntBtrE2, arArg1, arArg2, &sLen, ind, arP1, arNs, per, nPer, nps, arN1, r1, np1, d1, r2, np2, d2, nh, sCom));
 
-		sOut = new char[sLen];
+		sOut = new char[sLen + 1]; //OC19052020
+		//sOut = new char[sLen];
 		g_pyParse.ProcRes(RadFldFocKickPerFormStr(sOut, arM1, arM2, arIntBtrE2, arArg1, arArg2, np1, np2, per, nPer, sCom));
 
 		oRes = PyTuple_New(6);
-		PyObject *oM1 = CPyParse::SetDataListOfLists(arM1, np1, np2); //check dims; make it a flat array?
+		PyObject *oM1 = CPyParse::SetDataListOfLists(arM1, np1_np2, (long)np2); //OC19052020 //check dims; make it a flat array?
+		//PyObject *oM1 = CPyParse::SetDataListOfLists(arM1, np1, np2); //check dims; make it a flat array?
 		PyTuple_SET_ITEM(oRes, 0, oM1);
-		PyObject *oM2 = CPyParse::SetDataListOfLists(arM2, np1, np2); //check dims; make it a flat array?
+		PyObject *oM2 = CPyParse::SetDataListOfLists(arM2, np1_np2, (long)np2); //OC19052020 //check dims; make it a flat array?
+		//PyObject *oM2 = CPyParse::SetDataListOfLists(arM2, np1, np2); //check dims; make it a flat array?
 		PyTuple_SET_ITEM(oRes, 1, oM2);
-		PyObject *oIntBtrE2 = CPyParse::SetDataListOfLists(arIntBtrE2, np1, np2); //check dims; make it a flat array?
+		PyObject *oIntBtrE2 = CPyParse::SetDataListOfLists(arIntBtrE2, np1_np2, (long)np2); //OC19052020 //check dims; make it a flat array?
+		//PyObject *oIntBtrE2 = CPyParse::SetDataListOfLists(arIntBtrE2, np1, np2); //check dims; make it a flat array?
 		PyTuple_SET_ITEM(oRes, 2, oIntBtrE2);
 		PyObject *oArg1 = CPyParse::SetDataListOfLists(arArg1, np1, 1);
 		PyTuple_SET_ITEM(oRes, 3, oArg1);
@@ -3174,19 +3191,50 @@ static PyObject* radia_UtiVer(PyObject* self, PyObject* args)
  ***************************************************************************/
 static PyObject* radia_UtiMPI(PyObject* self, PyObject* args)
 {
-	PyObject *oOnOff=0, *oParMPI=0;
+	PyObject *oOnOff=0, *oParMPI=0, *oData=0;
+	double *arData=0, *arDataAux=0;
 	try
 	{
-		if(!PyArg_ParseTuple(args, "O:UtiMPI", &oOnOff)) throw CombErStr(strEr_BadFuncArg, ": UtiMPI");
+		long rankFrom=0, rankTo=-1;
+		if(!PyArg_ParseTuple(args, "O|Oii:UtiMPI", &oOnOff, &oData, &rankFrom, &rankTo)) throw CombErStr(strEr_BadFuncArg, ": UtiMPI"); //OC19032020
+		//if(!PyArg_ParseTuple(args, "O:UtiMPI", &oOnOff)) throw CombErStr(strEr_BadFuncArg, ": UtiMPI");
 		if(oOnOff == 0) throw CombErStr(strEr_BadFuncArg, ": UtiMPI");
 
 		char sOnOff[256]; *sOnOff = '\0';
 		CPyParse::CopyPyStringToC(oOnOff, sOnOff, 255);
 
-		int arParMPI[] = {-1,0}; //to obtain world rank and size
-		g_pyParse.ProcRes(RadUtiMPI(arParMPI, sOnOff));
+		long nData = 0; //OC19032020
+		//int nData = 0; //OC19032020
+		if(oData != 0)
+		{
+			if((strcmp(sOnOff, "share") == 0) || (strcmp(sOnOff, "Share") == 0) || (strcmp(sOnOff, "SHARE") == 0))
+			{
+				if(PyList_Check(oData) || PyObject_CheckBuffer(oData))
+				{
+					//bool lenIsSmall = false;
+					//CPyParse::CopyPyListElemsToNumArray(oData, 'd', arData, nData, lenIsSmall);
+					CPyParse::CopyPyNestedListElemsToNumAr(oData, 'd', arData, nData);
+				}
+			}
+		}
 
-		oParMPI = Py_BuildValue("i", arParMPI[0]); //returning just rank to simplify its use in scripts
+		int arParMPI[] = {-1,0}; //to obtain world rank and size
+		g_pyParse.ProcRes(RadUtiMPI(arParMPI, sOnOff, arData, &nData, &rankFrom, &rankTo));
+		//g_pyParse.ProcRes(RadUtiMPI(arParMPI, sOnOff));
+
+		if((oData != 0) && (nData > 0)) //OC19032020
+		{//Extract data that was shared from buffer
+			arDataAux = new double[nData];
+			g_pyParse.ProcRes(RadUtiDataGet((char*)arDataAux, "mad")); //OC22032020
+			//g_pyParse.ProcRes(RadUtiDataGet((char*)arDataAux, "d", rankTo)); //rankTo is used as key for Data here
+			oParMPI = CPyParse::SetDataListOfLists(arDataAux, nData, (long)1, "d");
+		}
+		else
+		{
+			oParMPI = Py_BuildValue("i", arParMPI[0]); //returning just rank to simplify its use in scripts
+		}
+
+		//oParMPI = Py_BuildValue("i", arParMPI[0]); //returning just rank to simplify its use in scripts
 		//oParMPI = CPyParse::SetDataTuple(arParMPI, 2, (char*)"i");
 		//oParMPI = CPyParse::SetDataListOfLists(arParMPI, 2, 1, (char*)"i");
 		if(oParMPI) Py_XINCREF(oParMPI);
@@ -3196,6 +3244,8 @@ static PyObject* radia_UtiMPI(PyObject* self, PyObject* args)
 		PyErr_SetString(PyExc_RuntimeError, erText);
 		//PyErr_PrintEx(1);
 	}
+	if(arData != 0) delete[] arData;
+	if(arDataAux != 0) delete[] arDataAux;
 	return oParMPI;
 }
 
@@ -3290,7 +3340,7 @@ static PyMethodDef radia_methods[] = {
 	{"UtiDel", radia_UtiDel, METH_VARARGS, "UtiDel(elem) deletes element elem."},
 	{"UtiDelAll", radia_UtiDelAll, METH_VARARGS, "UtiDelAll() deletes all previously created elements."},
 	{"UtiVer", radia_UtiVer, METH_VARARGS, "UtiVer() returns version number of the Radia library."},
-	{"UtiMPI", radia_UtiMPI, METH_VARARGS, "UtiMPI('on|off') initializes (if argument is 'on') or finalizes (in argument is 'off') the Message Passing Inteface (MPI) for parallel calculations and returns list of basic MPI process parameters (in the case of initialization): rank of a process and total number of processes."},
+	{"UtiMPI", radia_UtiMPI, METH_VARARGS, "UtiMPI('on|off|share',data,rankFrom,rankTo) initializes (if argument is 'on') or finalizes (in argument is 'off') the Message Passing Inteface (MPI) for parallel calculations and returns list of basic MPI process parameters (in the case of initialization): rank of a process and total number of processes. In the case of first argument is 'share', the function will send data (list or array) from rankFrom (by default 0) to all processes (by default) of to rankTo."},
 
 	{NULL, NULL}
 };

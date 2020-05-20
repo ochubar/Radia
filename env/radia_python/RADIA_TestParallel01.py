@@ -151,8 +151,6 @@ if __name__=="__main__":
     #Magnet Material
     magBr = 1.67 #Remanent Magnetization
     mm = rad.MatLin({0.05, 0.15}, magBr)
-    #print(MvsH_T)
-    #print(mp)
     
     grp = HybridUndCenPart(_gap=gap, _gap_ofst=gapOffset, _nper=nPer, _air=air,
                            _lp=lp, _ch_p=chPole, _np=np, _np_tip=npTip, _mp=mp, _cp=cp,
@@ -189,9 +187,8 @@ if __name__=="__main__":
         print('Field was calculated in:', round(time.time() - t0, 2), 's')
 
         #Plot the calculated Magnetic Field
-        uti_plot1d(Bz, [-yMax,yMax,ny], ['Longitudinal Position', 'Bz', 'Vertical Magnetic Field'], ['mm', 'T'])
+        uti_plot1d(Bz, [-yMax*0.001,yMax*0.001,ny], ['Longitudinal Position [m]', 'Bz [T]', 'Vertical Magnetic Field']) #, ['mm', 'T'])
         uti_plot_show()
 
     #End MPI
     rad.UtiMPI('off')
-

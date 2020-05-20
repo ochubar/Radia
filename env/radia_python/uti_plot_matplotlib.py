@@ -697,9 +697,12 @@ class Backend(object):
         import matplotlib.pyplot
         pl = matplotlib.pyplot
         try:
-            pl.figure(figsize=(0,0))
+            pl.figure(figsize=(1,1)) #OC08032020 (the line below throws exception with ~recent matplotlib)
+            #pl.figure(figsize=(0,0))
             pl.close('all')
         except:
+        #except Exception as e:
+            #print(str(e))
             old = backend
             (backend, fname_format) = self._default_file_backend(fname_format)
             pl.switch_backend(backend)

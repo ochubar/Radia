@@ -180,7 +180,8 @@ public:
 	 * If obj is neither List nor Array - returns without throwing error
 	 * If the length of Py list or array is larger than nElem at input, then nElemTooSmall is set to true
 	 ***************************************************************************/
-	template<class T> static char CopyPyListElemsToNumArray(PyObject* obj, char arType, T*& ar, int& nElem, bool& nElemTooSmall)
+	template<class T, class TI> static char CopyPyListElemsToNumArray(PyObject* obj, char arType, T*& ar, TI& nElem, bool& nElemTooSmall) //OC19032020
+	//template<class T> static char CopyPyListElemsToNumArray(PyObject* obj, char arType, T*& ar, int& nElem, bool& nElemTooSmall)
 	//template<class T> static char CopyPyListElemsToNumArray(PyObject* obj, char arType, T*& ar, int& nElem)
 	{
 		nElemTooSmall = false; //OC29072018
@@ -209,10 +210,12 @@ public:
 		float *pFloatAr = 0;
 		double *pDoubleAr = 0;
 
-		int nElemInList = 0;
+		long long nElemInList = 0; //OC19032020
+		//int nElemInList = 0;
 		if(isList) 
 		{
-			nElemInList = (int)PyList_Size(obj);
+			nElemInList = (long long)PyList_Size(obj); //OC19032020
+			//nElemInList = (int)PyList_Size(obj);
 		}
 		else
 		{
@@ -256,26 +259,30 @@ public:
 			{
 				//nElemInList = (int)pb.len/sizeof(int);
 				//pIntAr = (int*)pb.buf;
-				nElemInList = (int)(sizeBuf / sizeof(int));
+				//nElemInList = (int)(sizeBuf / sizeof(int));
+				nElemInList = (long long)(sizeBuf / sizeof(int)); //OC19032020
 				pIntAr = (int*)pVoidBuffer;
 			}
 			else if(arType == 'l')
 			{
 				//nElemInList = (int)pb.len/sizeof(long);
 				//pLongAr = (long*)pb.buf;
-				nElemInList = (int)(sizeBuf / sizeof(long));
+				//nElemInList = (int)(sizeBuf / sizeof(long));
+				nElemInList = (long long)(sizeBuf / sizeof(long)); //OC19032020
 				pLongAr = (long*)pVoidBuffer;
 			}
 			else if(arType == 'f')
 			{
 				//nElemInList = (int)pb.len/sizeof(float);
 				//pFloatAr = (float*)pb.buf;
-				nElemInList = (int)(sizeBuf / sizeof(float));
+				//nElemInList = (int)(sizeBuf / sizeof(float));
+				nElemInList = (long long)(sizeBuf / sizeof(float)); //OC19032020
 				pFloatAr = (float*)pVoidBuffer;
 			}
 			else if(arType == 'd')
 			{
-				nElemInList = (int)(sizeBuf / sizeof(double));
+				//nElemInList = (int)(sizeBuf / sizeof(double));
+				nElemInList = (long long)(sizeBuf / sizeof(double)); //OC19032020
 				pDoubleAr = (double*)pVoidBuffer;
 			}
 		}
@@ -285,16 +292,19 @@ public:
 		if(ar == 0)
 		{
 			ar = new T[nElemInList];
-			nElem = nElemInList;
+			nElem = (TI)nElemInList; //OC19032020
+			//nElem = nElemInList;
 		}
 		else
 		{
-			if(nElem > nElemInList) nElem = nElemInList;
+			if(nElem > nElemInList) nElem = (TI)nElemInList; //OC19032020
+			//if(nElem > nElemInList) nElem = nElemInList;
 			else if(nElem < nElemInList) nElemTooSmall = true; //OC29072018
 		}
 
 		T *t_ar = ar;
-		for(int i = 0; i < nElem; i++)
+		//for(int i = 0; i < nElem; i++)
+		for(TI i = 0; i < nElem; i++) //OC29072018
 		{
 			if(isList)
 			{
@@ -431,13 +441,15 @@ public:
 	 * arType can be 'i', 'f' or 'd'
 	 * Supports both Py lists and arrays
 	 ***************************************************************************/
-	template<class T> static char CopyPyNestedListElemsToNumAr(PyObject* obj, char typeElem, T*& ar, int& nElem)
+	template<class T, class TI> static char CopyPyNestedListElemsToNumAr(PyObject* obj, char typeElem, T*& ar, TI& nElem) //OC22032020
+	//template<class T> static char CopyPyNestedListElemsToNumAr(PyObject* obj, char typeElem, T*& ar, int& nElem)
 	{
 		vector<T> vData;
 		char res = CopyPyNestedListElemsToNumVect(obj, typeElem, &vData);
 		if(res == 0) return 0;
 
-		int nElemAct = (int)vData.size();
+		TI nElemAct = (TI)vData.size();
+		//int nElemAct = (int)vData.size();
 		if(nElemAct <= 0) return 0;
 
 		if(ar == 0)
@@ -451,7 +463,8 @@ public:
 		}
 
 		T *t_ar = ar;
-		for(int i=0; i<nElem; i++)
+		//for(int i=0; i<nElem; i++)
+		for(TI i=0; i<nElem; i++)
 		{
 			*(t_ar++) = vData[i];
 		}
@@ -702,12 +715,14 @@ public:
 	/************************************************************************//**
 	* Sets up output list (eventually of lists) data from an array
 	***************************************************************************/
-	template<class T> static PyObject* SetDataListOfLists(T* arB, int nB, int nP, const char* cType="d") //OC13092018
+	template<class T, class TI> static PyObject* SetDataListOfLists(T* arB, TI nB, TI nP, const char* cType="d") //OC19032020
+	//template<class T> static PyObject* SetDataListOfLists(T* arB, int nB, int nP, const char* cType="d") //OC13092018
 	//static PyObject* SetDataListOfLists(double* arB, int nB, int nP)
 	{
 		if((arB == 0) || (nB <= 0) || (nP <= 0)) return 0;
 		
-		int nElem = 0, nSubElem = 0;
+		TI nElem = 0, nSubElem = 0; //OC19032020
+		//int nElem = 0, nSubElem = 0;
 		if(nP == 1)
 		{
 			nElem = nB;
@@ -715,19 +730,24 @@ public:
 		else
 		{
 			nElem = nP;
-			nSubElem = (int)round(nB/nP);
+			nSubElem = (TI)round(nB/nP); //OC19032020
+			//nSubElem = (int)round(nB/nP);
 		}
 
-		PyObject *oResB = PyList_New(nElem);
+		//PyObject *oResB = PyList_New(nElem);
+		PyObject *oResB = PyList_New((Py_ssize_t)nElem); //OC19032020
 		T *t_arB = arB; //OC13092018
 		//double *t_arB = arB;
-		for(int i=0; i<nElem; i++)
+		//for(int i=0; i<nElem; i++)
+		for(TI i=0; i<nElem; i++) //OC19032020
 		{
 			PyObject *oElem = 0;
 			if(nSubElem > 1)
 			{
-				oElem = PyList_New(nSubElem);
-				for(int j=0; j<nSubElem; j++)
+				//oElem = PyList_New(nSubElem);
+				oElem = PyList_New((Py_ssize_t)nSubElem); //OC19032020
+				//for(int j=0; j<nSubElem; j++)
+				for(TI j=0; j<nSubElem; j++) //OC19032020
 				{
 					PyObject *oNum = Py_BuildValue(cType, *(t_arB++)); //OC13092018
 					//PyObject *oNum = Py_BuildValue("d", *(t_arB++));

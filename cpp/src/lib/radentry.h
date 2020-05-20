@@ -1057,10 +1057,15 @@ EXP int CALL RadUtiVer(double* d);
 /** initializes or finalizes the Message Passing Inteface (MPI) for parallel calculations and returns list of basic MPI process parameters (in the case of initialization): rank of a process and total number of processes.
 @param arPar [out] array of basic MPI parameters: rank of a process [0] and total number of processes [1]
 @param OnOrOff [in] string containing either "on" or "off"
+@param arData [in] array of data to be shared among different processes
+@param pnData [in/out] pointer to length of array of data to be shared among different processes (for processes receiving data this param will be set upon function return)
+@param pRankFrom [in/out] pointer to rank of process to take data (to be shered) from (the default value means take the from process with rank 0)
+@param rankTo [in/out] pointer to rank of process(es) to send the data to (the default value means sharing the data anomg all processes)
 @return integer error code (0 : no error, >0 : error number, <0 : warning number)
 @author O.C.
 */ 
-EXP int CALL RadUtiMPI(int* arPar, char* OnOrOff);
+EXP int CALL RadUtiMPI(int* arPar, char* OnOrOff, double* arData=0, long* pnData=0, long* pRankFrom=0, long* pRankTo=0); //OC19032020
+//EXP int CALL RadUtiMPI(int* arPar, char* OnOrOff);
 
 EXP int CALL RadUtiYeldFuncSet(int (*pExtFunc)());
 

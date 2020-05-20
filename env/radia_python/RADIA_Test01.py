@@ -9,10 +9,37 @@ import radia as rad
 import sys
 import time
 
+print('RADIA Version:', rad.UtiVer())
+
 print('RADIA Python Test Script 01')
 print('')
 
+prb = (10.0**-15)
+prcrd = (10.0**-14)
+fld_arg1 = 'PrcB->' + repr(prb)
+fld_arg2 = 'PrcCoord->' + repr(prcrd)
+fld_arg3 = fld_arg1+','+fld_arg2 
+rad.FldCmpPrc(fld_arg1)
+rad.FldCmpPrc(fld_arg2)
+rad.FldCmpPrc(fld_arg3)
+
+
+##help(rad.ObjRecMag)
+
 mag00 = rad.ObjRecMag([5,0,0], [5,8,10], [-0.5,1,0.7])
+
+#rad.ObjDrwOpenGL(mag00)
+
+#data = rad.ObjDrwVTK(mag00, 'Axes->False')
+##print(data)
+
+#print(data['polygons']['vertices'])
+
+#print(6*4*3)
+
+#print('Number of Polygon Vertex Coords:', len(data['polygons']['vertices']))
+
+
 
 mag01 = rad.ObjThckPgn(20, 10., [[-10,-10], [-12,5], [5,0], [7,-15]], 'x', [0,0,1])
 
@@ -38,13 +65,35 @@ mag10 = rad.ObjRaceTrk([0,0,0], [27,28], [1,2.5], 5, 15, 1.7, 'man', 'z')
 
 mag11 = rad.ObjFlmCur([[-10,-30,-10],[30,-30,-10],[30,25,25],[-30,25,25],[-30,-30,-10]], 10.2)
 
+magBkg = rad.ObjBckg([1,2,3])
+
 mag = rad.ObjCnt([mag00, mag01, mag02, mag03, mag04, mag05, mag06, mag07, mag08, mag09])
+print('Container Content:', rad.ObjCntStuf(mag))
+print('Container Size:', rad.ObjCntSize(mag))
+
 rad.ObjAddToCnt(mag, [mag10, mag11])
 cnt02 = rad.ObjCnt([mag00, mag])
 
-mat = rad.MatStd('NdFeB', 1.2)
+mat = rad.MatLin([1.01, 1.2], [0, 0, 1.3])
+#mat = rad.MatStd('NdFeB', 1.2)
 rad.MatApl(mag01, mat)
 print('Magn. Material index:', mat, ' appled to object:', mag01)
+
+mag00a = rad.ObjFullMag([10,0,40],[12,18,5],[0,0,1],[2,2,2],cnt02,mat,[0.5,0,0])
+
+rad.ObjDrwOpenGL(cnt02)
+
+data_cnt = rad.ObjDrwVTK(cnt02)
+print(data_cnt)
+
+
+objAfterCut = rad.ObjCutMag(mag00a,[10,0,40],[1,1,1]) #,'Frame->Lab')
+print('Indexes of objects after cutting:', objAfterCut)
+#rad.ObjDrwOpenGL(objAfterCut[0])
+
+print(rad.UtiDmp(mag01, 'asc'))
+print(rad.UtiDmp(mat, 'asc'))
+#print(rad.UtiDmp(107, 'asc'))
 
 magDpl = rad.ObjDpl(mag, 'FreeSym->False')
 
@@ -58,8 +107,14 @@ print('Indices of elements in the duplicated container:', rad.ObjCntStuf(magDpl)
 #rad.ObjDrwOpenGL(mag)
 #rad.ObjDrwOpenGL(magDpl)
 
-mag01sbd = rad.ObjDivMag(mag01, [[2,0.5],[3,0.2],[4,0.1]], 'pln', [[1,0.4,0.1],[0.4,1,0.2],[0,0,1]], 'Frame->Lab')
+#mag01sbd = rad.ObjDivMag(mag01, [[2,0.5],[3,0.2],[4,0.1]], 'pln', [[1,0.4,0.1],[0.4,1,0.2],[0,0,1]], 'Frame->Lab')
+
+#mag01sbd = rad.ObjDivMag(mag01, [[2,0.5],[3,0.2],[4,0.1]], 'Frame->Lab')
+#rad.ObjDrwOpenGL(mag01sbd)
+
 #mag01sbd = rad.ObjDivMagPln(mag01, [[2,0.5],[3,0.2],[4,0.1]], [1,0.4,0.1], [0.4,1,0.2], [0,0,1], 'Frame->Lab')
+mag01sbd = rad.ObjDivMagPln(mag01, [[2,0.5],[3,0.2],[4,0.1]])
+#rad.ObjDrwOpenGL(mag01sbd)
 
 #mag00sbd = rad.ObjDivMag(mag00, [[2,0.5],[3,0.2],[4,0.1]], 'cyl', [[2.5,4,0],[0,0,1],[8,0,0],3], 'Frame->Lab')
 #mag00sbd = rad.ObjDivMagCyl(mag00, [[2,0.5],[3,0.2],[4,0.1]], [2.5,4,0], [0,0,1], [8,0,0], 3, 'Frame->Lab')
@@ -81,12 +136,20 @@ rad.TrfOrnt(mag01, trf06)
 
 #rad.ObjDrwOpenGL(mag01)
 
+matNdFeB = rad.MatStd('NdFeB')
+M = rad.MatMvsH(matNdFeB, 'M', [0,0,0])
+print('NdFeB material index:', matNdFeB, ' Magnetization:', M)
+
+matLin01 = rad.MatLin([0.1,0.2],1.1)
+matLin02 = rad.MatLin([0.1,0.2],[0,0,1.1])
+print('Linear material indexes:', matLin01, matLin02)
+
 dmp = rad.UtiDmp([mag01, trf02], 'bin')
 #print(dmp)
 
 elemsRest = rad.UtiDmpPrs(dmp)
 print('Indexes of restored elements:', elemsRest)
-rad.ObjDrwOpenGL(elemsRest[0])
+#rad.ObjDrwOpenGL(elemsRest[0])
 
 print(rad.UtiDmp(elemsRest[0], 'asc'))
 print(rad.UtiDmp(elemsRest[1], 'asc'))

@@ -745,7 +745,8 @@ void radTApplication::ComputeFocusKickPer(int ElemKey, double* P1, double* Nlong
 			for(long k=0; k<np1; k++) *(tAuxFlatArr++) = *(tCoordDir1++);
 			for(long m=0; m<np2; m++) *(tAuxFlatArr++) = *(tCoordDir2++);
 
-			*tAuxFlatArr += strlen(pStrReport);
+			*tAuxFlatArr = strlen(pStrReport); //OC19052020
+			//*tAuxFlatArr += strlen(pStrReport);
 
 			Send.DoubleList(pAuxFlatArr, LenArr);
 			

@@ -140,7 +140,10 @@ def uti_plot1d_m(ars, labels=('X', 'Y'), units=None, styles=None, legend=None): 
 def uti_plot2d(ar2d, x_range, y_range, labels=('Horizontal Position [m]','Vertical Position [m]'), units=None):
     """Generate quad mesh plot from given "flattened" array
 
-    :param array ar2d: data points
+    :param array ar2d: data points, assuming: ar2d = [curve_1,curve_2,...], where curve_i can be:
+                    curve_i = [[y1_i,y2_i,...],[x_min_i,x_max_i,nx_i]] or
+                    curve_i = [[y1_i,y2_i,...],[x1_i,x2_i,...]] or
+                    curve_i = [[x1_i,y1_i],[x2_i,y2_i],...] 
     :param list x_range: Passed to numpy.linspace(start sequence, stop sequnce, num samples)
     :param list y_range: y axis (same structure as x_range)
     :param tuple labels: [x-axis, y-axis]

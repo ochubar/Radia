@@ -7,7 +7,7 @@
 from __future__ import print_function #Python 2.7 compatibility
 import radia as rad
 
-help(rad.ObjRecMag)
+##help(rad.ObjRecMag)
 ##help(rad.ObjThckPgn)
 ##help(rad.ObjPolyhdr)
 ##help(rad.ObjMltExtPgn)
@@ -74,7 +74,7 @@ help(rad.ObjRecMag)
 ##help(rad.FldFrc)
 ##help(rad.FldFrcShpRtg)
 ##help(rad.FldFocPot)
-##help(rad.FldFocKickPer)
+help(rad.FldFocKickPer)
 ##help(rad.FldCmpCrt)
 ##help(rad.FldCmpPrc)
 ##help(rad.FldUnits)

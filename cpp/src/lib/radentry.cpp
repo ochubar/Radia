@@ -123,7 +123,8 @@ void DumpElemOpt( int*, int, const char* );
 void DumpElemParseOpt( const unsigned char*, int );
 void GenDump();
 
-void ProcMPI( const char* );
+void ProcMPI( const char*, double*, long*, long*, long*);
+//void ProcMPI( const char* );
 }
 
 //-------------------------------------------------------------------------
@@ -1601,15 +1602,21 @@ int CALL RadUtiVer(double* d)
 
 //-------------------------------------------------------------------------
 
-int CALL RadUtiMPI(int* arPar, char* sOnOff)
+int CALL RadUtiMPI(int* arPar, char* sOnOff, double* arData, long* pnData, long* pRankFrom, long* pRankTo) //OC19032020
+//int CALL RadUtiMPI(int* arPar, char* sOnOff)
 {
-	ProcMPI(sOnOff);
+	ProcMPI(sOnOff, arData, pnData, pRankFrom, pRankTo); //OC19032020
+	//ProcMPI(sOnOff);
 
 	int ErrStat = ioBuffer.OutErrorStatus();
 	if(ErrStat > 0) return ErrStat;
 
-	int arDims[20], nDims=0;
-	ioBuffer.OutMultiDimArrayOfInt(arPar, arDims, nDims);
+	//Should we distinguish cases what to extract?
+	if((strcmp(sOnOff, "on") == 0) || (strcmp(sOnOff, "On") == 0) || (strcmp(sOnOff, "ON") == 0) || (strcmp(sOnOff, "off") == 0) || (strcmp(sOnOff, "Off") == 0) || (strcmp(sOnOff, "OFF") == 0))
+	{
+		int arDims[20], nDims=0;
+		ioBuffer.OutMultiDimArrayOfInt(arPar, arDims, nDims);
+	}//In other cases, there will be separate extraction after this
 
 	return ErrStat;
 }
