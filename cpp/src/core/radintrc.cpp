@@ -502,6 +502,10 @@ int radTInteraction::SetupInteractMatrix() //OC26122019
 
 	if(m_nProcMPI < 2) //OC01012020
 	{
+		//DEBUG
+		//long iCntBcomp = 0;
+		//END DEBUG
+
 		for(int ColNo=0; ColNo<AmOfMainElem; ColNo++)
 		{
 			FillInTransPtrVectForElem(ColNo, 'I');
@@ -525,6 +529,10 @@ int radTInteraction::SetupInteractMatrix() //OC26122019
 					BufSubMatrix.Str1 = Field.H;
 					BufSubMatrix.Str2 = Field.A;
 
+					//DEBUG
+					//iCntBcomp++;
+					//END DEBUG
+
 					TransPtrVect[i]->TrMatrix(BufSubMatrix);
 					SubMatrix += BufSubMatrix;
 				}
@@ -533,6 +541,13 @@ int radTInteraction::SetupInteractMatrix() //OC26122019
 			}
 			EmptyTransPtrVect();
 		}
+
+		//DEBUG
+		//long long nTotMatrElem = ((long long)AmOfMainElem)*((long long)AmOfMainElem);
+		//std::cout << "rank=" << m_rankMPI << ": iCntBcomp= " << iCntBcomp << "; nTotMatrElem=" << nTotMatrElem; //DEBUG
+		//std::cout.flush();
+		//END DEBUG
+
 		//--New
 		for(int ClNo=0; ClNo<AmOfMainElem; ClNo++)
 		{
@@ -544,6 +559,11 @@ int radTInteraction::SetupInteractMatrix() //OC26122019
 #ifdef _WITH_MPI
 	else
 	{
+		//DEBUG
+		//std::cout << "rank=" << m_rankMPI << ": Hello";
+		//std::cout.flush(); 
+		//END DEBUG
+
 		vector<pair<long long, long long> > vPacketElemStartEnd;
 		int nProc_mi_1 = m_nProcMPI - 1;
 		const long long switchAmOfElem = 1000; //threshold to switch between different data packaging for sending via MPI
@@ -648,6 +668,12 @@ int radTInteraction::SetupInteractMatrix() //OC26122019
 				arBufElem = new float[nBufElem*9 + 8]; //the first 8 float values encode long long iStart, iEnd, all other values - elements of interaction matrix
 				if(arBufElem == 0) { Send.ErrorMessage("Radia::Error900"); return 0;}
 
+				//DEBUG
+				//long iCntBcomp = 0;
+				//std::cout << "rank=" << m_rankMPI << ": nPackets=" << nPackets; //DEBUG
+				//std::cout.flush(); //DEBUG
+				//END DEBUG
+
 				for(ii=0; ii<nPackets; ii++)
 				{
 					pair<long long, long long> &pairStartEnd = vPacketElemStartEnd[ii];
@@ -709,6 +735,9 @@ int radTInteraction::SetupInteractMatrix() //OC26122019
 								BufSubMatrix.Str1 = Field.H;
 								BufSubMatrix.Str2 = Field.A;
 
+								//DEBUG
+								//iCntBcomp++;
+
 								TransPtrVect[i]->TrMatrix(BufSubMatrix);
 								SubMatrix += BufSubMatrix;
 							}
@@ -730,6 +759,12 @@ int radTInteraction::SetupInteractMatrix() //OC26122019
 					//std::cout.flush(); //DEBUG
 				}
 				if(arBufElem != 0) delete[] arBufElem;
+
+				//DEBUG
+				//long long nTotMatrElem = ((long long)AmOfMainElem)*((long long)AmOfMainElem);
+				//std::cout << "rank=" << m_rankMPI << ": iCntBcomp= " << iCntBcomp << "; nTotMatrElem=" << nTotMatrElem; //DEBUG
+				//std::cout.flush(); 
+				//END DEBUG
 			}
 		}
 		else if((nPacketsTot > 0) && (nMaxMatrElemInPacket > 0))

@@ -179,7 +179,7 @@ Creates a uniformly magnetized volume obtained by rotation of a planar convex po
 The slices are assumed to be convex planar polygons parallel to the XY plane.
 @param n [out] reference number of the object created
 @param FlatVert [in] flat array of x and y coordinates (x11, y11, x12, y12,..., x21, y21, x22, y22,...) of vertex points of the slices (planar polygons)
-@param SlicesLen [in] array of integer numbers equal to the numbers of vertex points in each slice; the order of the slices is the same as in the FlatVert array (the length of the FlatVert array is twice the sum of elements of the SlicesLen array) 
+@param SlicesLen [in] array of integer numbers specifying numbers of vertex points in each slice; the order of the slices is the same as in the FlatVert array (the length of the FlatVert array is twice the sum of elements of the SlicesLen array) 
 @param Attitudes [in] array of vertical coordinates (or attitudes) of the slices, in the ascending order (which is the same as for the SlicesLen array)
 @param ns [in] number of slices (or the length of the Attitudes and SlicesLen arrays)
 @param M [in] array of 3 cartesian coordinates of the magnetization vector inside the whole block
@@ -295,6 +295,21 @@ The line conductor is defined by sequence of points in 3D space.
 @author O.C.
 */ 
 EXP int CALL RadObjFlmCur(int* n, double* FlatPts, int np, double i);
+
+/** Attempts to create a set of current-carrying convex polyhedron objects by applying a generalized extrusion to the initial planar convex polygon.
+@param n [out] reference number of the object created
+@param FlatVert [in] flat array of x and y coordinates (x1, y1, x2, y2,...) of vertex points of the base planar polygon
+@param nv [in] number of vertex points of the 2D polygon (the length of the FlatVert array is 2*nv)
+
+@param SlicesLen [in] array of integer numbers equal to the numbers of vertex points in each slice; the order of the slices is the same as in the FlatVert array (the length of the FlatVert array is twice the sum of elements of the SlicesLen array)
+@param Attitudes [in] array of vertical coordinates (or attitudes) of the slices, in the ascending order (which is the same as for the SlicesLen array)
+@param ns [in] number of slices (or the length of the Attitudes and SlicesLen arrays)
+@param M [in] array of 3 cartesian coordinates of the magnetization vector inside the whole block
+@return integer error code (0 : no error, >0 : error number, <0 : warning number)
+@author O.C.
+*/
+//EXP int CALL RadObjMltExtPgnCur(int* n, double* FlatVert, int nv, 
+//	double* FlatVert, int* SlicesLen, double* Attitudes, int ns, double* M,      double z, char a, double i, char* opt);
 
 /** Scales current (density) in a 3D object by multiplying it by a constant.
 @param n [out] reference number of the object with current (density) to be scaled

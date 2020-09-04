@@ -2315,7 +2315,8 @@ int radTApplication::ApplySymmetry(int g3dElemKey, int TransElemKey, int Multipl
 
 //-------------------------------------------------------------------------
 
-int radTApplication::ProcMPI(const char* OnOrOff, double* arData, long* pnData, long* pRankFrom, long* pRankTo) //OC19032020
+int radTApplication::ProcMPI(const char* sCommand, double* arData, long* pnData, long* pRankFrom, long* pRankTo) //OC29082020
+//int radTApplication::ProcMPI(const char* OnOrOff, double* arData, long* pnData, long* pRankFrom, long* pRankTo) //OC19032020
 //int radTApplication::ProcMPI(const char* OnOrOff)
 {
 	//int arParMPI[] = {-1,0};
@@ -2324,10 +2325,15 @@ int radTApplication::ProcMPI(const char* OnOrOff, double* arData, long* pnData, 
 
 	bool SwitchOn = false;
 	bool Share = false;
+	bool Barrier = false; //OC29082020
 	//char SwitchOn;
-	if((!strcmp(OnOrOff, "on")) || (!strcmp(OnOrOff, "On")) || (!strcmp(OnOrOff, "ON"))) SwitchOn = true; //1;
-	else if((!strcmp(OnOrOff, "off")) || (!strcmp(OnOrOff, "Off")) || (!strcmp(OnOrOff, "OFF"))) SwitchOn = false; //0;
-	else if((!strcmp(OnOrOff, "share")) || (!strcmp(OnOrOff, "Share")) || (!strcmp(OnOrOff, "SHARE"))) Share = true; //OC19032020
+	if((!strcmp(sCommand, "on")) || (!strcmp(sCommand, "On")) || (!strcmp(sCommand, "ON"))) SwitchOn = true; //1;
+	else if((!strcmp(sCommand, "off")) || (!strcmp(sCommand, "Off")) || (!strcmp(sCommand, "OFF"))) SwitchOn = false; //0;
+	else if((!strcmp(sCommand, "share")) || (!strcmp(sCommand, "Share")) || (!strcmp(sCommand, "SHARE"))) Share = true; //OC19032020
+	else if((!strcmp(sCommand, "barrier")) || (!strcmp(sCommand, "Barrier")) || (!strcmp(sCommand, "BARRIER"))) Barrier = true; //OC29082020
+	//if((!strcmp(OnOrOff, "on")) || (!strcmp(OnOrOff, "On")) || (!strcmp(OnOrOff, "ON"))) SwitchOn = true; //1;
+	//else if((!strcmp(OnOrOff, "off")) || (!strcmp(OnOrOff, "Off")) || (!strcmp(OnOrOff, "OFF"))) SwitchOn = false; //0;
+	//else if((!strcmp(OnOrOff, "share")) || (!strcmp(OnOrOff, "Share")) || (!strcmp(OnOrOff, "SHARE"))) Share = true; //OC19032020
 	else { Send.ErrorMessage("Radia::Error043"); return 0; }
 
 	if(Share) //OC19032020
@@ -2426,14 +2432,16 @@ int radTApplication::ProcMPI(const char* OnOrOff, double* arData, long* pnData, 
 				Send.MultiDimArrayOfDouble(arDataLoc, Dims, 1); //Do this for all ranks, even if for m_rankMPI == rankFrom and m_rankMPI != rankTo this is not necessary
 
 				if(m_rankMPI != rankFrom) delete[] arDataLoc;
-
-
 			}
-
 		}
-
 		//if(MPI_Bcast(arMagnVals, (int)nValsToSend, MPI_FLOAT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); if(arMagnVals != 0) delete[] arMagnVals; return 0; }
-
+	}
+	else if(Barrier) //OC29082020
+	{
+		if((m_nProcMPI > 0) && (m_rankMPI >= 0))
+		{
+			if(MPI_Barrier(MPI_COMM_WORLD) != MPI_SUCCESS) Send.ErrorMessage("Radia::Error601");
+		}
 	}
 	else
 	{

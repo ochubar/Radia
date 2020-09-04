@@ -32,6 +32,7 @@ ML_INCLUDE=	-I$(ML_ORIG_DIR) -I$(RAD_SRC_ML_DIR)
 #MLLIBDIR=	$(ML_ORIG_DIR)
 #MLMPREP=	$(ML_ORIG_DIR)/mprep
 
+#CC  = gcc
 CC  = cc
 #CC  = mpicxx
 CXX = c++

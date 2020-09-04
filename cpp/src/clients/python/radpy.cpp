@@ -1492,7 +1492,8 @@ static PyObject* ParseGeomDataDrwVTK(double* arCrdV, int nV, int* arLenP, float*
 
 	for(Py_ssize_t i = PyList_Size(colors); --i >= 0;) 
 	{
-		PyObject *o = PyLong_FromDouble(arColP[i]); //why colors are float at input if they are casted to long here?
+		PyObject *o = PyFloat_FromDouble(arColP[i]); //OC04062020 (from Dan Abell) //why colors are float at input if they are casted to long here?
+		//PyObject *o = PyLong_FromDouble(arColP[i]); //why colors are float at input if they are casted to long here?
 		if(o == NULL || PyList_SetItem(colors, i, o) < 0) throw strEr_MAF;
 	}
 
