@@ -2324,10 +2324,15 @@ int radTApplication::ProcMPI(const char* sCommand, double* arData, long* pnData,
 #ifdef _WITH_MPI
 
 	bool SwitchOn = false;
+	bool DoInit = true; //OC19122020
 	bool Share = false;
 	bool Barrier = false; //OC29082020
 	//char SwitchOn;
 	if((!strcmp(sCommand, "on")) || (!strcmp(sCommand, "On")) || (!strcmp(sCommand, "ON"))) SwitchOn = true; //1;
+	else if((!strcmp(sCommand, "in")) || (!strcmp(sCommand, "In")) || (!strcmp(sCommand, "IN"))) //OC19122020
+	{
+		SwitchOn = true; DoInit = false;
+	}
 	else if((!strcmp(sCommand, "off")) || (!strcmp(sCommand, "Off")) || (!strcmp(sCommand, "OFF"))) SwitchOn = false; //0;
 	else if((!strcmp(sCommand, "share")) || (!strcmp(sCommand, "Share")) || (!strcmp(sCommand, "SHARE"))) Share = true; //OC19032020
 	else if((!strcmp(sCommand, "barrier")) || (!strcmp(sCommand, "Barrier")) || (!strcmp(sCommand, "BARRIER"))) Barrier = true; //OC29082020
@@ -2448,10 +2453,15 @@ int radTApplication::ProcMPI(const char* sCommand, double* arData, long* pnData,
 		int arParMPI[] = {-1,0};
 		if(SwitchOn)
 		{
-			if(MPI_Init(NULL, NULL) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0; } // Initialize the MPI environment
-			if(MPI_Comm_size(MPI_COMM_WORLD, &m_nProcMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0; } // Get the number of processes
-			if(MPI_Comm_rank(MPI_COMM_WORLD, &m_rankMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0; } // Get the rank of the process
+			if(DoInit) //19122020
+				if(MPI_Init(NULL, NULL) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0;} // Initialize the MPI environment
+
+			if(MPI_Comm_size(MPI_COMM_WORLD, &m_nProcMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0;} // Get the number of processes
+			if(MPI_Comm_rank(MPI_COMM_WORLD, &m_rankMPI) != MPI_SUCCESS) { Send.ErrorMessage("Radia::Error601"); return 0;} // Get the rank of the process
 			arParMPI[0] = m_rankMPI; arParMPI[1] = m_nProcMPI;
+
+			//std::cout << "rank=" << m_rankMPI << " num. proc.:" << m_nProcMPI << " recovered\n"; //DEBUG
+			//std::cout.flush(); //DEBUG
 
 			//MPI_Init(NULL, NULL); // Initialize the MPI environment
 			//MPI_Comm_size(MPI_COMM_WORLD, arParMPI + 1); // Get the number of processes

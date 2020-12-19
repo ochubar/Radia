@@ -1612,7 +1612,10 @@ int CALL RadUtiMPI(int* arPar, char* sOnOff, double* arData, long* pnData, long*
 	if(ErrStat > 0) return ErrStat;
 
 	//Should we distinguish cases what to extract?
-	if((strcmp(sOnOff, "on") == 0) || (strcmp(sOnOff, "On") == 0) || (strcmp(sOnOff, "ON") == 0) || (strcmp(sOnOff, "off") == 0) || (strcmp(sOnOff, "Off") == 0) || (strcmp(sOnOff, "OFF") == 0))
+	//if((strcmp(sOnOff, "on") == 0) || (strcmp(sOnOff, "On") == 0) || (strcmp(sOnOff, "ON") == 0) || (strcmp(sOnOff, "off") == 0) || (strcmp(sOnOff, "Off") == 0) || (strcmp(sOnOff, "OFF") == 0))
+	if((strcmp(sOnOff, "on") == 0) || (strcmp(sOnOff, "On") == 0) || (strcmp(sOnOff, "ON") == 0) ||
+	   (strcmp(sOnOff, "in") == 0) || (strcmp(sOnOff, "In") == 0) || (strcmp(sOnOff, "IN") == 0) ||
+	   (strcmp(sOnOff, "off") == 0) || (strcmp(sOnOff, "Off") == 0) || (strcmp(sOnOff, "OFF") == 0))
 	{
 		int arDims[20], nDims=0;
 		ioBuffer.OutMultiDimArrayOfInt(arPar, arDims, nDims);

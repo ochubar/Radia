@@ -3202,10 +3202,8 @@ static PyObject* radia_UtiMPI(PyObject* self, PyObject* args)
 		if(oOnOff == 0) throw CombErStr(strEr_BadFuncArg, ": UtiMPI");
 
 		char sOnOff[256]; *sOnOff = '\0';
-		CPyParse::CopyPyStringToC(oOnOff, sOnOff, 255);
-
 		long nData = 0; //OC19032020
-		//int nData = 0; //OC19032020
+		CPyParse::CopyPyStringToC(oOnOff, sOnOff, 255);
 		if(oData != 0)
 		{
 			if((strcmp(sOnOff, "share") == 0) || (strcmp(sOnOff, "Share") == 0) || (strcmp(sOnOff, "SHARE") == 0))
