@@ -98,7 +98,7 @@ if __name__=="__main__":
     #Uncomment the following line to use it:
     #rank = rad.UtiMPI('on')
 
-    #The second method uses mpi4py. It mimiks the initialization and the usage of MPI from Python script.
+    #The second method uses mpi4py. It mimics the initialization and the usage of MPI from Python script.
     #Uncomment the following 4 lines to use it:
     from mpi4py import MPI
     comMPI = MPI.COMM_WORLD
