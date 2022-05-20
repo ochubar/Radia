@@ -5,8 +5,8 @@
 # - `make fftw` - will compile FFTW only;
 # - `make` - will compile C++ core and Python lib;
 # - `make clean` - will clean temporary files.
-#
-# Updated by Maksim Rakitin (NSLS-II, BNL) on May 2, 2016.
+# - `make install` - will compile FFTW, C++ core and Python lib and install Python package;
+# - `make uninstall` - will clean temporary files and uninstall Python package
 
 root_dir = $(realpath .)
 env_dir = $(root_dir)/env
@@ -44,7 +44,7 @@ fftw:
 	cd $(root_dir); \
 	rm -rf $(ext_dir)/$(fftw_dir);
 
-core: 
+core:
 	#cd $(gcc_dir); make -j8 clean lib
 	cd $(gcc_dir); make clean lib
 
@@ -56,4 +56,10 @@ clean:
 	rm -rf $(ext_dir)/$(fftw_dir)/py/build/;
 	if [ -d $(root_dir)/.git ]; then rm -f $(examples_dir)/radia*.so && (git checkout $(examples_dir)/radia*.so 2>/dev/null || :); fi;
 
-.PHONY: all clean core fftw nofftw pylib
+install: clean fftw core
+	cd $(py_dir); make install
+
+uninstall: clean
+	cd $(py_dir); make uninstall
+
+.PHONY: all clean core fftw nofftw pylib install uninstall
