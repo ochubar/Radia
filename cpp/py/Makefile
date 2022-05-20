@@ -23,7 +23,7 @@ clean:
 	rm -f ../../env/radia_python/radia*.so
 
 install: uninstall python
-	$(PREFIX) $(PIP) install ./
+	$(PREFIX) $(PYTHON) setup.py install
 	$(PREFIX) git clean -fdX
 
 uninstall:
