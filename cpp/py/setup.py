@@ -39,6 +39,8 @@ if 'MODE' in os.environ:
     else:
         raise Exception("Unknown Radia compilation/linking option")
 
+res = os.popen('g++ --print-sysroot').read().split()[0]
+ext_kwargs['extra_link_args'] = ['-Wl,--sysroot='+res, ]
 radia = Extension('radia', **ext_kwargs)
 
 setup(name='Radia Python Interface',
