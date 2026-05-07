@@ -1,0 +1,228 @@
+# Radia Makefile.mac for Mac arm64 with fftw2
+#
+# 1. put fftw-2.1.5-mac.tar.gz in ext_lib
+# 2. cd cpp/gcc
+# 3. make -f Makefile_mac
+#
+# The Radia.exe will be generated. follow the direction in env/radia_math/ReadMe.txt, or the following two steps:
+#
+# 4. replace env/radia_math/Radia/Radia.exe with the above generated one
+# 5. rsync -av env/radia_math/Radia/ /Applications/Mathematica.app/Contents/AddOns/Applications/Radia/
+# 
+# Updated by E. Wallen (ALS, LBNL) in April 2026
+# Updated by A. He (NSLS-II, BNL) with contribution from H. Goel in May 2026
+# -------------------------------------------------------
+
+RAD_CPP_DIR         = ..
+RAD_SRC_DIR         = $(RAD_CPP_DIR)/src
+RAD_SRC_CORE_DIR    = $(RAD_SRC_DIR)/core
+RAD_SRC_TRI_DIR     = $(RAD_SRC_DIR)/ext/triangle
+SH_SRC_PARSE_DIR    = $(RAD_SRC_DIR)/ext/auxparse
+SH_SRC_GEN_MATH_DIR = $(RAD_SRC_DIR)/ext/genmath
+RAD_SRC_ML_DIR      = $(RAD_SRC_DIR)/clients/mathlink
+RAD_SRC_LIB_DIR     = $(RAD_SRC_DIR)/lib
+LIB_DIR             = $(RAD_CPP_DIR)/ext_lib
+
+MATHVERSION = 14.0
+SYS         = MacOSX-ARM64
+
+#ML_ORIG_DIR   = $(RAD_CPP_DIR)/ext_lib/mathlink/include
+ML_ORIG_DIR    = /Applications/Mathematica.app/Contents/SystemFiles/Links/MathLink/DeveloperKit/MacOSX-ARM64/CompilerAdditions/ 
+ML_ORIG_LIBDIR = $(ML_ORIG_DIR)
+MMA_LIB_DIR    = $(RAD_CPP_DIR)/ext_lib/mathlink
+MLMPREP        = $(ML_ORIG_DIR)/mprep
+
+ML_INCLUDE  = -I$(ML_ORIG_DIR) -I$(RAD_SRC_ML_DIR)
+SH_INCLUDE  = -I$(SH_SRC_GEN_MATH_DIR) -I$(SH_SRC_PARSE_DIR)
+
+CC  = cc
+CXX = g++
+
+RAD_SRC_DEF = -D__GCC__ -DFFTW_ENABLE_FLOAT -DNO_TIMER -DANSI_DECLARATORS -DTRILIBRARY -D_GM_WITHOUT_BASE
+
+FFTW_DIR      = $(LIB_DIR)/
+FFTW_TARBALL  = $(RAD_CPP_DIR)/../ext_lib/fftw-2.1.5-mac.tar.gz
+FFTW_VERSION  = fftw-2.1.5
+FFTW_INCLUDE  = -I$(FFTW_DIR)/include
+FFTW_TMP_BUILD = /tmp/fftw_build
+FFTW_TMP_INST  = /tmp/fftw_inst
+
+# -------------------------------------------------------
+# LIBCFLAGS: for building the static library (Radia.a)
+# No __MATHEMATICA__, uses ALPHA__LIB__
+# -------------------------------------------------------
+LIBCFLAGS = -arch arm64 -O3 -fPIC \
+            -I$(FFTW_INCLUDE) \
+            -I$(RAD_SRC_CORE_DIR) \
+            -I$(RAD_SRC_LIB_DIR) \
+            -I$(SH_SRC_PARSE_DIR) \
+            -I$(SH_SRC_GEN_MATH_DIR) \
+            -I$(RAD_SRC_TRI_DIR) \
+            $(RAD_SRC_DEF) -DALPHA__LIB__ -Wno-narrowing
+
+# -------------------------------------------------------
+# PGMCFLAGS: for building the MathLink executable (Radia.exe)
+# Uses __MATHEMATICA__, no ALPHA__LIB__
+# -------------------------------------------------------
+PGMCFLAGS = -arch arm64 -O3 -fPIC \
+            -D__MATHEMATICA__ \
+            -I$(ML_ORIG_DIR) \
+            -I$(RAD_SRC_ML_DIR) \
+            -I$(FFTW_INCLUDE) \
+            -I$(RAD_SRC_CORE_DIR) \
+            -I$(RAD_SRC_LIB_DIR) \
+            -I$(SH_SRC_PARSE_DIR) \
+            -I$(SH_SRC_GEN_MATH_DIR) \
+            -I$(RAD_SRC_TRI_DIR) \
+            $(RAD_SRC_DEF) -Wno-narrowing
+
+LIB_MATH = -L$(ML_ORIG_DIR) -L$(ML_ORIG_LIBDIR) -lMLi4 \
+           -L$(FFTW_DIR)/lib -lfftw -lm -lpthread \
+           -framework Foundation -framework CoreFoundation \
+           -lc++
+
+LDFLAGS = -L$(FFTW_DIR)/lib -lm -lfftw -lpthread
+
+# -------------------------------------------------------
+# Object files for the library
+# -------------------------------------------------------
+OBJ = radapl1.o radapl2.o radapl3.o radapl4.o radapl5.o radapl6.o radapl7.o \
+      radarccu.o radcast.o radexpgn.o radflm.o radg3d.o radg3dgr.o radgroup.o \
+      radinter.o radintrc.o radiobuf.o radmamet.o radmater.o radplnr1.o radplnr2.o \
+      radptrj.o radrec.o radrlmet.o radsbdac.o radsbdep.o radsbdrc.o radsbdvp.o \
+      radsend.o radvlpgn.o gmtrans.o gmfft.o triangle.o auxparse.o
+
+OBJ_LIB = radentry.o $(OBJ)
+
+# -------------------------------------------------------
+# Object files for the executable (compiled with PGMCFLAGS)
+# -------------------------------------------------------
+OBJ_PGM = radapl1_pgm.o radapl2_pgm.o radapl3_pgm.o radapl4_pgm.o \
+          radapl5_pgm.o radapl6_pgm.o radapl7_pgm.o \
+          radarccu_pgm.o radcast_pgm.o radexpgn_pgm.o radflm_pgm.o \
+          radg3d_pgm.o radg3dgr_pgm.o radgroup_pgm.o \
+          radinter_pgm.o radintrc_pgm.o radiobuf_pgm.o \
+          radmamet_pgm.o radmater_pgm.o radplnr1_pgm.o radplnr2_pgm.o \
+          radptrj_pgm.o radrec_pgm.o radrlmet_pgm.o \
+          radsbdac_pgm.o radsbdep_pgm.o radsbdrc_pgm.o radsbdvp_pgm.o \
+          radsend_pgm.o radvlpgn_pgm.o gmtrans_pgm.o gmfft_pgm.o \
+          triangle_pgm.o auxparse_pgm.o radentry_pgm.o
+
+PRG_LIB  = Radia.a
+PRG_MATH = Radia.exe
+
+# -------------------------------------------------------
+# Default target
+# -------------------------------------------------------
+.PHONY: all clean clean_obj fftw
+
+all: fftw lib pgm clean_obj
+
+# -------------------------------------------------------
+# Build FFTW from source (single-precision float)
+# -------------------------------------------------------
+fftw: $(FFTW_DIR)/lib/libfftw.a
+
+$(FFTW_DIR)/lib/libfftw.a:
+	rm -rf $(FFTW_TMP_BUILD) $(FFTW_TMP_INST)
+	mkdir -p $(FFTW_TMP_BUILD)
+	tar xzf $(abspath $(FFTW_DIR)/$(FFTW_TARBALL)) -C $(FFTW_TMP_BUILD)
+	mkdir -p $(FFTW_TMP_BUILD)/build
+	cd $(FFTW_TMP_BUILD)/build && \
+	    ../$(FFTW_VERSION)/configure \
+	        --enable-float \
+	        --enable-static \
+	        --disable-shared \
+	        --disable-fortran \
+	        --disable-dependency-tracking \
+	        --enable-neon \
+	        CC="cc -arch arm64" \
+	        --prefix=$(FFTW_TMP_INST) && \
+	    make && \
+	    make install
+	mkdir -p $(FFTW_DIR)/lib $(FFTW_DIR)/include
+	cp $(FFTW_TMP_INST)/lib/libfftw.a $(FFTW_DIR)/lib/
+	cp $(FFTW_TMP_INST)/include/fftw.h $(FFTW_DIR)/include/
+	# rm -rf $(FFTW_TMP_BUILD) $(FFTW_TMP_INST)
+
+# -------------------------------------------------------
+# Build static archive (Radia.a)
+# -------------------------------------------------------
+lib: $(OBJ_LIB)
+	ar -cvq $(PRG_LIB) $(OBJ_LIB)
+
+# -------------------------------------------------------
+# Build executable (Radia.exe)
+# -------------------------------------------------------
+mlmain.o:
+	echo 'extern int MLMain(int,char**); int main(int argc,char**argv){return MLMain(argc,argv);}' > mlmain.c
+	$(CC) -arch arm64 -c mlmain.c -o mlmain.o
+
+radiatm.o: $(RAD_SRC_ML_DIR)/radiatm.c
+	$(CC) $(PGMCFLAGS) $(ML_INCLUDE) -c $(RAD_SRC_ML_DIR)/radiatm.c -o radiatm.o
+
+pgm: $(OBJ_PGM) radiatm.o mlmain.o
+	$(CXX) -arch arm64 $(ML_INCLUDE) \
+		radiatm.o $(OBJ_PGM) \
+		$(LIB_MATH) \
+		-o $(PRG_MATH)
+	chmod +x $(PRG_MATH)
+
+# -------------------------------------------------------
+# Compile rules for LIBRARY objects (LIBCFLAGS)
+# -------------------------------------------------------
+radentry.o: $(RAD_SRC_LIB_DIR)/radentry.cpp
+	$(CXX) $(LIBCFLAGS) -c $< -o $@
+
+%.o: $(RAD_SRC_LIB_DIR)/%.cpp
+	$(CXX) $(LIBCFLAGS) -c $< -o $@
+
+%.o: $(RAD_SRC_CORE_DIR)/%.cpp
+	$(CXX) $(LIBCFLAGS) -c $< -o $@
+
+triangle.o: $(RAD_SRC_TRI_DIR)/triangle.c
+	$(CC) -arch arm64 $(LIBCFLAGS) -c $(RAD_SRC_TRI_DIR)/triangle.c -O $(RAD_SRC_DEF) -I$(RAD_SRC_TRI_DIR) -o $@
+
+%.o: $(SH_SRC_PARSE_DIR)/%.cpp
+	$(CXX) $(LIBCFLAGS) -c $< -o $@
+
+%.o: $(SH_SRC_GEN_MATH_DIR)/%.cpp
+	$(CXX) $(LIBCFLAGS) -c $< -o $@
+
+# -------------------------------------------------------
+# Compile rules for EXECUTABLE objects (PGMCFLAGS)
+# -------------------------------------------------------
+radentry_pgm.o: $(RAD_SRC_LIB_DIR)/radentry.cpp
+	$(CXX) $(PGMCFLAGS) -c $< -o $@
+
+%_pgm.o: $(RAD_SRC_LIB_DIR)/%.cpp
+	$(CXX) $(PGMCFLAGS) -c $< -o $@
+
+%_pgm.o: $(RAD_SRC_CORE_DIR)/%.cpp
+	$(CXX) $(PGMCFLAGS) -c $< -o $@
+
+triangle_pgm.o: $(RAD_SRC_TRI_DIR)/triangle.c
+	$(CC) -arch arm64 $(PGMCFLAGS) -c $(RAD_SRC_TRI_DIR)/triangle.c -O $(RAD_SRC_DEF) -I$(RAD_SRC_TRI_DIR) -o $@
+
+%_pgm.o: $(SH_SRC_PARSE_DIR)/%.cpp
+	$(CXX) $(PGMCFLAGS) -c $< -o $@
+
+%_pgm.o: $(SH_SRC_GEN_MATH_DIR)/%.cpp
+	$(CXX) $(PGMCFLAGS) -c $< -o $@
+
+# -------------------------------------------------------
+# Regenerate MathLink template (only if radia.tm changes)
+# -------------------------------------------------------
+$(RAD_SRC_ML_DIR)/radiatm.c: $(RAD_SRC_ML_DIR)/radia.tm
+	$(MLMPREP) $(RAD_SRC_ML_DIR)/radia.tm -o $(RAD_SRC_ML_DIR)/radiatm.c
+
+# -------------------------------------------------------
+# Cleanup
+# -------------------------------------------------------
+clean_obj:
+	rm -f *.o
+
+clean:
+	rm -f *.o *.so *.a $(PRG_LIB) $(PRG_MATH) mlmain.c
+	rm -rf $(FFTW_DIR)/lib $(FFTW_DIR)/include \
+	       $(FFTW_TMP_BUILD) $(FFTW_TMP_INST)

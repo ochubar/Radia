@@ -38,5 +38,6 @@ Oleg CHUBAR  (chubar@bnl.gov)
 Joel CHAVANNE  (chavanne@esrf.fr)
 
 Dean Hidas (dhidas@bnl.gov) assisted in porting Radia to Mathematica 10 and compilation on Linux and MacOSX.
+Erik Wallen (ejwallen@lbl.gov) adapted Radia for Mathematica to mac silicon arm64 architecture in April 2026.
 
-April 2016
+May 2026
