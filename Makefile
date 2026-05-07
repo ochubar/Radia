@@ -56,8 +56,7 @@ python:
 # Backward-compatible alias
 pylib: python
 
-math:
-	cd $(gcc_dir); make clean lib
+math: core
 
 clean:
 	rm -f $(ext_dir)/libfftw.a $(gcc_dir)/libradia.a $(gcc_dir)/radia*.so; \
