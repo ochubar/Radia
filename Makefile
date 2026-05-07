@@ -4,7 +4,7 @@
 # - `make all` - will compile FFTW, C++ core and Python lib;
 # - `make fftw` - will compile FFTW only;
 # - `make python` - will compile C++ core and Python lib;
-# - `make math` - will compile C++ core (MathLink/Mathematica entry-point build is handled in platform-specific makefiles);
+# - `make math` - will compile C++ core;
 # - `make` - will compile C++ core and Python lib;
 # - `make clean` - will clean temporary files.
 #
