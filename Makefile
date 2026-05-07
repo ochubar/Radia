@@ -3,6 +3,8 @@
 # The following options are available:
 # - `make all` - will compile FFTW, C++ core and Python lib;
 # - `make fftw` - will compile FFTW only;
+# - `make python` - will compile C++ core and Python lib;
+# - `make math` - will compile C++ core (MathLink/Mathematica entry-point build is handled in platform-specific makefiles);
 # - `make` - will compile C++ core and Python lib;
 # - `make clean` - will clean temporary files.
 #
@@ -21,9 +23,9 @@ examples_dir = $(env_dir)/radia_python
 export MODE ?= 0
 timeout=20
 
-nofftw: core pylib
+nofftw: core python
 
-all: clean fftw core pylib
+all: clean fftw core python
 
 fftw:
 	if [ ! -d "$(ext_dir)" ]; then \
@@ -48,12 +50,18 @@ core:
 	#cd $(gcc_dir); make -j8 clean lib
 	cd $(gcc_dir); make clean lib
 
-pylib:
+python:
 	cd $(py_dir); make python
+
+# Backward-compatible alias
+pylib: python
+
+math:
+	cd $(gcc_dir); make clean lib
 
 clean:
 	rm -f $(ext_dir)/libfftw.a $(gcc_dir)/libradia.a $(gcc_dir)/radia*.so; \
 	rm -rf $(ext_dir)/$(fftw_dir)/py/build/;
 	if [ -d $(root_dir)/.git ]; then rm -f $(examples_dir)/radia*.so && (git checkout $(examples_dir)/radia*.so 2>/dev/null || :); fi;
 
-.PHONY: all clean core fftw nofftw pylib
+.PHONY: all clean core fftw nofftw pylib python math
