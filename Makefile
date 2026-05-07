@@ -5,7 +5,7 @@
 # - `make fftw` - will compile FFTW only;
 # - `make python` - will compile C++ core and Python lib;
 # - `make math` - will compile C++ core;
-# - `make` - default target; same as `make nofftw`;
+# - `make` - default target; compiles C++ core and Python lib (without FFTW build step);
 # - `make clean` - will clean temporary files.
 #
 # Updated by Maksim Rakitin (NSLS-II, BNL) on May 2, 2016.
